@@ -6,7 +6,7 @@ import Polling from '../components/essential/Polling'
 import Popups from '../components/essential/Popups'
 import Web3ReactManager from '../components/essential/Web3ReactManager'
 import WarningModal from '../components/muiModal/WarningModal'
-import ComingSoon from './ComingSoon'
+import Bridge from './Bridge'
 import { ModalProvider } from 'context/ModalContext'
 
 const AppWrapper = styled.div`
@@ -82,7 +82,7 @@ export default function App() {
               {/* <TopLevelModals /> */}
               <Web3ReactManager>
                 <Switch>
-                  <Route exact strict path="/test1" component={ComingSoon} />
+                  <Route exact strict path="/" component={Bridge} />
                 </Switch>
               </Web3ReactManager>
               {/* <Marginer /> */}

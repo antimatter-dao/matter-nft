@@ -53,9 +53,7 @@ function ConfirmationPendingContent({ onDismiss, pendingText }: { onDismiss: () 
 
 function TransactionSubmittedContent({
   onDismiss,
-  chainId,
-  hash,
-  currencyToAdd
+  hash
 }: {
   onDismiss: () => void
   hash: string | undefined
@@ -147,7 +145,8 @@ export default function TransactionConfirmationModal({
   pendingText,
   content,
   currencyToAdd,
-  submittedContent
+  submittedContent,
+  onDismiss
 }: ConfirmationModalProps) {
   const { chainId } = useActiveWeb3React()
 
@@ -155,7 +154,7 @@ export default function TransactionConfirmationModal({
 
   // confirmation screen
   return (
-    <Modal>
+    <Modal customOnDismiss={onDismiss}>
       {attemptingTxn ? (
         <ConfirmationPendingContent onDismiss={onDismiss} pendingText={pendingText} />
       ) : hash ? (

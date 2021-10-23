@@ -120,7 +120,7 @@ export const theme = {
 
 export const override: any = {
   MuiCssBaseline: {
-    '@global': { body: { backgroundColor: '#1C1C1F' } }
+    '@global': { body: { backgroundColor: '#1C1C1F', fontFamily: 'Roboto, sans-serif' } }
   },
   MuiButton: {
     root: {
@@ -128,7 +128,8 @@ export const override: any = {
       fontWeight: 500,
       borderRadius: theme.shape.borderRadius,
       transition: '.3s',
-      textTransform: 'none' as const
+      textTransform: 'none' as const,
+      fontFamily: 'Roboto, sans-serif'
     },
     contained: {
       backgroundColor: theme.palette.primary.main,

@@ -7,15 +7,17 @@ import useBreakpoint from 'hooks/useBreakpoint'
 
 interface Props {
   children: React.ReactNode
-  width?: number
+  width?: number | string
   onReturnClick?: () => void
   title?: string
+  maxWidth?: string
 }
 
 const useStyles = makeStyles(theme => ({
   root: {
     position: 'relative',
-    width: (props: { width?: number }) => props.width || 560,
+    width: (props: Partial<Props>) => props.width || 560,
+    maxWidth: (props: Partial<Props>) => props.maxWidth || 560,
     borderRadius: 20,
     background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%), #000000',
     justifyContent: 'center',
@@ -23,7 +25,8 @@ const useStyles = makeStyles(theme => ({
     boxSizing: 'border-box',
     overflow: 'auto',
     [theme.breakpoints.down('sm')]: {
-      width: '100%!important'
+      width: '100%!important',
+      maxWidth: 'unset'
     }
   },
   box: {

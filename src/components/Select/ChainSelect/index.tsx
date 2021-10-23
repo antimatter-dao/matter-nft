@@ -46,7 +46,7 @@ export default function ChainSelect(props: Props) {
   const { label, disabled, chainList, onChange, selectedChain, width, active, placeholder } = props
 
   return (
-    <div>
+    <div style={{ width }}>
       {label && <InputLabel>{label}</InputLabel>}
       <Select
         defaultValue={selectedChain?.symbol}
@@ -54,7 +54,7 @@ export default function ChainSelect(props: Props) {
         disabled={disabled}
         onChange={onChange}
         placeholder={placeholder ?? 'Select Chain'}
-        width={width}
+        width={'100%'}
         primary={active}
       >
         {chainList.map(option => (

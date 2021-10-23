@@ -6,7 +6,7 @@ import InputLabel from './InputLabel'
 interface Props {
   placeholder?: string
   value: string
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void
   label?: string
   disabled?: boolean
   focused?: boolean

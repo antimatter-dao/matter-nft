@@ -46,6 +46,6 @@ const DefaultTemplate: ComponentStory<typeof ChainMultiSelect> = () => {
     setSelectedChains(selectedItems)
   }, [])
 
-  return <ChainMultiSelect chainList={ChainList} selectedChains={selectedChains} onChange={onChainSelect} />
+  return <ChainMultiSelect chainList={ChainList} selectedChains={selectedChains} onChainSelect={onChainSelect} />
 }
 export const Default = DefaultTemplate.bind({})
