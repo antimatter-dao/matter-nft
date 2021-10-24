@@ -5,8 +5,8 @@ import Input from 'components/Input'
 import Image from 'components/Image'
 import PlaceholderImg from 'assets/images/placeholder_image.png'
 import Matamask from 'assets/wallet/metamask.png'
-import ChainSelect, { Chain } from 'components/Select/ChainSelect'
-import SwitchButton from 'components/Button/SwitcherButton'
+import { Chain } from 'components/Select/ChainSelect'
+import ChainSwap from 'components/Select/ChainSwap'
 import DummyLogo from 'assets/images/ethereum-logo.png'
 import Button from 'components/Button/Button'
 import OutlineButton from 'components/Button/OutlineButton'
@@ -59,13 +59,11 @@ export default function BridgeForm({ importType }: { importType?: IMPORT_TYPE })
     setIdStr(e.target.value)
   }, [])
 
-  const handleFrom = useCallback(e => {
-    const chain = DummyChainList.find(chain => chain.symbol === e.target.value) ?? null
+  const handleFrom = useCallback(chain => {
     setFromChain(chain)
   }, [])
 
-  const handleTo = useCallback(e => {
-    const chain = DummyChainList.find(chain => chain.symbol === e.target.value) ?? null
+  const handleTo = useCallback(chain => {
     seToChain(chain)
   }, [])
 
@@ -89,27 +87,15 @@ export default function BridgeForm({ importType }: { importType?: IMPORT_TYPE })
               placeholder="Enter your token ID"
               onChange={handleIdStr}
             />
-            <Box display="flex" justifyContent="space-between" alignItems={'flex-end'} position={'relative'}>
-              <ChainSelect
-                label={'From'}
-                selectedChain={fromChain}
-                chainList={DummyChainList}
-                onChange={handleFrom}
-                width={'49%'}
-                disabled={!(tokenAddress && tokenId)}
-              />
-              <Box position={'absolute'} left={'calc(50% - 16px)'} zIndex={99} padding="0px" height="32px" bottom="8px">
-                <SwitchButton />
-              </Box>
-              <ChainSelect
-                label={'To'}
-                selectedChain={toChain}
-                chainList={DummyChainList}
-                onChange={handleTo}
-                width={'49%'}
-                disabled={!(tokenAddress && tokenId)}
-              />
-            </Box>
+            <ChainSwap
+              fromChain={fromChain}
+              toChain={toChain}
+              chainList={DummyChainList}
+              onSelectFrom={handleFrom}
+              onSelectTo={handleTo}
+              disabledFrom={!(tokenAddress && tokenId)}
+              disabledTo={!(tokenAddress && tokenId)}
+            />
             <Typography variant="caption">
               <Box display="flex" marginTop="-15px">
                 Destination:
@@ -132,6 +118,11 @@ export default function BridgeForm({ importType }: { importType?: IMPORT_TYPE })
             Enter token ID
           </OutlineButton>
         )}
+        {tokenAddress && tokenId && (!fromChain || !toChain) && (
+          <OutlineButton primary disabled>
+            Select Chain
+          </OutlineButton>
+        )}
         {tokenAddress && tokenId && fromChain && toChain && (
           <>
             <Box display="flex" gridGap="16px">
@@ -148,7 +139,7 @@ export default function BridgeForm({ importType }: { importType?: IMPORT_TYPE })
                 onClick={() => {
                   setWithdrawing(true)
                 }}
-                disabled={withdrawing}
+                disabled={withdrawing || !deposited}
               >
                 {withdrawing && <Spinner size="20px" />}
                 <span style={{ marginLeft: 16 }}>Withdrawing</span>
