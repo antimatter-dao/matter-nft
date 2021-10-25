@@ -4,20 +4,14 @@ import LogoText from 'components/LogoText'
 import InputLabel from 'components/Input/InputLabel'
 import SelectedIcon from 'assets/componentsIcon/selected_icon.svg'
 import { useCallback } from 'react'
-
-export interface Chain {
-  logo: string
-  symbol: string
-  id: string
-  address: string
-}
+import { Chain } from 'models/chain'
 
 interface Props {
   label?: string
   disabled?: boolean
   chainList: Chain[]
   selectedChain: Chain | null
-  onChange: (chain: Chain | null) => void
+  onChange?: (chain: Chain | null) => void
   width?: string
   active?: boolean
   placeholder?: string
@@ -57,7 +51,7 @@ export default function ChainSelect({
   const handleChange = useCallback(
     e => {
       const chain = chainList.find(chain => chain.symbol === e.target.value) ?? null
-      onChange(chain)
+      onChange && onChange(chain)
     },
     [chainList, onChange]
   )

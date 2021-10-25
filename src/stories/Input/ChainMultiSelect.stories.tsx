@@ -1,5 +1,5 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react'
-import { Chain } from 'components/Select/ChainSelect'
+import { Chain } from 'models/chain'
 import ChainMultiSelect from 'components/Select/ChainSelect/ChainMultiSelect'
 import DummyLogo from 'assets/images/ethereum-logo.png'
 import { useState } from 'react'
@@ -13,20 +13,16 @@ const ChainList = [
   {
     logo: DummyLogo,
     symbol: 'ETH',
-    id: 'XXX',
-    address: 'XXXXXXXXXXXXXXXXXXXX'
+    id: 1,
+    address: 'XXXXXXXXXXXXXXXXXXXX',
+    name: 'Ethereum Mainnet'
   },
   {
     logo: DummyLogo,
     symbol: 'BSC',
-    id: 'XXX',
-    address: 'XXXXXXXXXXXXXXXXXXXX'
-  },
-  {
-    logo: DummyLogo,
-    symbol: 'OEC',
-    id: 'XXX',
-    address: 'XXXXXXXXXXXXXXXXXXXX'
+    id: 1,
+    address: 'XXXXXXXXXXXXXXXXXXXX',
+    name: 'Binance Smart Chain'
   }
 ]
 

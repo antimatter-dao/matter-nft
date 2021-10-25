@@ -2,7 +2,8 @@ import { ComponentStory, ComponentMeta } from '@storybook/react'
 import { useState } from 'react'
 import ChainSwap from 'components/Select/ChainSwap'
 import DummyLogo from 'assets/images/ethereum-logo.png'
-import ChainSelect, { Chain } from 'components/Select/ChainSelect'
+import ChainSelect from 'components/Select/ChainSelect'
+import { Chain } from 'models/chain'
 import { Box } from '@material-ui/core'
 import TextButton from 'components/Button/TextButton'
 import SwitchButton from 'components/Select/ChainSwap/SwitcherButton'
@@ -16,20 +17,16 @@ const ChainList = [
   {
     logo: DummyLogo,
     symbol: 'ETH',
-    id: 'XXX',
-    address: 'XXXXXXXXXXXXXXXXXXXX'
+    id: 1,
+    address: 'XXXXXXXXXXXXXXXXXXXX',
+    name: 'Ethereum Mainnet'
   },
   {
     logo: DummyLogo,
     symbol: 'BSC',
-    id: 'XXX',
-    address: 'XXXXXXXXXXXXXXXXXXXX'
-  },
-  {
-    logo: DummyLogo,
-    symbol: 'OEC',
-    id: 'XXX',
-    address: 'XXXXXXXXXXXXXXXXXXXX'
+    id: 1,
+    address: 'XXXXXXXXXXXXXXXXXXXX',
+    name: 'Binance Smart Chain'
   }
 ]
 

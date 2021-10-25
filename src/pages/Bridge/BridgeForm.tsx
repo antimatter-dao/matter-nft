@@ -4,68 +4,124 @@ import { Typography, Box } from '@material-ui/core'
 import Input from 'components/Input'
 import Image from 'components/Image'
 import PlaceholderImg from 'assets/images/placeholder_image.png'
-import Matamask from 'assets/walletIcon/metamask.png'
-import { Chain } from 'components/Select/ChainSelect'
+import { Chain } from 'models/chain'
 import ChainSwap from 'components/Select/ChainSwap'
 import DummyLogo from 'assets/images/ethereum-logo.png'
 import Button from 'components/Button/Button'
 import OutlineButton from 'components/Button/OutlineButton'
 import Spinner from 'components/Spinner'
-import { IMPORT_TYPE } from '.'
+import TextButton from 'components/Button/TextButton'
 import Stepper from 'components/Stepper'
 import useBreakpoint from 'hooks/useBreakpoint'
+import DestinationAddress from 'components/Modal/TransactionModals/DestinationAddress'
+import DepositConfirmationModal from 'components/Modal/TransactionModals/DepositConfirmationModal'
+import useModal from 'hooks/useModal'
+import { useActiveWeb3React } from 'hooks'
+import { shortenAddress } from 'utils'
+import TransactionSubmittedModal from 'components/Modal/TransactionModals/TransactiontionSubmittedModal'
+import WithdrawConfirmationModal from 'components/Modal/TransactionModals/WithdrawConfirmationModal'
+import SwitchChainModal from 'components/Modal/SwitchChainModal'
+import { NFT } from 'models/nft'
 
-const DummyChainList = [
+export const DummyChainList = [
   {
     logo: DummyLogo,
     symbol: 'ETH',
-    id: 'XXX',
-    address: 'XXXXXXXXXXXXXXXXXXXX'
+    id: 1,
+    address: 'XXXXXXXXXXXXXXXXXXXX',
+    name: 'Ethereum Mainnet'
   },
   {
     logo: DummyLogo,
     symbol: 'BSC',
-    id: 'XXX',
-    address: 'XXXXXXXXXXXXXXXXXXXX'
-  },
-  {
-    logo: DummyLogo,
-    symbol: 'OEC',
-    id: 'XXX',
-    address: 'XXXXXXXXXXXXXXXXXXXX'
+    id: 1,
+    address: 'XXXXXXXXXXXXXXXXXXXX',
+    name: 'Binance Smart Chain'
   }
 ]
 
-export default function BridgeForm({ importType }: { importType?: IMPORT_TYPE }) {
-  const [fromChain, setFromChain] = useState<Chain | null>(null)
+export default function BridgeForm({ token }: { token: NFT | undefined }) {
+  const [fromChain] = useState<Chain | null>({
+    logo: DummyLogo,
+    symbol: 'ETH',
+    id: 1,
+    address: 'XXXXXXXXXXXXXXXXXXXX',
+    name: 'Ethereum Mainnet'
+  })
   const [toChain, seToChain] = useState<Chain | null>(null)
-  const [addressStr, setAddressStr] = useState('')
-  const [idStr, setIdStr] = useState('')
+  const [chain, setChain] = useState(1)
+
   const [deposited, setDeposited] = useState(false)
+  const [depositing, setDepositing] = useState(false)
   const [withdrawing, setWithdrawing] = useState(false)
-  const tokenAddressInfo = '0x33A9b7ED8C71C6910Fb4A9bc41de2391b74c2976'
-  const tokenIdInfo = '#1234'
+  const [withdrawed, setWithdrawed] = useState(false)
 
-  const isManual = importType !== IMPORT_TYPE.FROM_INVENTORY
-  const tokenAddress = isManual ? addressStr : tokenAddressInfo
-  const tokenId = isManual ? idStr : tokenIdInfo
+  const tokenAddress = token?.contractAddress ?? ''
+  const tokenId = token?.tokenId ?? ''
+  const imgUrl = token?.imgUrl ? token?.imgUrl : PlaceholderImg
 
+  const { account } = useActiveWeb3React()
   const isUpToSM = useBreakpoint()
-  const handleAddressStr = useCallback(e => {
-    setAddressStr(e.target.value)
-  }, [])
-
-  const handleIdStr = useCallback(e => {
-    setIdStr(e.target.value)
-  }, [])
-
-  const handleFrom = useCallback(chain => {
-    setFromChain(chain)
-  }, [])
+  const { showModal, hideModal } = useModal()
 
   const handleTo = useCallback(chain => {
     seToChain(chain)
   }, [])
+
+  const WithdrawModal = (
+    <WithdrawConfirmationModal
+      destinationAddress={account}
+      fromChain={fromChain}
+      toChain={toChain}
+      onConfirm={() => {
+        hideModal()
+        setWithdrawing(true)
+        setTimeout(() => {
+          setWithdrawing(false)
+          setWithdrawed(true)
+          showModal(<TransactionSubmittedModal />)
+        }, 1000)
+      }}
+      step1={
+        <>
+          <b>
+            Please&nbsp;
+            <TextButton
+              primary
+              onClick={() => {
+                showModal(
+                  <SwitchChainModal
+                    fromChain={fromChain}
+                    toChain={toChain}
+                    onConfirm={() => {
+                      setChain(2)
+                      hideModal()
+                      showModal(WithdrawModal)
+                    }}
+                  />
+                )
+              }}
+            >
+              switch
+            </TextButton>
+            &nbsp;your wallet network
+          </b>
+          to BSC to complete token swap.
+        </>
+      }
+      step2={
+        <>
+          Please make your connected wallet address is the address where you wish to receive your bridged NFT and the
+          correct destination chain.
+        </>
+      }
+      isStep3Active={chain === 2}
+    >
+      <Box display="grid" width="100%" justifyContent="center">
+        <Image src={imgUrl} style={{ width: 100 }} />
+      </Box>
+    </WithdrawConfirmationModal>
+  )
 
   return (
     <AppBody maxWidth="800px" width="100%">
@@ -76,36 +132,25 @@ export default function BridgeForm({ importType }: { importType?: IMPORT_TYPE })
             <Input
               value={tokenAddress}
               label="Token Contact Address"
-              disabled={!isManual}
+              disabled={true}
               placeholder="Enter your token contract address"
-              onChange={handleAddressStr}
             />
-            <Input
-              value={tokenId}
-              label="Token ID"
-              disabled={!isManual}
-              placeholder="Enter your token ID"
-              onChange={handleIdStr}
-            />
+            <Input value={tokenId} label="Token ID" disabled={true} placeholder="Enter your token ID" />
             <ChainSwap
               fromChain={fromChain}
               toChain={toChain}
               chainList={DummyChainList}
-              onSelectFrom={handleFrom}
               onSelectTo={handleTo}
-              disabledFrom={!(tokenAddress && tokenId)}
+              disabledFrom={true}
               disabledTo={!(tokenAddress && tokenId)}
             />
-            <Typography variant="caption">
-              <Box display="flex" marginTop="-15px">
-                Destination:
-                <Image src={Matamask} style={{ height: 16, width: 16, objectFit: 'contain', margin: '0 15px' }} />
-                0xKos369cd6vwd94wq1gt4hr87ujv
-              </Box>
-            </Typography>
+            {account && <DestinationAddress address={account} margin="-10px 0 10px" />}
           </Box>
-          <Box style={{ width: 252, margin: isUpToSM ? '0 auto' : 'unset' }}>
-            <Image src={PlaceholderImg} />
+          <Box style={{ margin: isUpToSM ? '0 auto' : 'unset' }}>
+            <Image
+              src={imgUrl}
+              style={{ width: 252, borderRadius: 12, backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+            />
           </Box>
         </Box>
         {!tokenAddress && (
@@ -128,21 +173,46 @@ export default function BridgeForm({ importType }: { importType?: IMPORT_TYPE })
             <Box display="flex" gridGap="16px">
               <Button
                 onClick={() => {
-                  setDeposited(true)
+                  showModal(
+                    <DepositConfirmationModal
+                      destinationAddress={account}
+                      fromChain={fromChain}
+                      toChain={toChain}
+                      onConfirm={() => {
+                        hideModal()
+                        setDepositing(true)
+                        setTimeout(() => {
+                          setDepositing(false)
+                          setDeposited(true)
+                          showModal(<TransactionSubmittedModal />)
+                        }, 1000)
+                      }}
+                    >
+                      <Box display="grid" gridGap="28px" justifyItems="center">
+                        <Typography variant="h6">Confirm Deposit</Typography>
+                        <Image src={imgUrl} style={{ width: 180 }} />
+                        <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body1">{tokenId}</Typography>
+                          <Typography variant="body1">{account && shortenAddress(account)}</Typography>
+                        </Box>
+                      </Box>
+                    </DepositConfirmationModal>
+                  )
                 }}
-                disabled={deposited}
+                disabled={depositing || deposited}
               >
+                {depositing && <Spinner size="20px" marginRight={16} color="#ffffff" />}
                 Deposite in ETH Chain
               </Button>
               <OutlineButton
                 primary
                 onClick={() => {
-                  setWithdrawing(true)
+                  showModal(WithdrawModal)
                 }}
-                disabled={withdrawing || !deposited}
+                disabled={withdrawing || !deposited || withdrawed}
               >
-                {withdrawing && <Spinner size="20px" />}
-                <span style={{ marginLeft: 16 }}>Withdrawing</span>
+                {withdrawing && <Spinner size="20px" marginRight={16} />}
+                Withdrawing
               </OutlineButton>
             </Box>
             <Box width="70%" style={{ margin: '0 auto' }}>

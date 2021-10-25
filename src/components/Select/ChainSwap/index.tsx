@@ -1,6 +1,7 @@
 import { Box } from '@material-ui/core'
 import TextButton from 'components/Button/TextButton'
-import ChainSelect, { Chain } from '../ChainSelect'
+import ChainSelect from '../ChainSelect'
+import { Chain } from 'models/chain'
 import SwitchButton from './SwitcherButton'
 
 export default function ChainSwap({
@@ -17,14 +18,15 @@ export default function ChainSwap({
   fromChain: Chain | null
   toChain: Chain | null
   chainList: Chain[]
-  onSelectFrom: (chain: Chain | null) => void
-  onSelectTo: (chain: Chain | null) => void
+  onSelectFrom?: (chain: Chain | null) => void
+  onSelectTo?: (chain: Chain | null) => void
   disabledFrom?: boolean
   disabledTo?: boolean
   activeFrom?: boolean
   activeTo?: boolean
 }) {
   const handleSwitch = () => {
+    if (!onSelectTo || !onSelectFrom) return
     const from = fromChain
     const to = toChain
     onSelectFrom(to)
@@ -43,7 +45,7 @@ export default function ChainSwap({
         active={activeFrom}
       />
       <Box position={'absolute'} left={'calc(50% - 16px)'} zIndex={99} padding="0px" height="32px" bottom="8px">
-        <TextButton onClick={handleSwitch} disabled={disabledFrom || disabledTo}>
+        <TextButton onClick={handleSwitch} disabled={disabledFrom || disabledTo || !onSelectTo || !onSelectFrom}>
           <SwitchButton />
         </TextButton>
       </Box>
