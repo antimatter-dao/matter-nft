@@ -55,6 +55,7 @@ export default function Bridge() {
         onManual={() => {
           setSelectedToken(undefined)
           setPageState(PAGE_STATE_TYPE.DEFAULT)
+          setShowInventory(false)
           setShowManual(true)
         }}
       />

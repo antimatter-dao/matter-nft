@@ -66,7 +66,7 @@ export default function SelectFromInventory({
   const [searchStr, setSearchStr] = useState('')
   return (
     <Modal width="100%" maxWidth="800px" closeIcon customIsOpen={isOpen} customOnDismiss={onDismiss}>
-      <div style={{ display: 'none' }}>
+      {DummyNFTList.length > 0 ? (
         <Box padding="20px 40px 55px" display="grid" gridGap="24px">
           <Typography variant="h6"> Select NFT</Typography>
           <Box display="flex" gridGap="16px">
@@ -93,17 +93,33 @@ export default function SelectFromInventory({
             ))}
           </Box>
         </Box>
-      </div>
-      <Box padding="20px 40px 55px" display="grid" gridGap="24px" height="60vh" maxHeight="508px" justifyItems="center">
-        <ErrorIcon />
-        <Typography variant="h6">Oops... No data was founded</Typography>
-        <Typography variant="body2" component="div">
-          You can try{' '}
-          <TextButton primary onClick={onManual}>
-            Importing Manually
-          </TextButton>
-        </Typography>
-      </Box>
+      ) : (
+        <Box
+          padding="20px 40px 55px"
+          display="grid"
+          height="60vh"
+          maxHeight="508px"
+          justifyItems="center"
+          alignContent="space-between"
+        >
+          <Typography variant="h5" style={{ width: '100%' }}>
+            Select NFT
+          </Typography>
+          <Box display="grid" gridGap="24px" justifyItems="center">
+            <ErrorIcon style={{ fill: '#ffffff' }} />
+            <Typography variant="h6" style={{ marginTop: -10 }}>
+              Oops... No data was founded
+            </Typography>
+            <Typography variant="body2" component="div">
+              You can try&nbsp;
+              <TextButton primary onClick={onManual} fontSize={14}>
+                Importing Manually
+              </TextButton>
+            </Typography>
+          </Box>
+          <div style={{ height: 50 }} />
+        </Box>
+      )}
     </Modal>
   )
 }
