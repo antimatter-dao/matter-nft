@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
-import { useTheme, Box, makeStyles } from '@material-ui/core'
-import { CountUp } from 'use-count-up'
+import { useTheme, Box, makeStyles, styled } from '@material-ui/core'
+// import { CountUp } from 'use-count-up'
 import { Activity } from 'react-feather'
 import Copy from 'components/Copy'
 import { NetworkContextName } from '../../constants'
@@ -13,13 +13,15 @@ import { TransactionDetails } from '../../state/transactions/reducer'
 import { shortenAddress } from '../../utils'
 import WalletModal from 'components/Modal/WalletModal/index'
 import Spinner from 'components/Spinner'
-import { TokenAmount } from 'constants/token'
-import { useAggregateUniBalance } from 'state/wallet/hooks'
-import usePrevious from '../../hooks/usePrevious'
-import Divider from 'components/Divider'
+// import { TokenAmount } from 'constants/token'
+// import { useAggregateUniBalance } from 'state/wallet/hooks'
+// import usePrevious from '../../hooks/usePrevious'
+// import Divider from 'components/Divider'
 import useBreakpoint from 'hooks/useBreakpoint'
 import TextButton from 'components/Button/TextButton'
 import Button from 'components/Button/Button'
+import { ReactComponent as UcenterIcon } from 'assets/svg/ucenter.svg'
+import { useHistory } from 'react-router'
 
 const useStyles = makeStyles(theme => ({
   actionButton: {
@@ -37,8 +39,71 @@ const useStyles = makeStyles(theme => ({
     border: '0.6px solid #ffffff',
     boxSizing: 'border-box',
     borderRadius: '50%'
+  },
+  ucenterButton: {
+    width: 36,
+    height: 36,
+    borderRadius: '50%'
   }
 }))
+
+const UserButtonWrap = styled('div')({
+  marginLeft: '5px',
+  position: 'relative',
+  width: 36,
+  height: 36,
+  '& > div': {
+    opacity: 0,
+    visibility: 'hidden'
+  },
+  '&:hover': {
+    '& > div': {
+      opacity: 1,
+      visibility: 'visible'
+    }
+  }
+})
+
+const UserMenuWrapper = styled('div')({
+  position: 'absolute',
+  top: '50px',
+  right: 0,
+  zIndex: 2000,
+  minWidth: '15rem',
+  boxSizing: 'border-box',
+  backgroundColor: '#ffffff',
+  overflow: 'hidden',
+  borderRadius: '16px',
+  transitionDuration: '0.3s',
+  transitionProperty: 'visibility, opacity',
+  display: 'flex',
+  border: '1px solid #ededed',
+  flexDirection: 'column',
+  '& > div:first-child': {
+    padding: '16px 24px',
+    display: 'flex',
+    alignItems: 'center',
+    borderBottom: '1px solid #ededed',
+    width: '100%'
+  },
+  '& > button:last-child': {
+    padding: '16px 24px',
+    borderTop: '1px solid #ededed'
+  }
+})
+
+const UserMenuItem = styled('button')({
+  padding: '12px 24px',
+  width: '100%',
+  border: 'none',
+  backgroundColor: 'transparent',
+  textAlign: 'left',
+  fontSize: '16px',
+  cursor: 'pointer',
+  '&:hover': {
+    backgroundColor: '#ededed'
+  }
+})
 
 // we want the latest one to come first, so return negative if a is after b
 function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
@@ -52,13 +117,13 @@ const SOCK = (
 )
 
 function Web3StatusInner() {
-  const { account, connector, error } = useWeb3React()
+  const { account, error } = useWeb3React()
   const isDownMD = useBreakpoint('md')
   const classes = useStyles()
-  const aggregateBalance: TokenAmount | undefined = useAggregateUniBalance()
+  // const aggregateBalance: TokenAmount | undefined = useAggregateUniBalance()
 
-  const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
-  const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
+  // const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
+  // const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
 
   const { ENSName } = useENSName(account ?? undefined)
 
@@ -71,6 +136,12 @@ function Web3StatusInner() {
 
   const pending = sortedRecentTransactions.filter(tx => !tx.receipt).map(tx => tx.hash)
 
+  const history = useHistory()
+  const toShowUserPanel = useCallback(() => {
+    history.push('/profile')
+    return
+  }, [history])
+
   const hasPendingTransactions = !!pending.length
   const hasSocks = useHasSocks()
   const toggleWalletModal = useWalletModalToggle()
@@ -78,14 +149,14 @@ function Web3StatusInner() {
   if (account) {
     return (
       <Box
-        height={'32px'}
+        height={'36px'}
         display={'flex'}
-        border={'1px solid #FFFFFF'}
-        borderRadius={'4px'}
+        paddingLeft={'10px'}
+        borderRadius={'32px'}
+        style={{ fontSize: 14, lineHeight: 16, background: 'rgba(255,255,255,0.1)' }}
         alignItems={'center'}
-        style={{ fontSize: 14 }}
       >
-        {!!account && aggregateBalance && (
+        {/* {!!account && aggregateBalance && (
           <>
             <Box padding={isDownMD ? '0 8px' : '0 10px 0 12px'} gridGap={10}>
               <CountUp
@@ -101,8 +172,8 @@ function Web3StatusInner() {
             </Box>
             <Divider orientation={'vertical'} />
           </>
-        )}
-        <Box display="flex" alignItems="center" padding={isDownMD ? '0 8px' : '0 12px 0 10px'} gridGap={10}>
+        )} */}
+        <Box display="flex" alignItems="center" padding={isDownMD ? '0 0 0 8px' : '0 0 0 10px'} gridGap={10}>
           {hasPendingTransactions ? (
             <>
               <Spinner color={theme.textColor.text1} size="16px" />
@@ -111,11 +182,18 @@ function Web3StatusInner() {
           ) : (
             <>
               {hasSocks ? SOCK : null}
-              {!hasPendingTransactions && connector && <span className={classes.dot} />}
-              <TextButton onClick={toggleWalletModal} fontSize={12} opacity={0.6}>
+              {/* {!hasPendingTransactions && connector && <span className={classes.dot} />} */}
+              <TextButton onClick={toggleWalletModal} fontSize={14} opacity={0.5}>
                 {ENSName || shortenAddress(account)}
               </TextButton>
               {account && <Copy toCopy={account}></Copy>}
+              <UserButtonWrap>
+                {/* <UserButton id="userButton" onClick={toShowUserPanel} isOpen={!!match}>
+                  <AntimatterIcon />
+                </UserButton> */}
+                <UcenterIcon onClick={toShowUserPanel} style={{ width: 36, position: 'absolute', cursor: 'pointer' }} />
+                <UserMenu account={account} />
+              </UserButtonWrap>
             </>
           )}
         </Box>
@@ -128,7 +206,7 @@ function Web3StatusInner() {
         classname={classes.actionButton}
         fontSize={'14px'}
         width={'140px'}
-        height={'32px'}
+        height={'36px'}
         onClick={toggleWalletModal}
       >
         <Activity size={16} style={{ marginRight: 10 }} />
@@ -141,7 +219,7 @@ function Web3StatusInner() {
         classname={classes.actionButton}
         fontSize={'14px'}
         width={'140px'}
-        height={'32px'}
+        height={'36px'}
         onClick={toggleWalletModal}
       >
         Connect Wallet
@@ -175,5 +253,40 @@ export default function Web3Status() {
       <Web3StatusInner />
       <WalletModal ENSName={ENSName ?? undefined} pendingTransactions={pending} confirmedTransactions={confirmed} />
     </>
+  )
+}
+
+export enum UserInfoTabs {
+  INVENTORY = 'Inventory',
+  ACTIVITY = 'Activity'
+}
+export const UserInfoTabRoute = {
+  [UserInfoTabs.INVENTORY]: 'Inventory',
+  [UserInfoTabs.ACTIVITY]: 'Activity'
+}
+
+function UserMenu({ account }: { account?: string | null }) {
+  const toggleWalletModal = useWalletModalToggle()
+  const history = useHistory()
+
+  return (
+    <UserMenuWrapper>
+      <div>
+        <UcenterIcon style={{ width: 24 }} />
+        <TextButton fontSize={14} opacity={0.5} style={{ margin: '0 15px', color: '#000' }}>
+          {account && shortenAddress(account)}
+        </TextButton>
+        {account && <Copy toCopy={account} />}
+      </div>
+      <Box display="flex" flexDirection="column">
+        <UserMenuItem onClick={() => history.push('/profile/' + UserInfoTabs.INVENTORY)}>
+          {UserInfoTabRoute[UserInfoTabs.INVENTORY]}
+        </UserMenuItem>
+        <UserMenuItem onClick={() => history.push('/profile/' + UserInfoTabs.ACTIVITY)}>
+          {UserInfoTabRoute[UserInfoTabs.ACTIVITY]}
+        </UserMenuItem>
+        <UserMenuItem onClick={toggleWalletModal}>Wallet</UserMenuItem>
+      </Box>
+    </UserMenuWrapper>
   )
 }
