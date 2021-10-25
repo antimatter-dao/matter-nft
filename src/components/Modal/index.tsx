@@ -92,7 +92,7 @@ export default function Modal(props: Props) {
   const classes = useStyles({ ...props, hasBorder })
   const { isOpen, hideModal } = useModal()
   const node = useRef<any>()
-  const hide = customIsOpen !== undefined ? customOnDismiss : hideModal
+  const hide = customOnDismiss ? customOnDismiss : hideModal
 
   return (
     <>

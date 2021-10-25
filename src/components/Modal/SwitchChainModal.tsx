@@ -6,7 +6,7 @@ import Image from 'components/Image'
 import { Chain } from 'models/chain'
 import Modal from '.'
 
-export default function SwitchChain({
+export default function SwitchChainModal({
   fromChain,
   toChain,
   onConfirm
