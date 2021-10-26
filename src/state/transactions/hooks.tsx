@@ -10,7 +10,12 @@ import { TransactionDetails } from './reducer'
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
   response: TransactionResponse,
-  customData?: { summary?: string; approval?: { tokenAddress: string; spender: string }; claim?: { recipient: string } }
+  customData?: {
+    summary?: string
+    approval?: { tokenAddress: string; spender: string }
+    claim?: { recipient: string }
+    ERC721Approval?: { contractAddress: string; spender: string; tokenId: string }
+  }
 ) => void {
   const { chainId, account } = useActiveWeb3React()
   const dispatch = useDispatch<AppDispatch>()
@@ -21,8 +26,14 @@ export function useTransactionAdder(): (
       {
         summary,
         approval,
-        claim
-      }: { summary?: string; claim?: { recipient: string }; approval?: { tokenAddress: string; spender: string } } = {}
+        claim,
+        ERC721Approval
+      }: {
+        summary?: string
+        claim?: { recipient: string }
+        approval?: { tokenAddress: string; spender: string }
+        ERC721Approval?: { contractAddress: string; spender: string; tokenId: string }
+      } = {}
     ) => {
       if (!account) return
       if (!chainId) return
@@ -31,7 +42,7 @@ export function useTransactionAdder(): (
       if (!hash) {
         throw Error('No transaction hash found.')
       }
-      dispatch(addTransaction({ hash, from: account, chainId, approval, summary, claim }))
+      dispatch(addTransaction({ hash, from: account, chainId, approval, summary, claim, ERC721Approval }))
     },
     [dispatch, chainId, account]
   )
@@ -81,6 +92,36 @@ export function useHasPendingApproval(tokenAddress: string | undefined, spender:
         }
       }),
     [allTransactions, spender, tokenAddress]
+  )
+}
+
+export function useERC721HasPendingApproval(
+  contractAddress: string | undefined,
+  spender: string | undefined,
+  tokenId: string
+): boolean {
+  const allTransactions = useAllTransactions()
+  return useMemo(
+    () =>
+      typeof contractAddress === 'string' &&
+      typeof spender === 'string' &&
+      Object.keys(allTransactions).some(hash => {
+        const tx = allTransactions[hash]
+        if (!tx) return false
+        if (tx.receipt) {
+          return false
+        } else {
+          const approval = tx.ERC721Approval
+          if (!approval) return false
+          return (
+            approval.spender === spender &&
+            approval.contractAddress === contractAddress &&
+            tokenId === approval.tokenId &&
+            isTransactionRecent(tx)
+          )
+        }
+      }),
+    [contractAddress, spender, allTransactions, tokenId]
   )
 }
 
