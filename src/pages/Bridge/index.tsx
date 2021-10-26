@@ -47,6 +47,8 @@ export default function Bridge() {
         selectedToken={selectedToken}
         onSelect={(nft: NFT) => {
           setSelectedToken(nft)
+          setPageState(PAGE_STATE_TYPE.BRIDGE)
+          setShowInventory(false)
         }}
         onDismiss={() => {
           setShowInventory(false)

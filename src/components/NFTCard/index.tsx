@@ -1,5 +1,6 @@
 import { Box, Typography, makeStyles } from '@material-ui/core'
 import { Text } from 'rebass'
+import clsx from 'clsx'
 import { OutlinedCard } from 'components/Card'
 import Image from 'components/Image'
 import { NFT } from 'models/nft'
@@ -7,9 +8,8 @@ import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 import { shortenAddress } from 'utils'
 import TextButton from 'components/Button/TextButton'
 import Copy from 'components/Copy'
-import { ReactComponent as Check } from 'assets/componentsIcon/statusIcon/success_icon.svg'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   box: {
     position: 'relative',
     width: '100%',
@@ -32,6 +32,24 @@ const useStyles = makeStyles(() => ({
     top: 16,
     left: 16,
     zIndex: 2
+  },
+  borderHover: {
+    '&:hover': {
+      position: 'relative',
+      '&:after': {
+        position: 'absolute',
+        top: -1,
+        left: -1,
+        content: '""',
+        width: 'calc(100% + 2px)',
+        height: 'calc(100% + 2px)',
+        border: '2px solid ' + theme.palette.primary.main,
+        borderRadius: theme.shape.borderRadius
+      }
+    }
+  },
+  bgHover: {
+    overflow: 'hidden'
   }
 }))
 
@@ -39,20 +57,27 @@ export default function NFTCard({
   nft,
   onClick,
   isSmall,
-  selected
+  selected,
+  isBorderHover,
+  isBgHover
 }: {
   nft: NFT
-  onClick: () => void
+  onClick?: () => void
   isSmall?: boolean
   selected?: boolean
+  isBorderHover?: boolean
+  isBgHover?: boolean
 }) {
   const classes = useStyles()
 
   return (
-    <TextButton onClick={onClick} style={{ width: '100%' }}>
+    <TextButton
+      onClick={onClick}
+      style={{ width: '100%' }}
+      classname={clsx(isBorderHover && classes.borderHover, isBgHover && classes.bgHover)}
+    >
       <OutlinedCard style={{ overflow: 'hidden', width: '100%', position: 'relative' }}>
         <Box display="grid">
-          {selected && <Check className={classes.selected} />}
           <div className={classes.box} style={{ opacity: selected ? 0.5 : 1 }}>
             <Image src={nft.imgUrl || NFTPlaceholder} className={classes.content} />
           </div>

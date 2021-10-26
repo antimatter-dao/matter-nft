@@ -11,6 +11,8 @@ import { ReactComponent as Search } from 'assets/svg/search.svg'
 import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 import { ReactComponent as ErrorIcon } from 'assets/componentsIcon/statusIcon/error_icon.svg'
 import TextButton from 'components/Button/TextButton'
+import useModal from 'hooks/useModal'
+import Button from 'components/Button/Button'
 
 const DummyNFTList = [
   {
@@ -64,6 +66,8 @@ export default function SelectFromInventory({
   onManual: () => void
 }) {
   const [searchStr, setSearchStr] = useState('')
+  const { showModal, hideModal } = useModal()
+
   return (
     <Modal width="100%" maxWidth="800px" closeIcon customIsOpen={isOpen} customOnDismiss={onDismiss}>
       {DummyNFTList.length > 0 ? (
@@ -85,8 +89,17 @@ export default function SelectFromInventory({
                 selected={selectedToken?.tokenId === nft.tokenId}
                 nft={nft}
                 key={nft.tokenId}
+                isBorderHover
                 onClick={() => {
-                  onSelect(nft)
+                  showModal(
+                    <ConfirmSelectModal
+                      nft={nft}
+                      onConfirm={() => {
+                        onSelect(nft)
+                        hideModal()
+                      }}
+                    />
+                  )
                 }}
                 isSmall
               />
@@ -120,6 +133,20 @@ export default function SelectFromInventory({
           <div style={{ height: 50 }} />
         </Box>
       )}
+    </Modal>
+  )
+}
+
+function ConfirmSelectModal({ onConfirm, nft }: { onConfirm: () => void; nft: NFT }) {
+  return (
+    <Modal closeIcon>
+      <Box padding="40px" display="grid" gridGap="24px" width="100%" justifyItems="center">
+        <Typography variant="h6">Select NFT</Typography>
+        <Box maxWidth="160px">
+          <NFTCard nft={nft} key={nft.tokenId} isSmall />
+        </Box>
+        <Button onClick={onConfirm}>Confirm</Button>
+      </Box>
     </Modal>
   )
 }

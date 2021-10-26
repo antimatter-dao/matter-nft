@@ -1,4 +1,9 @@
-import { createTheme, Theme, styled, ThemeProvider as MuiThemeProvider } from '@material-ui/core'
+import {
+  unstable_createMuiStrictModeTheme as createTheme,
+  Theme,
+  styled,
+  ThemeProvider as MuiThemeProvider
+} from '@material-ui/core'
 
 interface Gradient {
   gradient1: string

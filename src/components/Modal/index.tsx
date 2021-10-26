@@ -42,10 +42,12 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: (props: Props) => props.padding || 0,
       boxSizing: 'border-box',
       borderRadius: 20,
+      marginBottom: 100,
       overflowX: 'hidden',
       position: 'absolute',
       [theme.breakpoints.down('sm')]: {
-        width: 'calc(100% - 32px)!important'
+        width: 'calc(100% - 32px)!important',
+        marginBottom: '32px'
       }
     },
     mobilePaper: {
@@ -63,8 +65,9 @@ const useStyles = makeStyles((theme: Theme) =>
     backdrop: {
       backgroundColor: 'rgba(0,0,0,.8)',
       [theme.breakpoints.down('sm')]: {
-        height: `calc(100% - ${theme.height.mobileHeader})`,
-        marginTop: theme.height.mobileHeader
+        height: `calc(100% - ${theme.height.mobileHeader} - ${theme.height.header})`,
+        marginTop: theme.height.mobileHeader,
+        marginBottom: theme.height.header
       }
     },
     mobileBackdrop: {

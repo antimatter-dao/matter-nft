@@ -69,7 +69,7 @@ export default function Input(props: InputProps & Omit<InputHTMLAttributes<HTMLI
         value={value}
         disabled={disabled}
         type={type}
-        endAdornment={endAdornment && <span style={{ paddingRight: 20 }}>{endAdornment}</span>}
+        // endAdornment={endAdornment && <span style={{ paddingRight: 20 }}>{endAdornment}</span>}
         {...rest}
       />
     </div>
