@@ -4,10 +4,10 @@ import Input from 'components/Input'
 import InputLabel from 'components/Input/InputLabel'
 import Modal from 'components/Modal'
 import ChainSelect from 'components/Select/ChainSelect'
-import { Chain } from 'models/chain'
+import { ChainList, ChainListMap } from 'constants/chain'
+import { useActiveWeb3React } from 'hooks'
 import { NFT } from 'models/nft'
 import { useState } from 'react'
-import { DummyChainList } from './BridgeForm'
 
 export default function ImportManual({
   onImport,
@@ -18,9 +18,9 @@ export default function ImportManual({
   isOpen: boolean
   onDismiss: () => void
 }) {
+  const { chainId } = useActiveWeb3React()
   const [contractAddress, setContractAddress] = useState('')
   const [tokenId, setTokenId] = useState('')
-  const [chain, setChain] = useState<Chain | null>(null)
 
   return (
     <Modal maxWidth="520px" width="100%" customIsOpen={isOpen} customOnDismiss={onDismiss} closeIcon>
@@ -28,7 +28,7 @@ export default function ImportManual({
         <Typography variant="h5">Import Manually</Typography>
         <div>
           <InputLabel>Select Chain</InputLabel>
-          <ChainSelect chainList={DummyChainList} selectedChain={chain} onChange={chain => setChain(chain)} />
+          <ChainSelect selectedChain={chainId ? ChainListMap[chainId] : null} disabled chainList={ChainList} />
         </div>
         <Input
           label="Token Contact Address"
@@ -37,16 +37,16 @@ export default function ImportManual({
         />
         <Input label="Token ID" value={tokenId} onChange={e => setTokenId(e.target.value)} />
         <Button
-          disabled={!chain || !contractAddress || !tokenId}
-          onClick={() =>
+          disabled={!chainId || !contractAddress || !tokenId}
+          onClick={() => {
             onImport({
-              chainId: chain?.id ?? 1,
+              chainId: chainId ?? 1,
               contractAddress,
               tokenId,
               name: '',
               imgUrl: ''
             })
-          }
+          }}
         >
           Import
         </Button>

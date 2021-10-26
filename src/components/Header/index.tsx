@@ -6,8 +6,7 @@ import Image from 'components/Image'
 import ChainSwap from '../../assets/svg/chain_swap.svg'
 import MobileHeader from './MobileHeader'
 import { Check, ChevronDown } from 'react-feather'
-import { ChainId } from 'constants/chain'
-import { ReactComponent as ETH } from '../../assets/svg/eth_logo.svg'
+import { ChainId, ChainListMap } from 'constants/chain'
 import { useActiveWeb3React } from 'hooks'
 
 const useStyles = makeStyles(theme => ({
@@ -56,8 +55,6 @@ const NetworkCard = styled('div')({
   marginRight: 20,
   position: 'relative',
   color: 'rgba(255,255,255,0.5)',
-  // backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  // borderRadius: 32,
   height: 36,
   padding: '5px 15px',
   cursor: 'pointer',
@@ -120,26 +117,6 @@ const Dropdown = styled('div')({
     }
   }
 })
-
-const NetworkInfo: {
-  [key: number]: { title: string; color: string; icon: JSX.Element; link?: string; selectedIcon?: JSX.Element }
-} = {
-  // [ChainId.MAINNET]: {
-  //   color: '#FFFFFF',
-  //   icon: <ETH />,
-  //   title: 'ETH'
-  // },
-  [ChainId.ROPSTEN]: {
-    color: '#FFFFFF',
-    icon: <ETH />,
-    title: 'Ropsten'
-  },
-  [ChainId.RINKEBY]: {
-    color: '#FFFFFF',
-    icon: <ETH />,
-    title: 'Rinkeby'
-  }
-}
 
 export const SUPPORTED_NETWORKS: {
   [chainId in ChainId]?: {
@@ -204,33 +181,23 @@ export default function Header() {
           </Box>
         </HideOnMobile>
         <Box display="flex" alignItems="center">
-          {account && chainId && NetworkInfo[chainId] && (
+          {account && chainId && ChainListMap[chainId] && (
             <NetworkCard>
               <span>
-                {NetworkInfo[chainId].selectedIcon ? NetworkInfo[chainId].selectedIcon : NetworkInfo[chainId].icon}
-                {NetworkInfo[chainId].title}
+                {ChainListMap[chainId].icon}
+                {ChainListMap[chainId].symbol}
               </span>
               <ChevronDown size="18" />
               <div className="dropdown_wrapper">
                 <Dropdown>
-                  {Object.keys(NetworkInfo).map(key => {
-                    const info = NetworkInfo[parseInt(key) as keyof typeof NetworkInfo]
+                  {Object.keys(ChainListMap).map(key => {
+                    const info = ChainListMap[parseInt(key) as keyof typeof ChainListMap]
                     if (!info) {
                       return null
                     }
-                    return info.link ? (
-                      <div>
-                        {parseInt(key) === chainId && (
-                          <span style={{ position: 'absolute', left: '15px' }}>
-                            <Check size={18} />
-                          </span>
-                        )}
-                        {info.icon ?? info.icon}
-                        {info.title}
-                      </div>
-                    ) : (
+                    return (
                       <div
-                        key={info.title}
+                        key={info.symbol}
                         onClick={() => {
                           if (parseInt(key) === ChainId.MAINNET) {
                             library?.send('wallet_switchEthereumChain', [{ chainId: '0x1' }, account])
@@ -250,7 +217,7 @@ export default function Header() {
                           </span>
                         )}
                         {info.icon ?? info.icon}
-                        {info.title}
+                        {info.symbol}
                       </div>
                     )
                   })}
