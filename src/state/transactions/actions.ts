@@ -17,6 +17,7 @@ export const addTransaction = createAction<{
   hash: string
   from: string
   approval?: { tokenAddress: string; spender: string }
+  ERC721Approval?: { contractAddress: string; spender: string; tokenId: string }
   claim?: { recipient: string }
   summary?: string
 }>('transactions/addTransaction')
