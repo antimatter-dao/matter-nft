@@ -20,35 +20,35 @@ const DummyNFTList = [
     contractAddress: ZERO_ADDRESS,
     tokenId: '1234',
     name: 'Berserk - Red EthRanger #04 ttttttttttt',
-    imgUrl: NFTPlaceholder
+    tokenUri: NFTPlaceholder
   },
   {
     chainId: 1,
     contractAddress: ZERO_ADDRESS,
     tokenId: '1235',
     name: 'Berserk - Red EthRanger #04 ttttttttttt',
-    imgUrl: NFTPlaceholder
+    tokenUri: NFTPlaceholder
   },
   {
     chainId: 1,
     contractAddress: ZERO_ADDRESS,
     tokenId: '1236',
     name: 'Berserk - Red EthRanger #04 ttttttttttt',
-    imgUrl: NFTPlaceholder
+    tokenUri: NFTPlaceholder
   },
   {
     chainId: 1,
     contractAddress: ZERO_ADDRESS,
     tokenId: '1237',
     name: 'Berserk - Red EthRanger #04 ttttttttttt',
-    imgUrl: NFTPlaceholder
+    tokenUri: NFTPlaceholder
   },
   {
     chainId: 1,
     contractAddress: ZERO_ADDRESS,
     tokenId: '1238',
     name: 'Berserk - Red EthRanger #04 ttttttttttt',
-    imgUrl: NFTPlaceholder
+    tokenUri: NFTPlaceholder
   }
 ]
 

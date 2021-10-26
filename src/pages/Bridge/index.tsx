@@ -26,6 +26,7 @@ export default function Bridge() {
             <Typography variant="h5">NFT Bridge</Typography>
             <Button
               onClick={() => {
+                setSelectedToken(undefined)
                 setShowInventory(true)
               }}
             >
@@ -33,6 +34,7 @@ export default function Bridge() {
             </Button>
             <Button
               onClick={() => {
+                setSelectedToken(undefined)
                 setShowManual(true)
               }}
             >
@@ -65,8 +67,6 @@ export default function Bridge() {
         isOpen={showManual}
         onImport={(nft: NFT) => {
           setSelectedToken(nft)
-          nft ? setPageState(PAGE_STATE_TYPE.BRIDGE) : setPageState(PAGE_STATE_TYPE.DEFAULT)
-          setShowManual(false)
         }}
         onDismiss={() => {
           setShowManual(false)

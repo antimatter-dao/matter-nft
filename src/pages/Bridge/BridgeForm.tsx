@@ -61,7 +61,7 @@ export default function BridgeForm({ token }: { token: NFT | undefined }) {
 
   const tokenAddress = token?.contractAddress ?? ''
   const tokenId = token?.tokenId ?? ''
-  const imgUrl = token?.imgUrl ? token?.imgUrl : PlaceholderImg
+  const tokenUri = token?.tokenUri ? token?.tokenUri : PlaceholderImg
 
   const { account } = useActiveWeb3React()
   const isUpToSM = useBreakpoint()
@@ -124,7 +124,7 @@ export default function BridgeForm({ token }: { token: NFT | undefined }) {
       isStep3Active={isStep3Active}
     >
       <Box display="grid" width="100%" justifyContent="center">
-        <Image src={imgUrl} style={{ width: 100, borderRadius: 10 }} />
+        <Image src={tokenUri} style={{ width: 100, borderRadius: 10 }} />
       </Box>
     </WithdrawConfirmationModal>
   )
@@ -145,7 +145,7 @@ export default function BridgeForm({ token }: { token: NFT | undefined }) {
     >
       <Box display="grid" gridGap="28px" justifyItems="center">
         <Typography variant="h6">Confirm Deposit</Typography>
-        <Image src={imgUrl} style={{ width: 180 }} />
+        <Image src={tokenUri} style={{ width: 180 }} />
         <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
           <Typography variant="body1">{tokenId}</Typography>
           <Typography variant="body1">{account && shortenAddress(account)}</Typography>
@@ -182,8 +182,14 @@ export default function BridgeForm({ token }: { token: NFT | undefined }) {
             </Box>
             <Box style={{ margin: isUpToSM ? '0 auto' : 'unset' }}>
               <Image
-                src={imgUrl}
-                style={{ width: 252, borderRadius: 12, backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                src={tokenUri}
+                style={{
+                  width: 240,
+                  borderRadius: 12,
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  maxHeight: 252,
+                  objectFit: 'cover'
+                }}
               />
             </Box>
           </Box>

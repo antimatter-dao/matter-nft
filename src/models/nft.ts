@@ -1,7 +1,7 @@
 export interface NFT {
-  chainId: number
+  chainId?: number
   contractAddress: string
   tokenId: string
   name?: string
-  imgUrl?: string
+  tokenUri?: string
 }

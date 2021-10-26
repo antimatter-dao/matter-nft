@@ -16,7 +16,7 @@ import { useActiveWeb3React } from './index'
 import { ChainId } from '../constants/chain'
 
 // returns null on errors
-function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
+export function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
   const { library, account } = useActiveWeb3React()
 
   return useMemo(() => {
@@ -69,11 +69,6 @@ export function useMulticallContract(): Contract | null {
 
 export function useGovernanceContract(): Contract | null {
   return useContract(GOVERNANCE_ADDRESS, GOVERNANCE_ABI, true)
-}
-
-export function useUniContract(): Contract | null {
-  const { chainId } = useActiveWeb3React()
-  return useContract(chainId ? ANTIMATTER_ADDRESS[chainId] : undefined, ANTIMATTER_ABI, true)
 }
 
 export function useAntimatterContract(): Contract | null {

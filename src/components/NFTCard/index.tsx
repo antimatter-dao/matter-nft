@@ -79,7 +79,7 @@ export default function NFTCard({
       <OutlinedCard style={{ overflow: 'hidden', width: '100%', position: 'relative' }}>
         <Box display="grid">
           <div className={classes.box} style={{ opacity: selected ? 0.5 : 1 }}>
-            <Image src={nft.imgUrl || NFTPlaceholder} className={classes.content} />
+            <Image src={nft.tokenUri || NFTPlaceholder} className={classes.content} />
           </div>
 
           <Box display="grid" padding="16px" gridGap="8px">
