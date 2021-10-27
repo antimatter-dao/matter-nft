@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import AppBody from 'components/AppBody'
 import { Typography, Box } from '@material-ui/core'
 import Input from 'components/Input'
@@ -6,10 +6,6 @@ import Image from 'components/Image'
 import PlaceholderImg from 'assets/images/placeholder_image.png'
 import { Chain } from 'models/chain'
 import ChainSwap from 'components/Select/ChainSwap'
-import DummyLogo from 'assets/images/ethereum-logo.png'
-import Button from 'components/Button/Button'
-import OutlineButton from 'components/Button/OutlineButton'
-import Spinner from 'components/Spinner'
 import TextButton from 'components/Button/TextButton'
 import Stepper from 'components/Stepper'
 import useBreakpoint from 'hooks/useBreakpoint'
@@ -22,48 +18,44 @@ import TransactionSubmittedModal from 'components/Modal/TransactionModals/Transa
 import WithdrawConfirmationModal from 'components/Modal/TransactionModals/WithdrawConfirmationModal'
 import SwitchChainModal from 'components/Modal/SwitchChainModal'
 import { NFT } from 'models/nft'
+import { ChainList, ChainListMap } from 'constants/chain'
+import { ApprovalState } from 'hooks/useApproveCallback'
+import { useERC721ApproveCallback } from 'hooks/useERC721ApproveCallback'
+import { NFT_BRIDGE_ADDRESS } from 'constants/index'
+import { useBridgeCallback } from 'hooks/useBridgeCallback'
+import MessageBox from 'components/Modal/TransactionModals/MessageBox'
+import { useTransactionAdder } from 'state/transactions/hooks'
+import ActionButton from 'components/Button/ActionButton'
+import JSBI from 'jsbi'
 
-export const DummyChainList = [
-  {
-    logo: DummyLogo,
-    symbol: 'ETH',
-    id: 1,
-    address: 'XXXXXXXXXXXXXXXXXXXX',
-    name: 'Ethereum Mainnet'
-  },
-  {
-    logo: DummyLogo,
-    symbol: 'BSC',
-    id: 1,
-    address: 'XXXXXXXXXXXXXXXXXXXX',
-    name: 'Binance Smart Chain'
-  }
-]
-
-export default function BridgeForm({ token }: { token: NFT | undefined }) {
-  const [fromChain] = useState<Chain | null>({
-    logo: DummyLogo,
-    symbol: 'ETH',
-    id: 1,
-    address: 'XXXXXXXXXXXXXXXXXXXX',
-    name: 'Ethereum Mainnet'
-  })
+export default function BridgeForm({ token, onReturnClick }: { token: NFT | undefined; onReturnClick: () => void }) {
+  const [fromChain, setFromChain] = useState<Chain | null>(null)
   const [toChain, seToChain] = useState<Chain | null>(null)
-  const [chain, setChain] = useState(1)
 
   const [deposited, setDeposited] = useState(false)
   const [depositing, setDepositing] = useState(false)
   const [withdrawing, setWithdrawing] = useState(false)
   const [withdrawed, setWithdrawed] = useState(false)
-  const [approved, setApproved] = useState(false)
-  const [approving, setApproving] = useState(false)
+  // const [nonce, setNonce] = useState<any>(undefined)
   const [withdrawModalOpen, setwithdrawModalOpen] = useState(false)
+  const [error, setError] = useState('')
 
   const tokenAddress = token?.contractAddress ?? ''
   const tokenId = token?.tokenId ?? ''
   const tokenUri = token?.tokenUri ? token?.tokenUri : PlaceholderImg
 
-  const { account } = useActiveWeb3React()
+  const { account, chainId, library } = useActiveWeb3React()
+  const [approvalState, approvalCallback] = useERC721ApproveCallback(
+    token?.contractAddress ?? undefined,
+    NFT_BRIDGE_ADDRESS,
+    tokenId
+  )
+  const { deposit, withdraw } = useBridgeCallback()
+  const addTransaction = useTransactionAdder()
+
+  const approved = approvalState === ApprovalState.APPROVED
+  const approving = approvalState === ApprovalState.PENDING
+
   const isUpToSM = useBreakpoint()
   const { showModal, hideModal } = useModal()
 
@@ -71,93 +63,171 @@ export default function BridgeForm({ token }: { token: NFT | undefined }) {
     seToChain(chain)
   }, [])
 
-  const WithdrawModal = ({ isStep3Active }: { isStep3Active: boolean }) => (
-    <WithdrawConfirmationModal
-      isOpen={withdrawModalOpen}
-      onDismiss={() => {
-        setwithdrawModalOpen(false)
-      }}
-      destinationAddress={account}
-      fromChain={fromChain}
-      toChain={toChain}
-      onConfirm={() => {
-        setWithdrawing(true)
-        setwithdrawModalOpen(false)
-        setTimeout(() => {
-          setWithdrawing(false)
-          setWithdrawed(true)
-          showModal(<TransactionSubmittedModal />)
-        }, 1000)
-      }}
-      step1={
-        <>
-          <b>
-            Please&nbsp;
-            <TextButton
-              primary
-              onClick={() => {
-                showModal(
-                  <SwitchChainModal
-                    fromChain={fromChain}
-                    toChain={toChain}
-                    onConfirm={() => {
-                      setChain(2)
-                      hideModal()
-                    }}
-                  />
-                )
-              }}
-            >
-              switch
-            </TextButton>
-            &nbsp;your wallet network
-          </b>
-          to BSC to complete token swap.
-        </>
-      }
-      step2={
-        <>
-          Please make your connected wallet address is the address where you wish to receive your bridged NFT and the
-          correct destination chain.
-        </>
-      }
-      isStep3Active={isStep3Active}
-    >
-      <Box display="grid" width="100%" justifyContent="center">
-        <Image src={tokenUri} style={{ width: 100, borderRadius: 10 }} />
-      </Box>
-    </WithdrawConfirmationModal>
-  )
-  const DepositModal = () => (
-    <DepositConfirmationModal
-      destinationAddress={account}
-      fromChain={fromChain}
-      toChain={toChain}
-      onConfirm={() => {
-        hideModal()
-        setDepositing(true)
-        setTimeout(() => {
-          setDepositing(false)
-          setDeposited(true)
-          showModal(<TransactionSubmittedModal />)
-        }, 1000)
-      }}
-    >
-      <Box display="grid" gridGap="28px" justifyItems="center">
-        <Typography variant="h6">Confirm Deposit</Typography>
-        <Image src={tokenUri} style={{ width: 180 }} />
-        <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
-          <Typography variant="body1">{tokenId}</Typography>
-          <Typography variant="body1">{account && shortenAddress(account)}</Typography>
+  useEffect(() => {
+    if (token?.owner === NFT_BRIDGE_ADDRESS) {
+      setDeposited(true)
+    }
+  }, [chainId, token?.chainId, token?.owner])
+
+  useEffect(() => {
+    if (!tokenAddress) return setError('Enter token contract address')
+    if (tokenAddress && !tokenId) return setError('Enter token ID')
+    if (tokenAddress && tokenId && (!fromChain || !toChain)) return setError('Select Chain')
+    setError('')
+  }, [fromChain, toChain, tokenAddress, tokenId])
+
+  useEffect(() => {
+    chainId && setFromChain(ChainListMap[chainId])
+  }, [chainId])
+
+  const WithdrawModal = useCallback(
+    () => (
+      <WithdrawConfirmationModal
+        isOpen={withdrawModalOpen}
+        onDismiss={() => {
+          setwithdrawModalOpen(false)
+        }}
+        destinationAddress={account}
+        fromChain={fromChain}
+        toChain={toChain}
+        onConfirm={() => {
+          setWithdrawing(true)
+          setwithdrawModalOpen(false)
+          withdraw(
+            {
+              fromChainId: fromChain?.hex,
+              toAddress: account,
+              nonce: JSBI.BigInt(200).toString(),
+              name: token?.name,
+              symbol: token?.symbol,
+              mainChainId: token?.chainId,
+              nftAddress: token?.contractAddress,
+              tokenId: token?.tokenId,
+              tokenURI: token?.tokenUri,
+              signatures: []
+            },
+            {
+              gasLimit: 3500000,
+              value: '10000000000000000'
+            }
+          )
+            .then(r => {
+              setWithdrawing(false)
+              setWithdrawed(true)
+              showModal(<TransactionSubmittedModal />)
+              console.log('withdraw', 888, r)
+            })
+            .catch(e => {
+              showModal(<MessageBox type="error">{e.message}</MessageBox>)
+              setWithdrawing(false)
+              console.log('withdrawError', 888, e)
+            })
+        }}
+        step1={
+          <>
+            <b>
+              Please&nbsp;
+              <TextButton
+                primary
+                onClick={() => {
+                  showModal(
+                    <SwitchChainModal
+                      fromChain={fromChain}
+                      toChain={toChain}
+                      onConfirm={() => {
+                        library?.send('wallet_switchEthereumChain', [{ chainId: toChain?.hex }, account])
+                        hideModal()
+                      }}
+                    />
+                  )
+                }}
+              >
+                switch
+              </TextButton>
+              &nbsp;your wallet network
+            </b>
+            to BSC to complete token swap.
+          </>
+        }
+        step2={
+          <>
+            Please make your connected wallet address is the address where you wish to receive your bridged NFT and the
+            correct destination chain.
+          </>
+        }
+        isStep3Active={!!(toChain && chainId === toChain.id)}
+      >
+        <Box display="grid" width="100%" justifyContent="center">
+          <Image src={tokenUri} style={{ width: 100, borderRadius: 10 }} altSrc={PlaceholderImg} />
         </Box>
-      </Box>
-    </DepositConfirmationModal>
+      </WithdrawConfirmationModal>
+    ),
+    [
+      account,
+      chainId,
+      fromChain,
+      hideModal,
+      library,
+      showModal,
+      toChain,
+      token?.chainId,
+      token?.contractAddress,
+      token?.name,
+      token?.symbol,
+      token?.tokenId,
+      token?.tokenUri,
+      tokenUri,
+      withdraw,
+      withdrawModalOpen
+    ]
+  )
+  const DepositModal = useCallback(
+    () => (
+      <DepositConfirmationModal
+        destinationAddress={account}
+        fromChain={fromChain}
+        toChain={toChain}
+        onConfirm={() => {
+          hideModal()
+          setDepositing(true)
+          if (!token) return
+          deposit(token?.contractAddress ?? '', toChain?.id ?? 1, account ?? '', token.tokenId, {
+            gasLimit: 3500000,
+            value: '10000000000000000'
+          })
+            .then((r: any) => {
+              addTransaction(r, {
+                summary: `Deposit NFT(${token.name}) from ${fromChain?.name}`
+              })
+              console.debug('depositd', 999, r)
+              setDepositing(false)
+              setDeposited(true)
+              showModal(<TransactionSubmittedModal />)
+            })
+            .catch(e => {
+              showModal(<MessageBox type="error">{e.message}</MessageBox>)
+              setDepositing(false)
+              console.log('depositdError', 999, e)
+            })
+        }}
+      >
+        <Box display="grid" gridGap="28px" justifyItems="center">
+          <Typography variant="h6">Confirm Deposit</Typography>
+          <Image src={tokenUri} style={{ width: 180 }} altSrc={PlaceholderImg} />
+          <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
+            <Typography variant="body1">{tokenId}</Typography>
+            <Typography variant="body1">{account && shortenAddress(account)}</Typography>
+          </Box>
+        </Box>
+      </DepositConfirmationModal>
+    ),
+    [account, addTransaction, deposit, fromChain, hideModal, showModal, toChain, token, tokenId, tokenUri]
   )
 
   return (
     <>
-      <WithdrawModal isStep3Active={chain === 2} />
-      <AppBody maxWidth="800px" width="100%">
+      <WithdrawModal />
+      <AppBody maxWidth="800px" width="100%" onReturnClick={onReturnClick} closeIcon>
         <Box display="grid" gridGap="29px" padding="20px 40px 52px" width="100%">
           <Typography variant="h5">NFT Bridge</Typography>
           <Box display={isUpToSM ? 'grid' : 'flex'} gridGap={isUpToSM ? '24px' : '40px'} width="100%">
@@ -172,7 +242,7 @@ export default function BridgeForm({ token }: { token: NFT | undefined }) {
               <ChainSwap
                 fromChain={fromChain}
                 toChain={toChain}
-                chainList={DummyChainList}
+                chainList={ChainList}
                 onSelectTo={handleTo}
                 disabledFrom={true}
                 disabledTo={!(tokenAddress && tokenId)}
@@ -183,6 +253,7 @@ export default function BridgeForm({ token }: { token: NFT | undefined }) {
             <Box style={{ margin: isUpToSM ? '0 auto' : 'unset' }}>
               <Image
                 src={tokenUri}
+                altSrc={PlaceholderImg}
                 style={{
                   width: 240,
                   borderRadius: 12,
@@ -193,70 +264,57 @@ export default function BridgeForm({ token }: { token: NFT | undefined }) {
               />
             </Box>
           </Box>
-
-          {!tokenAddress && (
-            <OutlineButton primary disabled>
-              Enter token contract address
-            </OutlineButton>
-          )}
-          {tokenAddress && !tokenId && (
-            <OutlineButton primary disabled>
-              Enter token ID
-            </OutlineButton>
-          )}
-          {tokenAddress && tokenId && (!fromChain || !toChain) && (
-            <OutlineButton primary disabled>
-              Select Chain
-            </OutlineButton>
-          )}
-          {tokenAddress && tokenId && fromChain && toChain && (
-            <>
-              {!approved ? (
-                <Button
-                  disabled={approving || approved}
-                  onClick={() => {
-                    setApproving(true)
-                    setTimeout(() => {
-                      setApproved(true)
-                    }, 1000)
-                  }}
-                >
-                  {approving && <Spinner size="20px" marginRight={16} color="#ffffff" />}
-                  {approving ? <>Approving</> : <>Approve</>}
-                </Button>
-              ) : (
-                <>
-                  <Box display="flex" gridGap="16px">
-                    <Button
-                      onClick={() => {
-                        showModal(<DepositModal />)
-                      }}
-                      disabled={depositing || deposited}
-                    >
-                      {depositing && <Spinner size="20px" marginRight={16} color="#ffffff" />}
-                      {depositing ? <>Depositing</> : <>Deposite in ETH Chain</>}
-                    </Button>
-                    <OutlineButton
-                      primary
-                      onClick={() => {
+          <>
+            {!approved && !deposited ? (
+              <ActionButton
+                error={error}
+                pending={approving}
+                onAction={() => {
+                  approvalCallback()
+                }}
+                successText="Approved"
+                pendingText="approving"
+                actionText="Approve"
+              />
+            ) : (
+              <>
+                <Box display="flex" gridGap="16px">
+                  <ActionButton
+                    error={error}
+                    onAction={() => {
+                      showModal(<DepositModal />)
+                    }}
+                    actionText={`Deposite in ${fromChain?.symbol} Chain`}
+                    pending={depositing}
+                    pendingText="Depositing"
+                    success={deposited}
+                    successText={`Deposited in ${fromChain?.symbol} Chain`}
+                  />
+                  {!error && (
+                    <ActionButton
+                      error={deposited ? '' : `Withdraw in ${toChain?.symbol} Chain`}
+                      onAction={() => {
                         setwithdrawModalOpen(true)
                       }}
-                      disabled={withdrawing || !deposited || withdrawed}
-                    >
-                      {withdrawing && <Spinner size="20px" marginRight={16} />}
-                      {withdrawing ? <>Withdrawing</> : <>Withdraw in {toChain.symbol} Chian</>}
-                    </OutlineButton>
-                  </Box>
+                      actionText={`Withdraw in ${toChain?.symbol} Chain`}
+                      pending={withdrawing}
+                      pendingText="Withdrawing"
+                      success={withdrawed}
+                      successText={`Withdrawed in ${toChain?.symbol} Chain`}
+                    />
+                  )}
+                </Box>
+                {!error && (
                   <Box width="70%" style={{ margin: '0 auto' }}>
                     <Stepper
                       steps={[1, 2]}
                       activeStep={depositing || deposited ? 1 : withdrawing || withdrawed ? 2 : 0}
                     />
                   </Box>
-                </>
-              )}
-            </>
-          )}
+                )}
+              </>
+            )}
+          </>
         </Box>
       </AppBody>
     </>

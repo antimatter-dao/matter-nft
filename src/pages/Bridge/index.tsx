@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Typography, Box } from '@material-ui/core'
 import AppBody from 'components/AppBody'
 import Button from 'components/Button/Button'
@@ -14,9 +14,31 @@ export enum PAGE_STATE_TYPE {
 
 export default function Bridge() {
   const [pageState, setPageState] = useState<PAGE_STATE_TYPE | undefined>(PAGE_STATE_TYPE.DEFAULT)
-  const [selectedToken, setSelectedToken] = useState<NFT | undefined>(undefined)
+  const [selectedToken, setSelectedToken] = useState<(NFT & { deposited?: boolean | undefined }) | undefined>(undefined)
   const [showInventory, setShowInventory] = useState(false)
   const [showManual, setShowManual] = useState(false)
+
+  const handleImport = useCallback((nft: NFT) => {
+    setSelectedToken(nft)
+  }, [])
+  const handleProceed = useCallback(() => {
+    setShowManual(false)
+    setShowInventory(false)
+    setPageState(PAGE_STATE_TYPE.BRIDGE)
+  }, [])
+  const handleDismiss = useCallback(() => {
+    setShowManual(false)
+    setShowInventory(false)
+    setPageState(PAGE_STATE_TYPE.DEFAULT)
+    setSelectedToken(undefined)
+  }, [])
+
+  const handleChangeToManual = useCallback(() => {
+    setSelectedToken(undefined)
+    setPageState(PAGE_STATE_TYPE.DEFAULT)
+    setShowInventory(false)
+    setShowManual(true)
+  }, [])
 
   return (
     <>
@@ -43,36 +65,20 @@ export default function Bridge() {
           </Box>
         </AppBody>
       )}
-      {pageState === PAGE_STATE_TYPE.BRIDGE && <BridgeForm token={selectedToken} />}
-      <ImportInventory
-        isOpen={showInventory}
-        selectedToken={selectedToken}
-        onSelect={(nft: NFT) => {
-          setSelectedToken(nft)
-          setPageState(PAGE_STATE_TYPE.BRIDGE)
-          setShowInventory(false)
-        }}
-        onDismiss={() => {
-          setShowInventory(false)
-          selectedToken ? setPageState(PAGE_STATE_TYPE.BRIDGE) : setPageState(PAGE_STATE_TYPE.DEFAULT)
-        }}
-        onManual={() => {
-          setSelectedToken(undefined)
-          setPageState(PAGE_STATE_TYPE.DEFAULT)
-          setShowInventory(false)
-          setShowManual(true)
-        }}
-      />
-      <ImportManual
-        isOpen={showManual}
-        onImport={(nft: NFT) => {
-          setSelectedToken(nft)
-        }}
-        onDismiss={() => {
-          setShowManual(false)
-          selectedToken ? setPageState(PAGE_STATE_TYPE.BRIDGE) : setPageState(PAGE_STATE_TYPE.DEFAULT)
-        }}
-      />
+      {pageState === PAGE_STATE_TYPE.BRIDGE && <BridgeForm token={selectedToken} onReturnClick={handleDismiss} />}
+      {showInventory && (
+        <ImportInventory
+          isOpen={showInventory}
+          selectedToken={selectedToken}
+          onSelect={handleImport}
+          onDismiss={handleDismiss}
+          onProceed={handleProceed}
+          onManual={handleChangeToManual}
+        />
+      )}
+      {showManual && (
+        <ImportManual isOpen={showManual} onImport={handleImport} onDismiss={handleDismiss} onProceed={handleProceed} />
+      )}
     </>
   )
 }

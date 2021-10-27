@@ -6,8 +6,9 @@ import Image from 'components/Image'
 import ChainSwap from '../../assets/svg/chain_swap.svg'
 import MobileHeader from './MobileHeader'
 import { Check, ChevronDown } from 'react-feather'
-import { ChainId, ChainListMap } from 'constants/chain'
+import { ChainList, ChainListMap } from 'constants/chain'
 import { useActiveWeb3React } from 'hooks'
+import { triggerSwitchChain } from 'utils/triggerSwitchChain'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -118,54 +119,6 @@ const Dropdown = styled('div')({
   }
 })
 
-export const SUPPORTED_NETWORKS: {
-  [chainId in ChainId]?: {
-    chainId: string
-    chainName: string
-    nativeCurrency: {
-      name: string
-      symbol: string
-      decimals: number
-    }
-    rpcUrls: string[]
-    blockExplorerUrls: string[]
-  }
-} = {
-  [ChainId.MAINNET]: {
-    chainId: '0x1',
-    chainName: 'Ethereum',
-    nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
-      decimals: 18
-    },
-    rpcUrls: ['https://mainnet.infura.io/v3'],
-    blockExplorerUrls: ['https://etherscan.com']
-  },
-  [ChainId.ROPSTEN]: {
-    chainId: '0x3',
-    chainName: 'Ropsten',
-    nativeCurrency: {
-      name: 'Ropsten',
-      symbol: 'ETH',
-      decimals: 18
-    },
-    rpcUrls: ['https://ropsten.infura.io/v3/'],
-    blockExplorerUrls: ['https://ropsten.etherscan.io/']
-  },
-  [ChainId.RINKEBY]: {
-    chainId: '0x4',
-    chainName: 'Rinkeby',
-    nativeCurrency: {
-      name: 'Rinkeby',
-      symbol: 'ETH',
-      decimals: 18
-    },
-    rpcUrls: ['https://rinkeby.infura.io/v3/'],
-    blockExplorerUrls: ['https://rinkeby.etherscan.io/']
-  }
-}
-
 export default function Header() {
   const { account, chainId, library } = useActiveWeb3React()
   const classes = useStyles()
@@ -190,37 +143,22 @@ export default function Header() {
               <ChevronDown size="18" />
               <div className="dropdown_wrapper">
                 <Dropdown>
-                  {Object.keys(ChainListMap).map(key => {
-                    const info = ChainListMap[parseInt(key) as keyof typeof ChainListMap]
-                    if (!info) {
-                      return null
-                    }
-                    return (
-                      <div
-                        key={info.symbol}
-                        onClick={() => {
-                          if (parseInt(key) === ChainId.MAINNET) {
-                            library?.send('wallet_switchEthereumChain', [{ chainId: '0x1' }, account])
-                          } else if (parseInt(key) === ChainId.ROPSTEN) {
-                            library?.send('wallet_switchEthereumChain', [{ chainId: '0x3' }, account])
-                          } else if (parseInt(key) === ChainId.RINKEBY) {
-                            library?.send('wallet_switchEthereumChain', [{ chainId: '0x4' }, account])
-                          } else {
-                            const params = SUPPORTED_NETWORKS[parseInt(key) as ChainId]
-                            library?.send('wallet_addEthereumChain', [params, account])
-                          }
-                        }}
-                      >
-                        {parseInt(key) === chainId && (
-                          <span style={{ position: 'absolute', left: '15px' }}>
-                            <Check size={18} />
-                          </span>
-                        )}
-                        {info.icon ?? info.icon}
-                        {info.symbol}
-                      </div>
-                    )
-                  })}
+                  {ChainList.map(chain => (
+                    <div
+                      key={chain.symbol}
+                      onClick={() => {
+                        triggerSwitchChain(library, chain.id, account)
+                      }}
+                    >
+                      {chain.id === chainId && (
+                        <span style={{ position: 'absolute', left: '15px' }}>
+                          <Check size={18} />
+                        </span>
+                      )}
+                      {chain.icon ?? chain.icon}
+                      {chain.symbol}
+                    </div>
+                  ))}
                 </Dropdown>
               </div>
             </NetworkCard>

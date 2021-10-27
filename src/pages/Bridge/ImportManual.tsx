@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Box, Typography } from '@material-ui/core'
-import Button from 'components/Button/Button'
 import Input from 'components/Input'
 import InputLabel from 'components/Input/InputLabel'
 import Modal from 'components/Modal'
@@ -8,46 +7,50 @@ import ChainSelect from 'components/Select/ChainSelect'
 import { ChainList, ChainListMap } from 'constants/chain'
 import { useActiveWeb3React } from 'hooks'
 import { NFT } from 'models/nft'
-import { useNftData } from 'hooks/useNftData'
+import { useNftDataCallback } from 'hooks/useNftData'
 import useModal from 'hooks/useModal'
-import OutlineButton from 'components/Button/OutlineButton'
 import { isAddress } from 'utils'
+import MessageBox from 'components/Modal/TransactionModals/MessageBox'
+import ActionButton from 'components/Button/ActionButton'
 
 export default function ImportManual({
   onImport,
   isOpen,
-  onDismiss
+  onDismiss,
+  onProceed
 }: {
   onImport: (nft: NFT) => void
   isOpen: boolean
   onDismiss: () => void
+  onProceed: () => void
 }) {
   const { showModal } = useModal()
   const { chainId } = useActiveWeb3React()
   const [contractAddress, setContractAddress] = useState('')
   const [tokenId, setTokenId] = useState('')
-  const [nftTemp, setNftTemp] = useState<any>(undefined)
-  const nftRes = useNftData(nftTemp?.contractAddress || '', nftTemp?.tokenId || '')
   const [error, setError] = useState('')
+
+  const [nftRes, nftDataCallback] = useNftDataCallback()
 
   useEffect(() => {
     if (!nftRes) return
     if (nftRes.error) {
-      showModal(<></>)
+      showModal(<ImportFailedModal />)
       return
     }
     if (nftRes.loading) {
       return
     }
-    if (!nftTemp || nftRes.nft.name === undefined) return
-    console.log(999, nftRes.nft)
+    if (nftRes?.nft?.name === undefined || nftRes?.nft?.owner === undefined) return
     onImport(nftRes.nft)
-    onDismiss()
-  }, [nftRes, nftTemp, onDismiss, onImport, showModal])
+    onProceed()
+  }, [nftRes, onDismiss, onImport, onProceed, showModal])
 
   useEffect(() => {
+    if (contractAddress === '') return setError('Enter token contract address')
     isAddress(contractAddress) ? setError('') : setError('Invalid contract address')
-  }, [contractAddress])
+    if (tokenId === '') return setError('Enter token ID')
+  }, [contractAddress, tokenId])
 
   return (
     <Modal maxWidth="520px" width="100%" customIsOpen={isOpen} customOnDismiss={onDismiss} closeIcon>
@@ -63,24 +66,24 @@ export default function ImportManual({
           onChange={e => setContractAddress(e.target.value)}
         />
         <Input label="Token ID" value={tokenId} onChange={e => setTokenId(e.target.value)} />
-        {error ? (
-          <OutlineButton disabled primary>
-            {error}
-          </OutlineButton>
-        ) : (
-          <Button
-            disabled={!chainId || !contractAddress || !tokenId || !!error}
-            onClick={() => {
-              setNftTemp({
-                contractAddress,
-                tokenId
-              })
-            }}
-          >
-            Import
-          </Button>
-        )}
+        <ActionButton
+          pending={nftRes.loading}
+          pendingText={'Importing'}
+          actionText="Import"
+          error={error}
+          onAction={() => {
+            nftDataCallback(contractAddress, tokenId)
+          }}
+        />
       </Box>
     </Modal>
+  )
+}
+
+function ImportFailedModal() {
+  return (
+    <MessageBox type="failure" header="Import Failed">
+      <Typography variant="body2">Can&apos;t find your token contract address? Read guide</Typography>
+    </MessageBox>
   )
 }

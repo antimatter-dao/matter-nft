@@ -153,7 +153,7 @@ function Web3StatusInner() {
         display={'flex'}
         paddingLeft={'10px'}
         borderRadius={'32px'}
-        style={{ fontSize: 14, lineHeight: 16, background: 'rgba(255,255,255,0.1)' }}
+        style={{ fontSize: 14, lineHeight: 16, background: 'rgba(255,255,255,0.1)', minWidth: 185 }}
         alignItems={'center'}
       >
         {/* {!!account && aggregateBalance && (
@@ -175,10 +175,10 @@ function Web3StatusInner() {
         )} */}
         <Box display="flex" alignItems="center" padding={isDownMD ? '0 0 0 8px' : '0 0 0 10px'} gridGap={10}>
           {hasPendingTransactions ? (
-            <>
+            <Box margin="0 auto" gridGap={10} display="flex" alignItems="center" justifyContent="center" width="185px">
               <Spinner color={theme.textColor.text1} size="16px" />
-              <span>{pending?.length} Pending</span>
-            </>
+              <span style={{ marginRight: isDownMD ? '8px' : '10px' }}>{pending?.length} Pending</span>
+            </Box>
           ) : (
             <>
               {hasSocks ? SOCK : null}

@@ -6,13 +6,14 @@ import ChainSelect from 'components/Select/ChainSelect'
 import { ZERO_ADDRESS } from 'constants/index'
 import { NFT } from 'models/nft'
 import { useState } from 'react'
-import { DummyChainList } from './BridgeForm'
 import { ReactComponent as Search } from 'assets/svg/search.svg'
 import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 import { ReactComponent as ErrorIcon } from 'assets/componentsIcon/statusIcon/error_icon.svg'
 import TextButton from 'components/Button/TextButton'
 import useModal from 'hooks/useModal'
 import Button from 'components/Button/Button'
+import { ChainList, ChainListMap } from 'constants/chain'
+import { useActiveWeb3React } from 'hooks'
 
 const DummyNFTList = [
   {
@@ -57,14 +58,17 @@ export default function SelectFromInventory({
   selectedToken,
   isOpen,
   onDismiss,
-  onManual
+  onManual,
+  onProceed
 }: {
   onSelect: (nft: NFT) => void
   selectedToken?: NFT
   isOpen: boolean
   onDismiss: () => void
   onManual: () => void
+  onProceed: () => void
 }) {
+  const { chainId } = useActiveWeb3React()
   const [searchStr, setSearchStr] = useState('')
   const { showModal, hideModal } = useModal()
 
@@ -74,7 +78,7 @@ export default function SelectFromInventory({
         <Box padding="20px 40px 55px" display="grid" gridGap="24px">
           <Typography variant="h6"> Select NFT</Typography>
           <Box display="flex" gridGap="16px">
-            <ChainSelect selectedChain={DummyChainList[0]} chainList={[DummyChainList[0]]} width="180px" />
+            <ChainSelect selectedChain={ChainListMap[chainId ?? 1]} chainList={ChainList} width="180px" />
             <Input
               value={searchStr}
               onChange={e => setSearchStr(e.target.value)}
@@ -97,6 +101,7 @@ export default function SelectFromInventory({
                       onConfirm={() => {
                         onSelect(nft)
                         hideModal()
+                        onProceed()
                       }}
                     />
                   )

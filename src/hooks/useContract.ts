@@ -3,8 +3,10 @@ import { abi as GOVERNANCE_ABI } from '../constants/abis/governance.json'
 import ANTIMATTER_ABI from '../constants/abis/antimatter.json'
 import ANTIMATTER_GOVERNANCE_ABI from '../constants/abis/governance.json'
 import { useMemo } from 'react'
-import { ANTIMATTER_ADDRESS, GOVERNANCE_ADDRESS, ANTIMATTER_GOVERNANCE_ADDRESS } from '../constants'
+import { ANTIMATTER_ADDRESS, GOVERNANCE_ADDRESS, ANTIMATTER_GOVERNANCE_ADDRESS, NFT_BRIDGE_ADDRESS } from '../constants'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
+import NFT_BRIDGE_ABI from 'constants/abis/nft_bridge.json'
+import ERC721_ABI from 'constants/abis/erc721.json'
 import ENS_ABI from '../constants/abis/ens-registrar.json'
 import { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_ABI from '../constants/abis/erc20.json'
@@ -91,4 +93,12 @@ export function useSocksController(): Contract | null {
 
 export function useAntiMatterGovernanceContract(): Contract | null {
   return useContract(ANTIMATTER_GOVERNANCE_ADDRESS, ANTIMATTER_GOVERNANCE_ABI, false)
+}
+
+export function useNFTContract(address: string | undefined): Contract | null {
+  return useContract(address, ERC721_ABI, true)
+}
+
+export function useNFTBridgeContract(): Contract | null {
+  return useContract(NFT_BRIDGE_ADDRESS, NFT_BRIDGE_ABI, true)
 }

@@ -36,21 +36,50 @@ export const ChainListMap: {
   return acc
 }, {} as any)
 
-// {
-//   [ChainId.ROPSTEN]: {
-//     icon: <ETH />,
-//     logo: EthUrl,
-//     symbol: 'Ropsten',
-//     name: 'Ropsten Test Network',
-//     id: ChainId.ROPSTEN,
-//     hex: '0x3'
-//   },
-//   [ChainId.RINKEBY]: {
-//     icon: <ETH />,
-//     logo: EthUrl,
-//     symbol: 'Rinkeby',
-//     name: 'Rinkeby Testnet',
-//     id: ChainId.RINKEBY,
-//     hex: '0x4'
-//   }
-// }
+export const SUPPORTED_NETWORKS: {
+  [chainId in ChainId]?: {
+    chainId: string
+    chainName: string
+    nativeCurrency: {
+      name: string
+      symbol: string
+      decimals: number
+    }
+    rpcUrls: string[]
+    blockExplorerUrls: string[]
+  }
+} = {
+  [ChainId.MAINNET]: {
+    chainId: '0x1',
+    chainName: 'Ethereum',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    rpcUrls: ['https://mainnet.infura.io/v3'],
+    blockExplorerUrls: ['https://etherscan.com']
+  },
+  [ChainId.ROPSTEN]: {
+    chainId: '0x3',
+    chainName: 'Ropsten',
+    nativeCurrency: {
+      name: 'Ropsten',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    rpcUrls: ['https://ropsten.infura.io/v3/'],
+    blockExplorerUrls: ['https://ropsten.etherscan.io/']
+  },
+  [ChainId.RINKEBY]: {
+    chainId: '0x4',
+    chainName: 'Rinkeby',
+    nativeCurrency: {
+      name: 'Rinkeby',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    rpcUrls: ['https://rinkeby.infura.io/v3/'],
+    blockExplorerUrls: ['https://rinkeby.etherscan.io/']
+  }
+}
