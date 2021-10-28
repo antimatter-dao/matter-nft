@@ -154,7 +154,7 @@ function Web3StatusInner() {
         display={'flex'}
         paddingLeft={'10px'}
         borderRadius={'32px'}
-        style={{ fontSize: 14, lineHeight: 16, background: 'rgba(255,255,255,0.1)', minWidth: 185 }}
+        style={{ fontSize: 14, lineHeight: '16px', background: 'rgba(255,255,255,0.1)' }}
         alignItems={'center'}
       >
         {/* {!!account && aggregateBalance && (
@@ -176,7 +176,7 @@ function Web3StatusInner() {
         )} */}
         <Box display="flex" alignItems="center" padding={isDownMD ? '0 0 0 8px' : '0 0 0 10px'} gridGap={10}>
           {hasPendingTransactions ? (
-            <Box margin="0 auto" gridGap={10} display="flex" alignItems="center" justifyContent="center" width="185px">
+            <Box margin="0 auto" gridGap={10} display="flex" alignItems="center" justifyContent="center">
               <Spinner color={theme.textColor.text1} size="16px" />
               <span style={{ marginRight: isDownMD ? '8px' : '10px' }}>{pending?.length} Pending</span>
             </Box>
@@ -188,15 +188,15 @@ function Web3StatusInner() {
                 {ENSName || shortenAddress(account)}
               </TextButton>
               {account && <Copy toCopy={account}></Copy>}
-              <UserButtonWrap>
-                {/* <UserButton id="userButton" onClick={toShowUserPanel} isOpen={!!match}>
-                  <AntimatterIcon />
-                </UserButton> */}
-                <UcenterIcon onClick={toShowUserPanel} style={{ width: 36, position: 'absolute', cursor: 'pointer' }} />
-                <UserMenu account={account} />
-              </UserButtonWrap>
             </>
           )}
+          <UserButtonWrap>
+            {/* <UserButton id="userButton" onClick={toShowUserPanel} isOpen={!!match}>
+                  <AntimatterIcon />
+                </UserButton> */}
+            <UcenterIcon onClick={toShowUserPanel} style={{ width: 36, position: 'absolute', cursor: 'pointer' }} />
+            <UserMenu account={account} />
+          </UserButtonWrap>
         </Box>
       </Box>
     )
