@@ -273,6 +273,7 @@ export default function Account() {
         onImport={(nft: NFT) => {
           console.log(nft)
         }}
+        onProceed={() => {}}
         onDismiss={() => {
           setShowManual(false)
         }}

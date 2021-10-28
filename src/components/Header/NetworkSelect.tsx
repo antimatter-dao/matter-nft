@@ -3,8 +3,7 @@ import SelectedIcon from 'assets/componentsIcon/selected_icon.svg'
 import LogoText from 'components/LogoText'
 import Select from 'components/Select/Select'
 import { useActiveWeb3React } from 'hooks'
-import { ChainId, ChainList } from 'constants/chain'
-import { SUPPORTED_NETWORKS } from '.'
+import { ChainId, ChainList, SUPPORTED_NETWORKS } from 'constants/chain'
 
 const useStyles = makeStyles({
   menuItem: {
