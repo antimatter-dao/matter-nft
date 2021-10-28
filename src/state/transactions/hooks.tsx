@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { useActiveWeb3React } from '../../hooks'
 import { AppDispatch, AppState } from '../index'
-import { addTransaction } from './actions'
+import { addTransaction, SerializableTransactionReceipt } from './actions'
 import { TransactionDetails } from './reducer'
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
@@ -142,4 +142,12 @@ export function useUserHasSubmittedClaim(
   }, [account, allTransactions])
 
   return { claimSubmitted: Boolean(claimTxn), claimTxn }
+}
+
+export function useTransaction(transactionHash?: string): SerializableTransactionReceipt | undefined {
+  const transactions = useAllTransactions()
+
+  if (!transactionHash || !transactions[transactionHash]) return undefined
+
+  return transactions[transactionHash].receipt
 }

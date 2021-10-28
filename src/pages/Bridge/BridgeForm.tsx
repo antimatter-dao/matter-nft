@@ -24,18 +24,20 @@ import { useERC721ApproveCallback } from 'hooks/useERC721ApproveCallback'
 import { NFT_BRIDGE_ADDRESS } from 'constants/index'
 import { useBridgeCallback } from 'hooks/useBridgeCallback'
 import MessageBox from 'components/Modal/TransactionModals/MessageBox'
-import { useTransactionAdder } from 'state/transactions/hooks'
+import { useTransaction, useTransactionAdder } from 'state/transactions/hooks'
 import ActionButton from 'components/Button/ActionButton'
 import JSBI from 'jsbi'
+import TransacitonPendingModal from 'components/Modal/TransactionModals/TransactionPendingModal'
 
 export default function BridgeForm({ token, onReturnClick }: { token: NFT | undefined; onReturnClick: () => void }) {
   const [fromChain, setFromChain] = useState<Chain | null>(null)
-  const [toChain, seToChain] = useState<Chain | null>(null)
-
+  const [toChain, setToChain] = useState<Chain | null>(null)
   const [deposited, setDeposited] = useState(false)
   const [depositing, setDepositing] = useState(false)
   const [withdrawing, setWithdrawing] = useState(false)
   const [withdrawed, setWithdrawed] = useState(false)
+  const [depositHash, setDepositHash] = useState<undefined | string>(undefined)
+  const [withdrawHash, setWithdrawHash] = useState<undefined | string>(undefined)
   // const [nonce, setNonce] = useState<any>(undefined)
   const [withdrawModalOpen, setwithdrawModalOpen] = useState(false)
   const [error, setError] = useState('')
@@ -52,6 +54,8 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
   )
   const { deposit, withdraw } = useBridgeCallback()
   const addTransaction = useTransactionAdder()
+  const depositReceipt = useTransaction(depositHash)
+  const withdrawReceipt = useTransaction(withdrawHash)
 
   const approved = approvalState === ApprovalState.APPROVED
   const approving = approvalState === ApprovalState.PENDING
@@ -60,14 +64,111 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
   const { showModal, hideModal } = useModal()
 
   const handleTo = useCallback(chain => {
-    seToChain(chain)
+    setToChain(chain)
   }, [])
 
+  const handleWithdraw = useCallback(() => {
+    setWithdrawing(true)
+    setwithdrawModalOpen(false)
+    withdraw(
+      {
+        fromChainId: fromChain?.hex,
+        toAddress: account,
+        nonce: JSBI.BigInt(200).toString(),
+        name: token?.name,
+        symbol: token?.symbol,
+        mainChainId: token?.chainId,
+        nftAddress: token?.contractAddress,
+        tokenId: token?.tokenId,
+        tokenURI: token?.tokenUri,
+        signatures: []
+      },
+      {
+        gasLimit: 3500000,
+        value: '10000000000000000'
+      }
+    )
+      .then(r => {
+        setWithdrawHash(r.hash)
+        addTransaction(r, {
+          summary: `Withdraw NFT(${token?.name}) from ${toChain?.name}`
+        })
+        showModal(<TransactionSubmittedModal />)
+        console.log('withdraw', 888, r)
+      })
+      .catch(e => {
+        showModal(<MessageBox type="error">{e.message}</MessageBox>)
+        setWithdrawing(false)
+        console.log('withdrawError', 888, e)
+      })
+  }, [
+    account,
+    addTransaction,
+    fromChain?.hex,
+    showModal,
+    toChain?.name,
+    token?.chainId,
+    token?.contractAddress,
+    token?.name,
+    token?.symbol,
+    token?.tokenId,
+    token?.tokenUri,
+    withdraw
+  ])
+
+  const handleDeposit = useCallback(() => {
+    hideModal()
+    setDepositing(true)
+    if (!token) return
+    deposit(token?.contractAddress ?? '', toChain?.id ?? 1, account ?? '', token.tokenId, {
+      gasLimit: 3500000,
+      value: '10000000000000000'
+    })
+      .then((r: any) => {
+        setDepositHash(r.hash)
+        addTransaction(r, {
+          summary: `Deposit NFT(${token.name}) from ${fromChain?.name}`
+        })
+        showModal(<TransactionSubmittedModal />)
+      })
+      .catch(e => {
+        setDepositing(false)
+        showModal(<MessageBox type="error">{e.message}</MessageBox>)
+      })
+  }, [account, addTransaction, deposit, fromChain?.name, hideModal, showModal, toChain?.id, token])
+
   useEffect(() => {
+    if (approvalState === ApprovalState.APPROVED) {
+      hideModal()
+    }
+  }, [approvalState, approving, hideModal, showModal])
+
+  useEffect(() => {
+    console.log('depositReceipt', depositReceipt)
     if (token?.owner === NFT_BRIDGE_ADDRESS) {
       setDeposited(true)
     }
-  }, [chainId, token?.chainId, token?.owner])
+    if (depositReceipt?.status === 1) {
+      setDeposited(true)
+      setDepositing(false)
+    }
+    if (depositReceipt?.status === 0) {
+      setDepositing(false)
+      setDepositing(false)
+    }
+  }, [chainId, depositReceipt, depositReceipt?.status, token?.chainId, token?.owner, withdrawReceipt])
+
+  useEffect(() => {
+    console.log('withdrawReceipt', withdrawReceipt)
+    if (withdrawReceipt?.status === 1) {
+      setWithdrawed(true)
+      setWithdrawing(false)
+    }
+    if (withdrawReceipt?.status === 0) {
+      setWithdrawed(false)
+      setWithdrawing(false)
+    }
+  }, [withdrawReceipt, withdrawReceipt?.status])
 
   useEffect(() => {
     if (!tokenAddress) return setError('Enter token contract address')
@@ -90,39 +191,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
         destinationAddress={account}
         fromChain={fromChain}
         toChain={toChain}
-        onConfirm={() => {
-          setWithdrawing(true)
-          setwithdrawModalOpen(false)
-          withdraw(
-            {
-              fromChainId: fromChain?.hex,
-              toAddress: account,
-              nonce: JSBI.BigInt(200).toString(),
-              name: token?.name,
-              symbol: token?.symbol,
-              mainChainId: token?.chainId,
-              nftAddress: token?.contractAddress,
-              tokenId: token?.tokenId,
-              tokenURI: token?.tokenUri,
-              signatures: []
-            },
-            {
-              gasLimit: 3500000,
-              value: '10000000000000000'
-            }
-          )
-            .then(r => {
-              setWithdrawing(false)
-              setWithdrawed(true)
-              showModal(<TransactionSubmittedModal />)
-              console.log('withdraw', 888, r)
-            })
-            .catch(e => {
-              showModal(<MessageBox type="error">{e.message}</MessageBox>)
-              setWithdrawing(false)
-              console.log('withdrawError', 888, e)
-            })
-        }}
+        onConfirm={handleWithdraw}
         step1={
           <>
             <b>
@@ -187,29 +256,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
         destinationAddress={account}
         fromChain={fromChain}
         toChain={toChain}
-        onConfirm={() => {
-          hideModal()
-          setDepositing(true)
-          if (!token) return
-          deposit(token?.contractAddress ?? '', toChain?.id ?? 1, account ?? '', token.tokenId, {
-            gasLimit: 3500000,
-            value: '10000000000000000'
-          })
-            .then((r: any) => {
-              addTransaction(r, {
-                summary: `Deposit NFT(${token.name}) from ${fromChain?.name}`
-              })
-              console.debug('depositd', 999, r)
-              setDepositing(false)
-              setDeposited(true)
-              showModal(<TransactionSubmittedModal />)
-            })
-            .catch(e => {
-              showModal(<MessageBox type="error">{e.message}</MessageBox>)
-              setDepositing(false)
-              console.log('depositdError', 999, e)
-            })
-        }}
+        onConfirm={handleDeposit}
       >
         <Box display="grid" gridGap="28px" justifyItems="center">
           <Typography variant="h6">Confirm Deposit</Typography>
@@ -221,7 +268,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
         </Box>
       </DepositConfirmationModal>
     ),
-    [account, addTransaction, deposit, fromChain, hideModal, showModal, toChain, token, tokenId, tokenUri]
+    [account, fromChain, handleDeposit, toChain, tokenId, tokenUri]
   )
 
   return (
@@ -271,6 +318,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
                 pending={approving}
                 onAction={() => {
                   approvalCallback()
+                  showModal(<TransacitonPendingModal />)
                 }}
                 successText="Approved"
                 pendingText="approving"
@@ -278,7 +326,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
               />
             ) : (
               <>
-                <Box display="flex" gridGap="16px">
+                <Box display={isUpToSM ? 'grid' : 'flex'} gridGap="16px">
                   <ActionButton
                     error={error}
                     onAction={() => {
@@ -288,7 +336,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
                     pending={depositing}
                     pendingText="Depositing"
                     success={deposited}
-                    successText={`Deposited in ${fromChain?.symbol} Chain`}
+                    successText={`Deposited Successfully`}
                   />
                   {!error && (
                     <ActionButton
@@ -300,16 +348,13 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
                       pending={withdrawing}
                       pendingText="Withdrawing"
                       success={withdrawed}
-                      successText={`Withdrawed in ${toChain?.symbol} Chain`}
+                      successText={`Withdrawed Successfully`}
                     />
                   )}
                 </Box>
                 {!error && (
                   <Box width="70%" style={{ margin: '0 auto' }}>
-                    <Stepper
-                      steps={[1, 2]}
-                      activeStep={depositing || deposited ? 1 : withdrawing || withdrawed ? 2 : 0}
-                    />
+                    <Stepper steps={[1, 2]} activeStep={deposited ? 1 : withdrawed ? 2 : 0} />
                   </Box>
                 )}
               </>

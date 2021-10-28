@@ -40,7 +40,6 @@ const BodyWrapper = styled('div')(({ theme }) => ({
   overflowX: 'hidden',
   position: 'relative',
   [theme.breakpoints.down('sm')]: {
-    marginBottom: theme.height.header,
     minHeight: `calc(100vh - ${theme.height.header} - ${theme.height.mobileHeader})`,
     paddingTop: 20
   }

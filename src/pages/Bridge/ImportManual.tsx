@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Box, Typography } from '@material-ui/core'
 import Input from 'components/Input'
 import InputLabel from 'components/Input/InputLabel'
@@ -25,32 +25,31 @@ export default function ImportManual({
   onProceed: () => void
 }) {
   const { showModal } = useModal()
-  const { chainId } = useActiveWeb3React()
+  const { chainId, account } = useActiveWeb3React()
   const [contractAddress, setContractAddress] = useState('')
   const [tokenId, setTokenId] = useState('')
   const [error, setError] = useState('')
 
-  const [nftRes, nftDataCallback] = useNftDataCallback()
+  const nftRes = useNftDataCallback(contractAddress, tokenId)
 
-  useEffect(() => {
+  const handleImport = useCallback(() => {
     if (!nftRes) return
     if (nftRes.error) {
       showModal(<ImportFailedModal />)
       return
     }
-    if (nftRes.loading) {
-      return
-    }
-    if (nftRes?.nft?.name === undefined || nftRes?.nft?.owner === undefined) return
     onImport(nftRes.nft)
     onProceed()
-  }, [nftRes, onDismiss, onImport, onProceed, showModal])
+  }, [nftRes, onImport, onProceed, showModal])
 
   useEffect(() => {
     if (contractAddress === '') return setError('Enter token contract address')
-    isAddress(contractAddress) ? setError('') : setError('Invalid contract address')
+    if (!isAddress(contractAddress)) return setError('Invalid contract address')
     if (tokenId === '') return setError('Enter token ID')
-  }, [contractAddress, tokenId])
+    if (nftRes?.nft?.name === undefined) return setError(`Token doesnt exist`)
+    // if (nftRes?.nft?.owner !== account) return setError('NFT not in your possession')
+    setError('')
+  }, [account, contractAddress, nftRes?.nft?.name, nftRes?.nft?.owner, tokenId])
 
   return (
     <Modal maxWidth="520px" width="100%" customIsOpen={isOpen} customOnDismiss={onDismiss} closeIcon>
@@ -70,10 +69,8 @@ export default function ImportManual({
           pending={nftRes.loading}
           pendingText={'Importing'}
           actionText="Import"
-          error={error}
-          onAction={() => {
-            nftDataCallback(contractAddress, tokenId)
-          }}
+          error={error || nftRes.error}
+          onAction={handleImport}
         />
       </Box>
     </Modal>

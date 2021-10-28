@@ -63,7 +63,9 @@ const useStyles = makeStyles((theme: Theme) =>
       }
     },
     backdrop: {
-      backgroundColor: 'rgba(0,0,0,.8)',
+      backgroundColor: theme.palette.background.default,
+      opacity: 0.6,
+      marginTop: theme.height.header,
       [theme.breakpoints.down('sm')]: {
         height: `calc(100% - ${theme.height.mobileHeader} - ${theme.height.header})`,
         marginTop: theme.height.mobileHeader,

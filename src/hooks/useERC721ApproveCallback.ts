@@ -6,6 +6,7 @@ import { Contract } from '@ethersproject/contracts'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { ApprovalState } from './useApproveCallback'
 import { useNFTContract } from './useContract'
+import useModal from './useModal'
 
 function useGetApproved(contract: Contract | null, spender: string, tokenId: string) {
   const arg = useMemo(() => [tokenId], [tokenId])
@@ -24,6 +25,7 @@ export function useERC721ApproveCallback(
   tokenId: string
 ): [ApprovalState, () => Promise<void>] {
   // const { account } = useActiveWeb3React()
+  const { hideModal } = useModal()
   const contract = useNFTContract(contractAddress)
   const isApproved = useGetApproved(contract, spender ?? '', tokenId)
   const pendingApproval = useERC721HasPendingApproval(contract?.address, spender ?? '', tokenId)
@@ -75,6 +77,7 @@ export function useERC721ApproveCallback(
         })
       })
       .catch((error: Error) => {
+        hideModal()
         console.debug('Failed to approve nft', error)
         throw error
       })

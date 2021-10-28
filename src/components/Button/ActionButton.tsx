@@ -40,9 +40,9 @@ export default function ActionButton({
           )}
         </OutlineButton>
       ) : success ? (
-        <OutlineButton disabled height={height} width={width} primary>
+        <Button disabled height={height} width={width}>
           <Text>{successText ?? actionText}</Text>
-        </OutlineButton>
+        </Button>
       ) : (
         <Button height={height} width={width} onClick={onAction} disabled={disableAction}>
           {actionText}
