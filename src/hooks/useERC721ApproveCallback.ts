@@ -5,9 +5,11 @@ import { calculateGasMargin } from '../utils'
 import { Contract } from '@ethersproject/contracts'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { ApprovalState } from './useApproveCallback'
+import { useNFTContract } from './useContract'
 
 function useGetApproved(contract: Contract | null, spender: string, tokenId: string) {
-  const res = useSingleCallResult(contract, 'getApproved', [tokenId])
+  const arg = useMemo(() => [tokenId], [tokenId])
+  const res = useSingleCallResult(contract, 'getApproved', arg)
   return useMemo(() => {
     if (res.loading) return undefined
     if (res.result?.includes(spender)) return true
@@ -17,13 +19,14 @@ function useGetApproved(contract: Contract | null, spender: string, tokenId: str
 
 // returns a variable indicating the state of the approval and a function which approves if necessary or early returns
 export function useERC721ApproveCallback(
-  contract: Contract | null,
+  contractAddress: string | undefined,
   spender: string,
   tokenId: string
 ): [ApprovalState, () => Promise<void>] {
   // const { account } = useActiveWeb3React()
-  const isApproved = useGetApproved(contract, spender, tokenId)
-  const pendingApproval = useERC721HasPendingApproval(contract?.address, spender, tokenId)
+  const contract = useNFTContract(contractAddress)
+  const isApproved = useGetApproved(contract, spender ?? '', tokenId)
+  const pendingApproval = useERC721HasPendingApproval(contract?.address, spender ?? '', tokenId)
   // check the current approval status
   const approvalState: ApprovalState = useMemo(() => {
     // if (!spender) return ApprovalState.UNKNOWN

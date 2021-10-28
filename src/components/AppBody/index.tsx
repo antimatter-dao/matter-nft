@@ -1,9 +1,6 @@
 import React from 'react'
-import { X } from 'react-feather'
-import { Box, makeStyles, Typography } from '@material-ui/core'
-import TextButton from 'components/Button/TextButton'
-import { ReactComponent as ArrowLeft } from 'assets/componentsIcon/arrow_left.svg'
-import useBreakpoint from 'hooks/useBreakpoint'
+import { IconButton, makeStyles } from '@material-ui/core'
+import CloseIcon from '@material-ui/icons/Close'
 
 interface Props {
   children: React.ReactNode
@@ -11,6 +8,7 @@ interface Props {
   onReturnClick?: () => void
   title?: string
   maxWidth?: string
+  closeIcon?: boolean
 }
 
 const useStyles = makeStyles(theme => ({
@@ -29,38 +27,29 @@ const useStyles = makeStyles(theme => ({
       maxWidth: 'unset'
     }
   },
-  box: {
-    padding: '20px 40px',
-    [theme.breakpoints.down('sm')]: {
-      padding: 20
+  closeIconContainer: {
+    padding: 0,
+    position: 'absolute',
+    top: 24,
+    right: 24,
+    '&:hover $closeIcon': {
+      color: theme.palette.text.primary
     }
+  },
+  closeIcon: {
+    color: theme.palette.grey[500]
   }
 }))
 
-export default function AppBody({ onReturnClick, title, children, ...props }: Props) {
+export default function AppBody({ children, closeIcon, onReturnClick, ...props }: Props) {
   const classes = useStyles(props)
-  const matches = useBreakpoint()
 
   return (
     <div className={classes.root}>
-      {(onReturnClick || title) && (
-        <Box display="flex" justifyContent="space-between" className={classes.box}>
-          {onReturnClick && !matches && (
-            <TextButton onClick={onReturnClick}>
-              <ArrowLeft />
-            </TextButton>
-          )}
-
-          {title && <Typography variant="h6">{title}</Typography>}
-
-          {onReturnClick && matches ? (
-            <TextButton onClick={onReturnClick}>
-              <X />
-            </TextButton>
-          ) : (
-            <div />
-          )}
-        </Box>
+      {closeIcon && (
+        <IconButton className={classes.closeIconContainer} onClick={onReturnClick}>
+          <CloseIcon className={classes.closeIcon} />
+        </IconButton>
       )}
       {children}
     </div>
