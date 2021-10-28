@@ -59,7 +59,8 @@ export default function NFTCard({
   isSmall,
   selected,
   isBorderHover,
-  isBgHover
+  isBgHover,
+  hoverChildren
 }: {
   nft: NFT
   onClick?: () => void
@@ -67,6 +68,7 @@ export default function NFTCard({
   selected?: boolean
   isBorderHover?: boolean
   isBgHover?: boolean
+  hoverChildren?: JSX.Element
 }) {
   const classes = useStyles()
 
@@ -79,6 +81,7 @@ export default function NFTCard({
       <OutlinedCard style={{ overflow: 'hidden', width: '100%', position: 'relative' }}>
         <Box display="grid">
           <div className={classes.box} style={{ opacity: selected ? 0.5 : 1 }}>
+            {hoverChildren}
             <Image src={nft.tokenUri || NFTPlaceholder} className={classes.content} />
           </div>
 
@@ -86,13 +89,14 @@ export default function NFTCard({
             <Text
               fontWeight={isSmall ? 400 : 500}
               fontSize={isSmall ? 14 : 16}
+              textAlign="left"
               style={{ width: '100%', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
             >
               {nft.name}
             </Text>
 
             <Box display="flex" justifyContent="space-between">
-              <Typography variant="body2" component="div">
+              <Typography variant="body2" component="div" style={{ display: 'flex' }}>
                 {shortenAddress(nft.contractAddress)} {!isSmall && <Copy toCopy={nft.contractAddress} />}
               </Typography>
               <Typography variant="body2">{nft.tokenId}</Typography>
