@@ -7,6 +7,7 @@ import Popups from '../components/essential/Popups'
 import Web3ReactManager from '../components/essential/Web3ReactManager'
 import WarningModal from '../components/Modal/WarningModal'
 import Bridge from './Bridge'
+import Account from './Account'
 import { ModalProvider } from 'context/ModalContext'
 import Footer from 'components/Footer'
 
@@ -60,6 +61,8 @@ export default function App() {
               <Web3ReactManager>
                 <Switch>
                   <Route exact strict path="/" component={Bridge} />
+                  <Route strict path="/profile/:tab" component={Account} />
+                  <Route strict path="/profile" component={Account} />
                 </Switch>
               </Web3ReactManager>
             </BodyWrapper>

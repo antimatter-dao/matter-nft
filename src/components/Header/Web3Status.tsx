@@ -22,6 +22,7 @@ import TextButton from 'components/Button/TextButton'
 import Button from 'components/Button/Button'
 import { ReactComponent as UcenterIcon } from 'assets/svg/ucenter.svg'
 import { useHistory } from 'react-router'
+import { UserInfoTabRoute, UserInfoTabs } from 'pages/Account'
 
 const useStyles = makeStyles(theme => ({
   actionButton: {
@@ -216,7 +217,7 @@ function Web3StatusInner() {
   } else {
     return (
       <Button
-        classname={classes.actionButton}
+        // classname={classes.actionButton}
         fontSize={'14px'}
         width={'140px'}
         height={'36px'}
@@ -254,15 +255,6 @@ export default function Web3Status() {
       <WalletModal ENSName={ENSName ?? undefined} pendingTransactions={pending} confirmedTransactions={confirmed} />
     </>
   )
-}
-
-export enum UserInfoTabs {
-  INVENTORY = 'Inventory',
-  ACTIVITY = 'Activity'
-}
-export const UserInfoTabRoute = {
-  [UserInfoTabs.INVENTORY]: 'Inventory',
-  [UserInfoTabs.ACTIVITY]: 'Activity'
 }
 
 function UserMenu({ account }: { account?: string | null }) {
