@@ -12,6 +12,7 @@ import useModal from 'hooks/useModal'
 import { isAddress } from 'utils'
 import MessageBox from 'components/Modal/TransactionModals/MessageBox'
 import ActionButton from 'components/Button/ActionButton'
+import { NFT_BRIDGE_ADDRESS } from 'constants/index'
 
 export default function ImportManual({
   onImport,
@@ -47,7 +48,8 @@ export default function ImportManual({
     if (!isAddress(contractAddress)) return setError('Invalid contract address')
     if (tokenId === '') return setError('Enter token ID')
     if (nftRes?.nft?.name === undefined) return setError(`Token doesnt exist`)
-    // if (nftRes?.nft?.owner !== account) return setError('NFT not in your possession')
+    if (nftRes?.nft?.owner === NFT_BRIDGE_ADDRESS) return setError('')
+    if (nftRes?.nft?.owner !== account) return setError('NFT not in your possession')
     setError('')
   }, [account, contractAddress, nftRes?.nft?.name, nftRes?.nft?.owner, tokenId])
 
@@ -60,15 +62,24 @@ export default function ImportManual({
           <ChainSelect selectedChain={chainId ? ChainListMap[chainId] : null} disabled chainList={ChainList} />
         </div>
         <Input
+          placeholder="Token Contact Address"
           label="Token Contact Address"
           value={contractAddress}
           onChange={e => setContractAddress(e.target.value)}
         />
-        <Input label="Token ID" value={tokenId} onChange={e => setTokenId(e.target.value)} />
+        <Input
+          placeholder="Token ID"
+          label="Token ID"
+          value={tokenId}
+          inputMode="numeric"
+          minLength={1}
+          pattern="\d*"
+          onChange={e => setTokenId(/^\d+$/.test(e.target.value) ? e.target.value : '')}
+        />
         <ActionButton
           pending={nftRes.loading}
           pendingText={'Importing'}
-          actionText="Import"
+          actionText={nftRes?.nft?.owner === NFT_BRIDGE_ADDRESS ? 'NFT deposited, continue to withdraw' : 'Import'}
           error={error || nftRes.error}
           onAction={handleImport}
         />

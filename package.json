@@ -109,6 +109,7 @@
     "clsx": "^1.1.1",
     "decimal.js-light": "^2.5.1",
     "jsbi": "^4.0.0",
-    "toformat": "^2.0.0"
+    "toformat": "^2.0.0",
+    "web3": "^1.6.0"
   }
 }

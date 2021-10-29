@@ -1,10 +1,12 @@
 import { createReducer } from '@reduxjs/toolkit'
+import { NFT } from 'models/nft'
 import {
   addTransaction,
   checkedTransaction,
   clearAllTransactions,
   finalizeTransaction,
-  SerializableTransactionReceipt
+  SerializableTransactionReceipt,
+  finalizeLog
 } from './actions'
 
 const now = () => new Date().getTime()
@@ -20,6 +22,7 @@ export interface TransactionDetails {
   addedTime: number
   confirmedTime?: number
   from: string
+  deposit?: { fromChain: number; toChain: number; nft: NFT; log?: { log: any; parsedLog: any } }
 }
 
 export interface TransactionState {
@@ -34,12 +37,12 @@ export default createReducer(initialState, builder =>
   builder
     .addCase(
       addTransaction,
-      (transactions, { payload: { chainId, from, hash, approval, summary, claim, ERC721Approval } }) => {
+      (transactions, { payload: { chainId, from, hash, approval, summary, claim, ERC721Approval, deposit } }) => {
         if (transactions[chainId]?.[hash]) {
           throw Error('Attempted to add existing transaction.')
         }
         const txs = transactions[chainId] ?? {}
-        txs[hash] = { hash, approval, summary, claim, from, addedTime: now(), ERC721Approval }
+        txs[hash] = { hash, approval, summary, claim, from, addedTime: now(), ERC721Approval, deposit }
         transactions[chainId] = txs
       }
     )
@@ -64,6 +67,15 @@ export default createReducer(initialState, builder =>
         return
       }
       tx.receipt = receipt
+      tx.confirmedTime = now()
+    })
+    .addCase(finalizeLog, (transactions, { payload: { hash, chainId, log, parsedLog } }) => {
+      const tx = transactions[chainId]?.[hash]
+      if (!tx || !tx.deposit) {
+        return
+      }
+      console.debug('add log!!', { log, parsedLog })
+      tx.deposit.log = { log, parsedLog }
       tx.confirmedTime = now()
     })
 )

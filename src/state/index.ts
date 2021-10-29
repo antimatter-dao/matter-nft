@@ -7,7 +7,7 @@ import user from './user/reducer'
 import transactions from './transactions/reducer'
 import multicall from './multicall/reducer'
 
-const PERSISTED_KEYS: string[] = ['user', 'transactions']
+const PERSISTED_KEYS: string[] = ['user', 'transactions', 'bridge']
 
 const store = configureStore({
   reducer: {

@@ -1,4 +1,5 @@
 import { createAction } from '@reduxjs/toolkit'
+import { NFT } from 'models/nft'
 import { ChainId } from '../../constants/chain'
 
 export interface SerializableTransactionReceipt {
@@ -20,6 +21,7 @@ export const addTransaction = createAction<{
   ERC721Approval?: { contractAddress: string; spender: string; tokenId: string }
   claim?: { recipient: string }
   summary?: string
+  deposit?: { fromChain: number; toChain: number; nft: NFT }
 }>('transactions/addTransaction')
 export const clearAllTransactions = createAction<{ chainId: ChainId }>('transactions/clearAllTransactions')
 export const finalizeTransaction = createAction<{
@@ -32,3 +34,10 @@ export const checkedTransaction = createAction<{
   hash: string
   blockNumber: number
 }>('transactions/checkedTransaction')
+
+export const finalizeLog = createAction<{
+  chainId: ChainId
+  hash: string
+  log: any
+  parsedLog: any
+}>('transactions/finalizeLog')

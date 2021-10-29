@@ -24,9 +24,8 @@ import { useERC721ApproveCallback } from 'hooks/useERC721ApproveCallback'
 import { NFT_BRIDGE_ADDRESS } from 'constants/index'
 import { useBridgeCallback } from 'hooks/useBridgeCallback'
 import MessageBox from 'components/Modal/TransactionModals/MessageBox'
-import { useTransaction, useTransactionAdder } from 'state/transactions/hooks'
+import { useTransaction, useTransactionAdder, useDepositTxn } from 'state/transactions/hooks'
 import ActionButton from 'components/Button/ActionButton'
-import JSBI from 'jsbi'
 import TransacitonPendingModal from 'components/Modal/TransactionModals/TransactionPendingModal'
 import { Axios } from 'utils/httpRequest/axios'
 
@@ -37,7 +36,6 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
   const [depositing, setDepositing] = useState(false)
   const [withdrawing, setWithdrawing] = useState(false)
   const [withdrawed, setWithdrawed] = useState(false)
-  const [depositHash, setDepositHash] = useState<undefined | string>(undefined)
   const [withdrawHash, setWithdrawHash] = useState<undefined | string>(undefined)
   const [withdrawModalOpen, setwithdrawModalOpen] = useState(false)
   const [error, setError] = useState('')
@@ -52,10 +50,11 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
     NFT_BRIDGE_ADDRESS,
     tokenId
   )
-  const { deposit, withdraw, getNonce } = useBridgeCallback()
+  const { deposit, withdraw } = useBridgeCallback()
   const addTransaction = useTransactionAdder()
-  const depositReceipt = useTransaction(depositHash)
-  const withdrawReceipt = useTransaction(withdrawHash)
+  // const allTxn = useAllTransactions(token?.chainId)
+  const depositTxn = useDepositTxn(token)
+  const withdrawTxn = useTransaction(withdrawHash)
 
   const approved = approvalState === ApprovalState.APPROVED
   const approving = approvalState === ApprovalState.PENDING
@@ -68,80 +67,85 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
   }, [])
 
   const handleWithdraw = useCallback(async () => {
-    if (!token || !toChain || !account) return
+    if (!token || !toChain || !account || !library) return
     showModal(<TransacitonPendingModal />)
     try {
-      const nonce = await getNonce(token.contractAddress, toChain.hex, account)
-      const sign = await Axios.post('getNftRecvSignData', {
-        from: {
-          chainId: toChain?.id,
-          fromChainId: fromChain?.id,
-          mainChainId: token.mainChainId,
-          name: token.name,
-          nft: token.contractAddress,
-          nonce: JSBI.toNumber(JSBI.BigInt(nonce.toString())),
-          symbol: token.symbol,
-          to: account,
-          tokenId: token.tokenId,
-          tokenURI: token.tokenUri
-        }
+      const nonce = depositTxn?.deposit?.log?.parsedLog.nonce
+      if (nonce === undefined) throw Error('No nonce')
+      const {
+        data: { data: response }
+      }: any = await Axios.post('getNftRecvSignData', {
+        chainId: toChain?.id,
+        fromChainId: depositTxn?.deposit?.fromChain,
+        mainChainId: token.mainChainId,
+        name: token.name,
+        nft: token.contractAddress,
+        nonce: +nonce,
+        symbol: token.symbol,
+        to: account,
+        tokenId: token.tokenId,
+        tokenURI: token.tokenUri
       })
-
-      console.log(10086, nonce, sign)
+      console.log(10086, nonce, response, {
+        fromChainId: ChainListMap[response.fromChainId].hex,
+        toAddress: account,
+        nonce: nonce,
+        name: token.name,
+        symbol: token.symbol,
+        mainChainId: ChainListMap[response.mainChainId].hex,
+        nftAddress: token.contractAddress,
+        tokenId: token.tokenId,
+        tokenURI: token.tokenUri,
+        signatures: [response.signatory, response.signV, response.signR, response.signS]
+      })
       setwithdrawModalOpen(false)
-      withdraw(
+      const r: any = await withdraw(
         {
-          fromChainId: fromChain?.hex,
+          fromChainId: ChainListMap[response.fromChainId].hex,
           toAddress: account,
-          nonce: JSBI.BigInt(nonce.toString()),
+          nonce: nonce,
           name: token.name,
-          symbol: token?.symbol,
-          mainChainId: token?.chainId,
-          nftAddress: token?.contractAddress,
-          tokenId: token?.tokenId,
-          tokenURI: token?.tokenUri,
-          signatures: []
+          symbol: token.symbol,
+          mainChainId: ChainListMap[response.mainChainId].hex,
+          nftAddress: token.contractAddress,
+          tokenId: token.tokenId,
+          tokenURI: token.tokenUri,
+          signatures: [response.signatory, response.signV, response.signR, response.signS]
         },
         {
           gasLimit: 3500000,
           value: '10000000000000000'
         }
       )
-        .then(r => {
-          hideModal()
-          setWithdrawing(true)
-          setWithdrawHash(r.hash)
-          addTransaction(r, {
-            summary: `Withdraw NFT(${token?.name}) from ${toChain?.name}`
-          })
-          showModal(<TransactionSubmittedModal />)
-          console.log('withdraw', 888, r)
-        })
-        .catch(e => {
-          hideModal()
-          showModal(<MessageBox type="error">{e.message}</MessageBox>)
-          setWithdrawing(false)
-          console.log('withdrawError', 888, e)
-        })
+
+      hideModal()
+      setWithdrawing(true)
+      setWithdrawHash(r.hash)
+      addTransaction(r, {
+        summary: `Withdraw NFT(${token?.name}) from ${toChain?.name}`
+      })
+      showModal(<TransactionSubmittedModal />)
     } catch (e) {
+      hideModal()
+      showModal(<MessageBox type="error">{(e as Error).message}</MessageBox>)
+      setWithdrawing(false)
       return console.error(e)
     }
-  }, [account, addTransaction, fromChain?.hex, fromChain?.id, getNonce, hideModal, showModal, toChain, token, withdraw])
+  }, [account, addTransaction, depositTxn, hideModal, library, showModal, toChain, token, withdraw])
 
   const handleDeposit = useCallback(() => {
+    if (!token || !toChain || !fromChain) return
     showModal(<TransacitonPendingModal />)
-
-    if (!token) return
     deposit(token?.contractAddress ?? '', toChain?.id ?? 1, account ?? '', token.tokenId, {
       gasLimit: 3500000,
       value: '10000000000000000'
     })
       .then((r: any) => {
         hideModal()
-        setDepositHash(r.hash)
         setDepositing(true)
         addTransaction(r, {
-          summary: `Deposit NFT(${token.name}) from ${fromChain?.name}`
+          summary: `Deposit NFT(${token.name}) from ${fromChain?.name}`,
+          deposit: { fromChain: fromChain.id ?? 1, toChain: toChain.id ?? 1, nft: token }
         })
         showModal(<TransactionSubmittedModal />)
       })
@@ -150,7 +154,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
         setDepositing(false)
         showModal(<MessageBox type="error">{e.message}</MessageBox>)
       })
-  }, [account, addTransaction, deposit, fromChain?.name, hideModal, showModal, toChain?.id, token])
+  }, [account, addTransaction, deposit, fromChain, hideModal, showModal, toChain, token])
 
   useEffect(() => {
     if (approvalState === ApprovalState.APPROVED) {
@@ -159,31 +163,29 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
   }, [approvalState, approving, hideModal, showModal])
 
   useEffect(() => {
-    console.log('depositReceipt', depositReceipt)
     if (token?.owner === NFT_BRIDGE_ADDRESS) {
       setDeposited(true)
     }
-    if (depositReceipt?.status === 1) {
+    if (depositTxn?.receipt?.status === 1) {
       setDeposited(true)
       setDepositing(false)
     }
-    if (depositReceipt?.status === 0) {
+    if (depositTxn?.receipt?.status === 0) {
       setDepositing(false)
       setDepositing(false)
     }
-  }, [chainId, depositReceipt, depositReceipt?.status, token?.chainId, token?.owner, withdrawReceipt])
+  }, [chainId, depositTxn, token?.chainId, token?.owner])
 
   useEffect(() => {
-    console.log('withdrawReceipt', withdrawReceipt)
-    if (withdrawReceipt?.status === 1) {
+    if (withdrawTxn?.receipt?.status === 1) {
       setWithdrawed(true)
       setWithdrawing(false)
     }
-    if (withdrawReceipt?.status === 0) {
+    if (withdrawTxn?.receipt?.status === 0) {
       setWithdrawed(false)
       setWithdrawing(false)
     }
-  }, [withdrawReceipt, withdrawReceipt?.status])
+  }, [withdrawTxn])
 
   useEffect(() => {
     if (!tokenAddress) return setError('Enter token contract address')
@@ -193,8 +195,8 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
   }, [fromChain, toChain, tokenAddress, tokenId])
 
   useEffect(() => {
-    chainId && setFromChain(ChainListMap[chainId])
-  }, [chainId])
+    token?.chainId && setFromChain(ChainListMap[token?.chainId])
+  }, [token])
 
   const WithdrawModal = useCallback(
     () => (
@@ -246,24 +248,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
         </Box>
       </WithdrawConfirmationModal>
     ),
-    [
-      account,
-      chainId,
-      fromChain,
-      hideModal,
-      library,
-      showModal,
-      toChain,
-      token?.chainId,
-      token?.contractAddress,
-      token?.name,
-      token?.symbol,
-      token?.tokenId,
-      token?.tokenUri,
-      tokenUri,
-      withdraw,
-      withdrawModalOpen
-    ]
+    [account, chainId, fromChain, handleWithdraw, hideModal, library, showModal, toChain, tokenUri, withdrawModalOpen]
   )
   const DepositModal = useCallback(
     () => (
@@ -335,6 +320,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
                   approvalCallback()
                   showModal(<TransacitonPendingModal />)
                 }}
+                success={approved}
                 successText="Approved"
                 pendingText="approving"
                 actionText="Approve"

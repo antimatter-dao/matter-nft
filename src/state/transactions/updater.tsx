@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import Web3 from 'web3'
 import { useActiveWeb3React } from '../../hooks'
 import { useAddPopup, useBlockNumber } from '../application/hooks'
 import { AppDispatch, AppState } from '../index'
-import { checkedTransaction, finalizeTransaction } from './actions'
+import { checkedTransaction, finalizeTransaction, finalizeLog } from './actions'
+const web3 = new Web3()
 
 export function shouldCheck(
   lastBlockNumber: number,
@@ -50,6 +52,34 @@ export default function Updater(): null {
           .getTransactionReceipt(hash)
           .then(receipt => {
             if (receipt) {
+              if (transactions[hash].deposit) {
+                const parsed = web3.eth.abi.decodeLog(
+                  [
+                    {
+                      name: 'from',
+                      type: 'address'
+                    },
+                    {
+                      name: 'nonce',
+                      type: 'uint256'
+                    },
+                    {
+                      name: 'tokenId',
+                      type: 'uint256'
+                    }
+                  ],
+                  receipt.logs[3].data,
+                  receipt.logs[3].topics
+                )
+                dispatch(
+                  finalizeLog({
+                    chainId,
+                    hash,
+                    log: receipt.logs,
+                    parsedLog: { from: parsed.from, nonce: parsed.nonce, tokenId: parsed.tokenId }
+                  })
+                )
+              }
               dispatch(
                 finalizeTransaction({
                   chainId,

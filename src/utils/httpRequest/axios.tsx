@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const axiosInstance = axios.create({
   baseURL: 'https://test-nftapi.antimatter.finance/web/',
-  timeout: 5000,
+  timeout: 10000,
   headers: { 'content-type': 'application/json', accept: 'application/json' }
 })
 

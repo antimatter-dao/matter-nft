@@ -4,7 +4,6 @@ import { useNFTBridgeContract } from './useContract'
 export function useBridgeCallback(): {
   deposit: (...args: any[]) => Promise<any>
   withdraw: (...args: any[]) => Promise<any>
-  getNonce: (...args: any[]) => Promise<any>
 } {
   const contract = useNFTBridgeContract()
 
@@ -25,7 +24,7 @@ export function useBridgeCallback(): {
         nftAddress: string
         tokenId: string
         tokenURI: string
-        signatures: any[]
+        signatures: string[]
       },
       options?: any
     ): Promise<any> => {
@@ -58,11 +57,5 @@ export function useBridgeCallback(): {
     [contract]
   )
 
-  const getNonce = useCallback(
-    (nftAddress: string, toChainId: string, toAddress: string): Promise<any> => {
-      return contract?.nonces(nftAddress, toChainId, toAddress)
-    },
-    [contract]
-  )
-  return useMemo(() => ({ deposit, withdraw, getNonce }), [deposit, withdraw, getNonce])
+  return useMemo(() => ({ deposit, withdraw }), [deposit, withdraw])
 }
