@@ -71,6 +71,7 @@ export function useERC721ApproveCallback(
         gasLimit: calculateGasMargin(estimatedGas)
       })
       .then((response: TransactionResponse) => {
+        hideModal()
         addTransaction(response, {
           summary: 'Approve NFT',
           ERC721Approval: { contractAddress: contract.address, spender, tokenId }
@@ -81,7 +82,7 @@ export function useERC721ApproveCallback(
         console.debug('Failed to approve nft', error)
         throw error
       })
-  }, [approvalState, tokenId, contract, spender, addTransaction])
+  }, [approvalState, tokenId, contract, spender, hideModal, addTransaction])
 
   return [approvalState, approve]
 }
