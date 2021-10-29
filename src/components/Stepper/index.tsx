@@ -76,13 +76,18 @@ const useStyles = makeStyles({
 })
 
 export default function Stepper(props: Props) {
-  const { activeStep, steps, completedIcon = <StepCompletedIcon />, connector = <Connector />, onStep } = props
+  const { activeStep, steps, completedIcon = <StepCompletedIcon />, connector, onStep } = props
   const classes = useStyles(props)
 
   const onClick = useCallback(e => onStep && onStep(parseInt(e.currentTarget.value)), [onStep])
 
   return (
-    <MuiStepper nonLinear classes={{ root: classes.root }} activeStep={activeStep} connector={connector}>
+    <MuiStepper
+      nonLinear
+      classes={{ root: classes.root }}
+      activeStep={activeStep}
+      connector={connector ? connector : <Connector />}
+    >
       {steps.map((label, index) => {
         return (
           <MuiStep key={label}>
