@@ -7,9 +7,12 @@ import { useSingleCallResult } from '../state/multicall/hooks'
 import { ApprovalState } from './useApproveCallback'
 import { useNFTContract } from './useContract'
 import useModal from './useModal'
+import { useActiveWeb3React } from 'hooks'
 
 function useGetApproved(contract: Contract | null, spender: string, tokenId: string) {
-  const arg = useMemo(() => [tokenId], [tokenId])
+  const { account } = useActiveWeb3React()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const arg = useMemo(() => [account ?? '', spender], [account, spender, tokenId])
   const res = useSingleCallResult(contract, 'isApprovedForAll', arg)
   return useMemo(() => {
     if (res.loading) return undefined
@@ -67,7 +70,7 @@ export function useERC721ApproveCallback(
     })
 
     return contract
-      .setApprovalForAll(spender, tokenId, {
+      .setApprovalForAll(spender, true, {
         gasLimit: calculateGasMargin(estimatedGas)
       })
       .then((response: TransactionResponse) => {

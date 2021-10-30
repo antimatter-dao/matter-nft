@@ -6,7 +6,8 @@ import {
   clearAllTransactions,
   finalizeTransaction,
   SerializableTransactionReceipt,
-  finalizeLog
+  finalizeLog,
+  cleanUpOutdatedDeposit
 } from './actions'
 
 const now = () => new Date().getTime()
@@ -74,8 +75,15 @@ export default createReducer(initialState, builder =>
       if (!tx || !tx.deposit) {
         return
       }
-      console.debug('add log!!', { log, parsedLog })
       tx.deposit.log = { log, parsedLog }
       tx.confirmedTime = now()
+    })
+    .addCase(cleanUpOutdatedDeposit, (transactions, { payload: { newestHash, chainId } }) => {
+      const tx = transactions[chainId]
+      if (!tx) return
+      Object.keys(tx).map(hash => {
+        if (hash === newestHash) return
+        tx?.[hash]?.deposit && delete tx?.[hash].deposit
+      })
     })
 )

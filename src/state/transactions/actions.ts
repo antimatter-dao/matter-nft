@@ -41,3 +41,8 @@ export const finalizeLog = createAction<{
   log: any
   parsedLog: any
 }>('transactions/finalizeLog')
+
+export const cleanUpOutdatedDeposit = createAction<{
+  newestHash: string
+  chainId: ChainId
+}>('transactions/cleanUpOutdatedDeposit')
