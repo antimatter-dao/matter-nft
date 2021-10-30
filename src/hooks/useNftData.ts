@@ -22,8 +22,8 @@ export function useNftDataCallback(contractAddress: string, tokenId: string) {
     const ownerOf = async () => {
       try {
         if (!tokenId || !nftContract) return
-        const ownerResponse = await nftContract.ownerOf(tokenId)
-        console.log(ownerResponse)
+        await nftContract.ownerOf(tokenId)
+        setOwnerError(false)
       } catch (e) {
         setOwnerError(true)
       }
