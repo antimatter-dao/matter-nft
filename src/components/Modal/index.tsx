@@ -3,6 +3,7 @@ import { Dialog, makeStyles, Theme, IconButton, createStyles } from '@material-u
 import CloseIcon from '@material-ui/icons/Close'
 import useModal from 'hooks/useModal'
 import { useRef } from 'react'
+import clsx from 'clsx'
 
 interface Props {
   children?: React.ReactNode
@@ -22,6 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
       '& *': {
         boxSizing: 'border-box'
       },
+      paddingTop: theme.height.header,
       [theme.breakpoints.down('sm')]: {
         height: `calc(100% - ${theme.height.mobileHeader})`,
         marginTop: 'auto'
@@ -45,7 +47,10 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: 100,
       overflowX: 'hidden',
       position: 'absolute',
+      overflowY: 'auto',
+      maxHeight: `calc(100vh - ${theme.height.header})`,
       [theme.breakpoints.down('sm')]: {
+        maxHeight: `calc(100vh - ${theme.height.header} - ${theme.height.mobileHeader})`,
         width: 'calc(100% - 32px)!important',
         marginBottom: '32px'
       }
@@ -55,22 +60,17 @@ const useStyles = makeStyles((theme: Theme) =>
         border: 'none',
         borderTop: '1px solid ' + theme.palette.grey.A200,
         width: '100%!important',
-        height: '100%',
+        maxWidth: 'unset!important',
         maxHeight: 'unset',
+        height: `calc(100vh - ${theme.height.mobileHeader})`,
         margin: 0,
-        paddingBottom: '30px',
-        borderRadius: 0
+        borderRadius: '20px 20px 0 0',
+        paddingBottom: theme.height.header
       }
     },
     backdrop: {
-      backgroundColor: theme.palette.background.default,
-      opacity: 0.6,
-      marginTop: theme.height.header,
-      [theme.breakpoints.down('sm')]: {
-        height: `calc(100% - ${theme.height.mobileHeader} - ${theme.height.header})`,
-        marginTop: theme.height.mobileHeader,
-        marginBottom: theme.height.header
-      }
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      opacity: 0.4
     },
     mobileBackdrop: {
       [theme.breakpoints.down('sm')]: {
@@ -103,9 +103,9 @@ export default function Modal(props: Props) {
     <>
       <Dialog
         open={customIsOpen !== undefined ? !!customIsOpen : isOpen}
-        className={`${classes.root}${isCardOnMobile ? ' ' + classes.mobileRoot : ''}`}
-        PaperProps={{ className: `${classes.paper}${isCardOnMobile ? ' ' + classes.mobilePaper : ''}`, ref: node }}
-        BackdropProps={{ className: `${classes.backdrop}${isCardOnMobile ? ' ' + classes.mobileBackdrop : ''}` }}
+        className={clsx(classes.root, !isCardOnMobile && classes.mobileRoot)}
+        PaperProps={{ className: clsx(classes.paper, !isCardOnMobile && classes.mobilePaper), ref: node }}
+        BackdropProps={{ className: clsx(classes.backdrop, !isCardOnMobile && classes.mobileBackdrop) }}
         onClose={hide}
       >
         {closeIcon && (

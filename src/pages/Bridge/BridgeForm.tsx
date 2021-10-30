@@ -27,7 +27,7 @@ import MessageBox from 'components/Modal/TransactionModals/MessageBox'
 import { useTransaction, useTransactionAdder, useDepositTxn } from 'state/transactions/hooks'
 import ActionButton from 'components/Button/ActionButton'
 import TransacitonPendingModal from 'components/Modal/TransactionModals/TransactionPendingModal'
-import { Axios } from 'utils/httpRequest/axios'
+import { Axios, SignatureResponse } from 'utils/httpRequest/axios'
 
 export default function BridgeForm({ token, onReturnClick }: { token: NFT | undefined; onReturnClick: () => void }) {
   const [fromChain, setFromChain] = useState<Chain | null>(null)
@@ -52,7 +52,6 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
   )
   const { deposit, withdraw } = useBridgeCallback()
   const addTransaction = useTransactionAdder()
-  // const allTxn = useAllTransactions(token?.chainId)
   const depositTxn = useDepositTxn(token)
   const withdrawTxn = useTransaction(withdrawHash)
 
@@ -70,47 +69,45 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
     if (!token || !toChain || !account || !library) return
     showModal(<TransacitonPendingModal />)
     try {
+      const signRoutes = ['getNftRecvSignData']
       const nonce = depositTxn?.deposit?.log?.parsedLog.nonce
       if (nonce === undefined) throw Error('No nonce')
-      const {
-        data: { data: response }
-      }: any = await Axios.post('getNftRecvSignData', {
-        chainId: toChain?.id,
-        fromChainId: depositTxn?.deposit?.fromChain,
-        mainChainId: token.mainChainId,
-        name: token.name,
-        nft: token.contractAddress,
-        nonce: +nonce,
-        symbol: token.symbol,
-        to: account,
-        tokenId: token.tokenId,
-        tokenURI: token.tokenUri
-      })
-      console.log(10086, nonce, response, {
-        fromChainId: ChainListMap[response.fromChainId].hex,
-        toAddress: account,
-        nonce: nonce,
-        name: token.name,
-        symbol: token.symbol,
-        mainChainId: ChainListMap[response.mainChainId].hex,
-        nftAddress: token.contractAddress,
-        tokenId: token.tokenId,
-        tokenURI: token.tokenUri,
-        signatures: [[response.signatory, response.signV, response.signR, response.signS]]
-      })
+      const requestList = await Promise.all(
+        signRoutes.map(route =>
+          Axios.post<SignatureResponse>(route, {
+            chainId: toChain?.id,
+            fromChainId: depositTxn?.deposit?.fromChain,
+            mainChainId: token.mainChainId,
+            name: token.name,
+            nft: token.contractAddress,
+            nonce: +nonce,
+            symbol: token.symbol,
+            to: account,
+            tokenId: token.tokenId,
+            tokenURI: token.tokenUri
+          })
+        )
+      )
+      const resList = await requestList
+      const signsList = resList.map(({ data: { data: response } }: { data: { data: any } }) => [
+        response.signatory,
+        response.signV,
+        response.signR,
+        response.signS
+      ])
       setwithdrawModalOpen(false)
       const r: any = await withdraw(
         {
-          fromChainId: ChainListMap[response.fromChainId].hex,
+          fromChainId: token.chainId,
           toAddress: account,
           nonce: nonce,
           name: token.name,
           symbol: token.symbol,
-          mainChainId: ChainListMap[response.mainChainId].hex,
+          mainChainId: token.mainChainId,
           nftAddress: token.contractAddress,
           tokenId: token.tokenId,
           tokenURI: token.tokenUri,
-          signatures: [[response.signatory, response.signV, response.signR, response.signS]]
+          signatures: signsList
         },
         {
           gasLimit: 3500000,
@@ -196,7 +193,8 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
 
   useEffect(() => {
     token?.chainId && setFromChain(ChainListMap[token?.chainId])
-  }, [token])
+    depositTxn?.deposit?.toChain && setToChain(ChainListMap[depositTxn.deposit.toChain])
+  }, [depositTxn?.deposit?.toChain, token])
 
   const WithdrawModal = useCallback(
     () => (
@@ -292,7 +290,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
                 chainList={ChainList}
                 onSelectTo={handleTo}
                 disabledFrom={true}
-                disabledTo={!(tokenAddress && tokenId)}
+                disabledTo={!(tokenAddress && tokenId) || !!depositTxn}
                 activeTo={!!fromChain && !!tokenAddress && !!tokenId && !toChain}
               />
               {account && <DestinationAddress address={account} margin="-10px 0 10px" />}
@@ -342,10 +340,18 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
                   {!error && (
                     <ActionButton
                       error={deposited ? '' : `Withdraw in ${toChain?.symbol} Chain`}
-                      onAction={() => {
-                        setwithdrawModalOpen(true)
-                      }}
-                      actionText={`Withdraw in ${toChain?.symbol} Chain`}
+                      onAction={
+                        chainId === toChain?.id
+                          ? () => {
+                              setwithdrawModalOpen(true)
+                            }
+                          : () => {
+                              library?.send('wallet_switchEthereumChain', [{ chainId: toChain?.hex }, account])
+                            }
+                      }
+                      actionText={
+                        chainId === toChain?.id ? `Withdraw in ${toChain?.symbol} Chain` : `Switch to ${toChain?.name}`
+                      }
                       pending={withdrawing}
                       pendingText="Withdrawing"
                       success={withdrawed}

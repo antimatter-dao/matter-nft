@@ -140,6 +140,11 @@ export const override: any = {
       }
     }
   },
+  MuiAppBar: {
+    root: {
+      zIndex: 1301
+    }
+  },
   MuiButton: {
     root: {
       color: theme.palette.primary.contrastText,

@@ -14,7 +14,7 @@ export function useNftDataCallback(contractAddress: string, tokenId: string) {
   const nftContract = useContract(isAddress(contractAddress) ? contractAddress : undefined, ERC721_ABI)
   const ownerRes = useSingleCallResult(tokenId ? nftContract : null, 'ownerOf', arg)
   const nftRes = useSingleCallResult(tokenId ? bridgeContract : null, 'mappingNftInfo', args)
-
+  console.log(nftRes, ownerRes)
   const response = useMemo(
     () => ({
       loading: ownerRes.loading || nftRes.loading,

@@ -3,6 +3,7 @@ import TextButton from 'components/Button/TextButton'
 import ChainSelect from '../ChainSelect'
 import { Chain } from 'models/chain'
 import SwitchButton from './SwitcherButton'
+import { useMemo } from 'react'
 
 export default function ChainSwap({
   fromChain,
@@ -33,6 +34,10 @@ export default function ChainSwap({
     onSelectTo(from)
   }
 
+  const toChainList = useMemo(() => {
+    return chainList.filter(chain => !(chain.id === fromChain?.id))
+  }, [chainList, fromChain?.id])
+
   return (
     <Box display="flex" justifyContent="space-between" alignItems={'flex-end'} position={'relative'} width="100%">
       <ChainSelect
@@ -52,7 +57,7 @@ export default function ChainSwap({
       <ChainSelect
         label={'To'}
         selectedChain={toChain}
-        chainList={chainList}
+        chainList={toChainList}
         onChange={onSelectTo}
         width={'49%'}
         disabled={disabledTo}

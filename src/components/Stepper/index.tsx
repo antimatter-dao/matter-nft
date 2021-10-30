@@ -22,7 +22,7 @@ const Connector = styled(MuiStepConnector)(() => ({
   },
   [`&.${stepConnectorClasses.completed}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      backgroundImage: 'linear-gradient(90deg, #24FF00 0%, #FFFFFF 100%)'
+      backgroundImage: 'linear-gradient(90deg, #24FF00 100%, #FFFFFF 100%)'
     }
   },
   [`& .${stepConnectorClasses.line}`]: {
@@ -45,7 +45,7 @@ export default function Stepper(props: Props) {
         style={{
           borderRadius: '50%',
           border: completed ? '1px solid transparent' : '1px solid #FFFFFF',
-          opacity: active ? 1 : 0.4,
+          opacity: active || completed ? 1 : 0.4,
           width: 22,
           height: 22,
           display: 'flex',
