@@ -8,7 +8,7 @@ import Copy from 'components/Copy'
 import { useHistory } from 'react-router'
 import { SwitchTabWrapper, Tab } from 'components/SwitchTab'
 import { useParams } from 'react-router-dom'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import NetworkSelect from 'components/Header/NetworkSelect'
 import ImportManual from 'pages/Bridge/ImportManual'
 import { NFT } from 'models/nft'
@@ -18,6 +18,12 @@ import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 import PaginationView from 'components/Pagination'
 import OutlineButton from 'components/Button/OutlineButton'
 import TableView from 'components/Table'
+import { useMyActivity } from '../../hooks/useAccount'
+import Spinner from 'components/Spinner'
+import { ChainListMap } from 'constants/chain'
+import { useNftDataCallback } from 'hooks/useNftData'
+import { ReactComponent as ReceiveIcon } from 'assets/svg/receive_icon.svg'
+import { ReactComponent as SendIcon } from 'assets/svg/send_icon.svg'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -127,7 +133,7 @@ const DummyNFTList = [
   }
 ]
 
-enum EventType {
+export enum AccountEventType {
   ALL = 'All',
   SEND = 'Send',
   RECEIVE = 'Receive'
@@ -170,6 +176,25 @@ function AccountNFTCardChild() {
   )
 }
 
+function ShowNFTName({ contractAddress, tokenId }: { contractAddress: string; tokenId: string | number }) {
+  const { nft } = useNftDataCallback(contractAddress, tokenId.toString())
+  const nftUrl = useMemo(() => {
+    if (!nft.tokenUri) return ''
+    if (nft.tokenUri instanceof String) {
+      const str = nft.tokenUri.replace(/^data:application\/json;base64,/, '')
+      if (str.length !== nft.tokenUri.length) return JSON.parse(window.atob(str))
+      return nft.tokenUri
+    }
+    return ''
+  }, [nft.tokenUri])
+  return (
+    <Box display="flex" alignItems="center" gridColumnGap="5px">
+      <img src={nftUrl || NFTPlaceholder} alt="" style={{ width: 48, height: 48 }} />
+      {nft?.name || '--'}
+    </Box>
+  )
+}
+
 export default function Account() {
   const { account } = useActiveWeb3React()
   const classes = useStyles()
@@ -177,7 +202,11 @@ export default function Account() {
   const { tab } = useParams<{ tab: string }>()
   const [currentTab, setCurrentTab] = useState(UserInfoTabs.INVENTORY)
   const [showManual, setShowManual] = useState(false)
-  const [currentEventType, setCurrentEventType] = useState(EventType.ALL)
+  const [currentEventType, setCurrentEventType] = useState(AccountEventType.ALL)
+
+  useEffect(() => {
+    if (!account) history.replace('/')
+  }, [account, history])
 
   const handleTabClick = useCallback(
     tab => () => {
@@ -191,6 +220,28 @@ export default function Account() {
       setCurrentTab(tab as UserInfoTabs)
     }
   }, [tab])
+
+  const { page: myActivityPage, data: myActivityList, loading: myActivityLoading } = useMyActivity(currentEventType)
+  const myActivityListRows = useMemo(() => {
+    return myActivityList.map(item => [
+      <>
+        {item.type === AccountEventType.RECEIVE ? <ReceiveIcon /> : <SendIcon />}
+        {item.type}
+      </>,
+      <ShowNFTName key={0} contractAddress={item.contract} tokenId={item.tokenId} />,
+      1,
+      <Box display="flex" alignItems="center" key="3">
+        {ChainListMap[item.fromChainId]?.icon}
+        {shortenAddress(item.fromAddress)}
+      </Box>,
+      <Box display="flex" alignItems="center" key="3">
+        {ChainListMap[item.toChainId]?.icon}
+        {shortenAddress(item.toAddress)}
+      </Box>,
+      new Date(item.timestamp * 1000).toLocaleString('en')
+    ])
+  }, [myActivityList])
+
   return (
     <div className={classes.root}>
       <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 60 }}>
@@ -239,8 +290,8 @@ export default function Account() {
 
         {currentTab === UserInfoTabs.ACTIVITY && (
           <>
-            <Box display="flex" gridGap="20px">
-              {Object.values(EventType).map(item =>
+            <Box display="flex" gridGap="20px" flexWrap="wrap">
+              {Object.values(AccountEventType).map(item =>
                 currentEventType === item ? (
                   <Button key={item} width="120px" height="48px">
                     {item}
@@ -254,15 +305,21 @@ export default function Account() {
             </Box>
             <TableView
               header={['Event', 'Item', 'Quantity', 'From', 'To', 'Date']}
-              rows={[
-                ['Event', 'Item', 'Quantity', 'From', 'To', 'Date'],
-                ['Event', 'Item', 'Quantity', 'From', 'To', 'Date'],
-                ['Event', 'Item', 'Quantity', 'From', 'To', 'Date']
-              ]}
+              rows={myActivityListRows}
               isHeaderGray
             />
+            {myActivityLoading && (
+              <Box display="flex" justifyContent="center">
+                <Spinner size="40px" />
+              </Box>
+            )}
             <Box display="flex" flexDirection="row-reverse">
-              <PaginationView count={20} page={6} onChange={() => {}} setPage={() => {}} />
+              <PaginationView
+                count={myActivityPage.totalPages}
+                page={myActivityPage.currentPage}
+                onChange={() => {}}
+                setPage={myActivityPage.setCurrentPage}
+              />
             </Box>
           </>
         )}

@@ -90,13 +90,13 @@ const useStyles = makeStyles({
         isHeaderGray ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #999999'
     },
     '&:hover': {
-      backgroundColor: ' rgba(255, 255, 255, 0.08)'
+      backgroundColor: ' rgba(255, 255, 255, 0.02)'
     }
   }
 })
 
 const Card = styled.div`
-  background: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
   border-radius: 30px;
   padding: 24px;
   > div {
@@ -139,8 +139,8 @@ export default function Table({
               <Box display="flex" flexDirection="column" gridGap="16px">
                 {header.map((headerString, index) => (
                   <CardRow key={index}>
-                    <Typography variant="h4">{headerString}</Typography>
-                    <Typography style={{ color: '#000' }}> {data[index] ?? null}</Typography>
+                    <Typography variant="inherit">{headerString}</Typography>
+                    <Typography style={{ color: '#fff' }}> {data[index] ?? null}</Typography>
                   </CardRow>
                 ))}
               </Box>
