@@ -50,7 +50,6 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center'
   },
   cardHover: {
-    display: 'absolute',
     top: 0,
     right: 0,
     bottom: 0,

@@ -10,16 +10,17 @@ import TextButton from 'components/Button/TextButton'
 import Copy from 'components/Copy'
 
 const useStyles = makeStyles(theme => ({
-  box: {
+  imgWrapper: {
     position: 'relative',
     width: '100%',
+    overflow: 'hidden',
     '&::before': {
       content: '""',
       display: 'block',
       paddingTop: '100%'
     }
   },
-  content: {
+  img: {
     position: 'absolute',
     width: '100%',
     top: 0,
@@ -80,9 +81,9 @@ export default function NFTCard({
     >
       <OutlinedCard style={{ overflow: 'hidden', width: '100%', position: 'relative' }}>
         <Box display="grid">
-          <div className={classes.box} style={{ opacity: selected ? 0.5 : 1 }}>
+          <div className={classes.imgWrapper} style={{ opacity: selected ? 0.5 : 1 }}>
             {hoverChildren}
-            <Image src={nft.tokenUri || NFTPlaceholder} className={classes.content} />
+            <Image src={nft.tokenUri || NFTPlaceholder} className={classes.img} />
           </div>
 
           <Box display="grid" padding="16px" gridGap="8px">
