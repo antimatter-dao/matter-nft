@@ -10,7 +10,7 @@ import useModal from './useModal'
 
 function useGetApproved(contract: Contract | null, spender: string, tokenId: string) {
   const arg = useMemo(() => [tokenId], [tokenId])
-  const res = useSingleCallResult(contract, 'getApproved', arg)
+  const res = useSingleCallResult(contract, 'isApprovedForAll', arg)
   return useMemo(() => {
     if (res.loading) return undefined
     if (res.result?.includes(spender)) return true
@@ -67,7 +67,7 @@ export function useERC721ApproveCallback(
     })
 
     return contract
-      .approve(spender, tokenId, {
+      .setApprovalForAll(spender, tokenId, {
         gasLimit: calculateGasMargin(estimatedGas)
       })
       .then((response: TransactionResponse) => {
