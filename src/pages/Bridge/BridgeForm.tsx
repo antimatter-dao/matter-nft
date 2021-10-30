@@ -96,7 +96,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
         nftAddress: token.contractAddress,
         tokenId: token.tokenId,
         tokenURI: token.tokenUri,
-        signatures: [response.signatory, response.signV, response.signR, response.signS]
+        signatures: [[response.signatory, response.signV, response.signR, response.signS]]
       })
       setwithdrawModalOpen(false)
       const r: any = await withdraw(
@@ -110,11 +110,11 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
           nftAddress: token.contractAddress,
           tokenId: token.tokenId,
           tokenURI: token.tokenUri,
-          signatures: [response.signatory, response.signV, response.signR, response.signS]
+          signatures: [[response.signatory, response.signV, response.signR, response.signS]]
         },
         {
           gasLimit: 3500000,
-          value: '10000000000000000'
+          value: '100000000000000000'
         }
       )
 
@@ -355,7 +355,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
                 </Box>
                 {!error && (
                   <Box width="70%" style={{ margin: '0 auto' }}>
-                    <Stepper steps={[1, 2]} activeStep={deposited ? 1 : withdrawed ? 2 : 0} />
+                    <Stepper steps={[1, 2]} activeStep={withdrawed ? 2 : deposited ? 2 : 0} />
                   </Box>
                 )}
               </>
