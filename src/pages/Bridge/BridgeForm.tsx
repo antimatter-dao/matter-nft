@@ -20,7 +20,7 @@ import SwitchChainModal from 'components/Modal/SwitchChainModal'
 import { NFT } from 'models/nft'
 import { ChainList, ChainListMap } from 'constants/chain'
 import { ApprovalState } from 'hooks/useApproveCallback'
-import { useERC721ApproveCallback } from 'hooks/useERC721ApproveCallback'
+import { useERC721ApproveAllCallback } from 'hooks/useERC721ApproveAllCallback'
 import { NFT_BRIDGE_ADDRESS } from 'constants/index'
 import { useBridgeCallback } from 'hooks/useBridgeCallback'
 import MessageBox from 'components/Modal/TransactionModals/MessageBox'
@@ -45,10 +45,9 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
   const tokenUri = token?.tokenUri ? token?.tokenUri : PlaceholderImg
 
   const { account, chainId, library } = useActiveWeb3React()
-  const [approvalState, approvalCallback] = useERC721ApproveCallback(
+  const [approvalState, approvalCallback] = useERC721ApproveAllCallback(
     token?.contractAddress ?? undefined,
-    NFT_BRIDGE_ADDRESS,
-    tokenId
+    NFT_BRIDGE_ADDRESS
   )
   const { deposit, withdraw } = useBridgeCallback()
   const addTransaction = useTransactionAdder()
@@ -104,7 +103,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
           name: token.name,
           symbol: token.symbol,
           mainChainId: token.mainChainId,
-          nftAddress: token.contractAddress,
+          nftAddress: token.mainAddress,
           tokenId: token.tokenId,
           tokenURI: token.tokenUri,
           signatures: signsList

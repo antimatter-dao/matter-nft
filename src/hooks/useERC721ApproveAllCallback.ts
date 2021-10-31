@@ -1,36 +1,30 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { useCallback, useMemo } from 'react'
-import { useERC721HasPendingApproval, useTransactionAdder } from '../state/transactions/hooks'
+import { useHasPendingApproval, useTransactionAdder } from '../state/transactions/hooks'
 import { calculateGasMargin } from '../utils'
 import { Contract } from '@ethersproject/contracts'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { ApprovalState } from './useApproveCallback'
+import { useActiveWeb3React } from '.'
 import { useNFTContract } from './useContract'
-import useModal from './useModal'
-import { useActiveWeb3React } from 'hooks'
 
-function useGetApproved(contract: Contract | null, spender: string, tokenId: string) {
+function useGetApproved(contract: Contract | undefined, spender: string) {
   const { account } = useActiveWeb3React()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const arg = useMemo(() => [account ?? '', spender], [account, spender, tokenId])
-  const res = useSingleCallResult(contract, 'isApprovedForAll', arg)
+  const res = useSingleCallResult(contract, 'isApprovedForAll', [account || '', spender])
   return useMemo(() => {
-    if (res.loading) return undefined
-    return !!res.result?.[0]
+    if (res.loading || !res.result) return undefined
+    return res.result[0]
   }, [res.loading, res.result])
 }
 
-// returns a variable indicating the state of the approval and a function which approves if necessary or early returns
-export function useERC721ApproveCallback(
+export function useERC721ApproveAllCallback(
   contractAddress: string | undefined,
-  spender: string,
-  tokenId: string
+  spender: string
 ): [ApprovalState, () => Promise<void>] {
   // const { account } = useActiveWeb3React()
-  const { hideModal } = useModal()
   const contract = useNFTContract(contractAddress)
-  const isApproved = useGetApproved(contract, spender ?? '', tokenId)
-  const pendingApproval = useERC721HasPendingApproval(contract?.address, spender ?? '', tokenId)
+  const isApproved = useGetApproved(contract ?? undefined, spender)
+  const pendingApproval = useHasPendingApproval(contract?.address, spender)
   // check the current approval status
   const approvalState: ApprovalState = useMemo(() => {
     // if (!spender) return ApprovalState.UNKNOWN
@@ -48,10 +42,6 @@ export function useERC721ApproveCallback(
       console.error('approve was called unnecessarily')
       return
     }
-    if (!tokenId) {
-      console.error('no nft token id')
-      return
-    }
 
     if (!contract) {
       console.error('Contract is null')
@@ -63,7 +53,7 @@ export function useERC721ApproveCallback(
       return
     }
 
-    const estimatedGas = await contract.estimateGas.approve(spender, tokenId).catch((error: Error) => {
+    const estimatedGas = await contract.estimateGas.setApprovalForAll(spender, true).catch((error: Error) => {
       console.debug('Failed to approve nft', error)
       throw error
     })
@@ -73,18 +63,16 @@ export function useERC721ApproveCallback(
         gasLimit: calculateGasMargin(estimatedGas)
       })
       .then((response: TransactionResponse) => {
-        hideModal()
         addTransaction(response, {
           summary: 'Approve NFT',
-          ERC721Approval: { contractAddress: contract.address, spender, tokenId }
+          approval: { tokenAddress: contract.address, spender }
         })
       })
       .catch((error: Error) => {
-        hideModal()
         console.debug('Failed to approve nft', error)
         throw error
       })
-  }, [approvalState, tokenId, contract, spender, hideModal, addTransaction])
+  }, [approvalState, contract, spender, addTransaction])
 
   return [approvalState, approve]
 }

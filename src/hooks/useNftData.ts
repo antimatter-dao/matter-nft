@@ -40,7 +40,8 @@ export function useNftDataCallback(contractAddress: string, tokenId: string) {
         name: nftRes?.result?.[0],
         symbol: nftRes?.result?.[1],
         mainChainId: nftRes?.result?.[2] ? +JSBI.BigInt(nftRes?.result?.[2]).toString() : undefined,
-        contractAddress: nftRes?.result?.[3],
+        contractAddress: contractAddress,
+        mainAddress: nftRes?.result?.[3],
         tokenUri: nftRes?.result?.[4],
         owner: ownerRes.result?.[0],
         chainId: chainId
@@ -48,6 +49,7 @@ export function useNftDataCallback(contractAddress: string, tokenId: string) {
     }),
     [
       chainId,
+      contractAddress,
       nftRes.error,
       nftRes.loading,
       nftRes?.result,

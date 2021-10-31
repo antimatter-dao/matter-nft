@@ -3,7 +3,7 @@ import axios, { AxiosResponse, AxiosPromise } from 'axios'
 const axiosInstance = axios.create({
   baseURL: 'https://test-nftapi.antimatter.finance/web/',
   // baseURL: 'https://test-nftapi.antimatter.finance:8081/',
-  timeout: 5000,
+  timeout: 10000,
   headers: { 'content-type': 'application/json', accept: 'application/json' }
 })
 
