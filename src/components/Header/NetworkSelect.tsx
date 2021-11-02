@@ -35,12 +35,11 @@ export default function NetworkSelect() {
           <MenuItem
             className={classes.menuItem}
             onClick={() => {
-              if (option.id === ChainId.MAINNET) {
-                library?.send('wallet_switchEthereumChain', [{ chainId: '0x1' }, account])
-              } else if (option.id === ChainId.ROPSTEN) {
-                library?.send('wallet_switchEthereumChain', [{ chainId: '0x3' }, account])
-              } else if (option.id === ChainId.RINKEBY) {
-                library?.send('wallet_switchEthereumChain', [{ chainId: '0x4' }, account])
+              if ([ChainId.MAINNET, ChainId.ROPSTEN, ChainId.RINKEBY, ChainId.KOVAN].includes(option.id)) {
+                library?.send('wallet_switchEthereumChain', [
+                  { chainId: SUPPORTED_NETWORKS[option.id as ChainId]?.chainId },
+                  account
+                ])
               } else {
                 const params = SUPPORTED_NETWORKS[option.id as ChainId]
                 library?.send('wallet_addEthereumChain', [params, account])

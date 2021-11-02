@@ -18,10 +18,10 @@ import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 import PaginationView from 'components/Pagination'
 import OutlineButton from 'components/Button/OutlineButton'
 import TableView from 'components/Table'
-import { useMyActivity } from '../../hooks/useAccount'
+import { ActivityItemProp, useMyActivity } from '../../hooks/useAccount'
 import Spinner from 'components/Spinner'
 import { ChainListMap } from 'constants/chain'
-import { useNftDataCallback } from 'hooks/useNftData'
+import { useNftBaseData } from 'hooks/useNftData'
 import { ReactComponent as ReceiveIcon } from 'assets/svg/receive_icon.svg'
 import { ReactComponent as SendIcon } from 'assets/svg/send_icon.svg'
 import { useNFTImageByUri } from 'hooks/useNFTImage'
@@ -144,6 +144,11 @@ export enum AccountEventType {
   SEND = 'Send',
   RECEIVE = 'Receive'
 }
+export enum AccountActivityRecvStatus {
+  UNKNOWN,
+  NORECV,
+  RECVD
+}
 
 function SwitchTab({
   currentTab,
@@ -182,12 +187,14 @@ function AccountNFTCardChild() {
   )
 }
 
-function ShowNFTName({ contractAddress, tokenId }: { contractAddress: string; tokenId: string | number }) {
-  const { nft } = useNftDataCallback(contractAddress, tokenId.toString())
+function ShowNFTName({ data }: { data: ActivityItemProp }) {
+  const chain = data.type === AccountEventType.SEND ? data.fromChainId : data.toChainId
+  const nft = useNftBaseData(chain, data.contract, data.tokenId.toString())
   const tokenUri = useNFTImageByUri(nft?.tokenUri)
+  console.log('🚀 ~ file: index.tsx ~ line 194 ~ ShowNFTName ~ tokenUri', tokenUri)
   return (
     <Box display="flex" alignItems="center" gridColumnGap="5px">
-      <Image src={tokenUri} alt="" altSrc={NFTPlaceholder} style={{ width: 48, height: 48 }} />
+      <Image src={tokenUri || NFTPlaceholder} alt="" altSrc={NFTPlaceholder} style={{ width: 48, height: 48 }} />
       {nft?.name || '--'}
     </Box>
   )
@@ -226,7 +233,7 @@ export default function Account() {
         {item.type === AccountEventType.RECEIVE ? <ReceiveIcon /> : <SendIcon />}
         {item.type}
       </>,
-      <ShowNFTName key={0} contractAddress={item.contract} tokenId={item.tokenId} />,
+      <ShowNFTName key={0} data={item} />,
       1,
       <Box display="flex" alignItems="center" key="3">
         {ChainListMap[item.fromChainId]?.icon}

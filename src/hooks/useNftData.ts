@@ -4,8 +4,12 @@ import ERC721_ABI from 'constants/abis/erc721.json'
 import { useActiveWeb3React } from 'hooks'
 import JSBI from 'jsbi'
 import { useSingleCallResult } from 'state/multicall/hooks'
-import { isAddress } from 'utils'
+import { getContract, isAddress } from 'utils'
 import { useBlockNumber } from 'state/application/hooks'
+import { getOtherNetworkLibrary } from 'connectors/MultiNetworkConnector'
+import NFT_BRIDGE_ABI from 'constants/abis/nft_bridge.json'
+import { NFT } from 'models/nft'
+import { NFT_BRIDGE_ADDRESS } from '../constants'
 
 export function useNftDataCallback(contractAddress: string, tokenId: string) {
   const { chainId } = useActiveWeb3React()
@@ -68,4 +72,40 @@ export function useFeeSend(address: string | undefined): undefined | string {
   const nftContract = useNFTBridgeContract()
   const feeSendRes = useSingleCallResult(nftContract, 'feeSend', [address])
   return feeSendRes.result?.[0].toString()
+}
+
+export function useRecvSend(chainId: number | undefined, address: string | undefined): undefined | string {
+  const nftContract = useNFTBridgeContract()
+  const feeRecvRes = useSingleCallResult(nftContract, 'feeRecv', [chainId, address])
+  return feeRecvRes.result?.[0].toString()
+}
+
+export function useNftBaseData(chainId: number, contractAddress: string, tokenId: string): NFT | undefined {
+  const [nftData, setNftData] = useState<NFT | undefined>()
+
+  useEffect(() => {
+    const library = getOtherNetworkLibrary(chainId)
+    if (!library || !tokenId || !contractAddress) return
+    const bridgeContract = getContract(NFT_BRIDGE_ADDRESS, NFT_BRIDGE_ABI, library)
+    bridgeContract
+      .mappingNftInfo(contractAddress, tokenId)
+      .then((res: any) => {
+        const nft = {
+          tokenId,
+          name: res.name,
+          symbol: res.symbol,
+          mainChainId: Number(res.mainChainId.toString()),
+          contractAddress: contractAddress,
+          mainAddress: res[3],
+          tokenUri: res.tokenURI,
+          chainId: chainId
+        }
+        setNftData(nft)
+      })
+      .catch((e: any) => {
+        setNftData(undefined)
+        console.log('load error:', e)
+      })
+  }, [chainId, contractAddress, tokenId])
+  return nftData
 }

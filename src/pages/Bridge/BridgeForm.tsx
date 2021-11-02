@@ -29,7 +29,7 @@ import ActionButton from 'components/Button/ActionButton'
 import TransacitonPendingModal from 'components/Modal/TransactionModals/TransactionPendingModal'
 import { Axios, SignatureResponse } from 'utils/httpRequest/axios'
 import { useNFTImageByUri } from 'hooks/useNFTImage'
-import { useFeeSend } from 'hooks/useNftData'
+import { useFeeSend, useRecvSend } from 'hooks/useNftData'
 import { TransactionDetails } from 'state/transactions/reducer'
 
 export default function BridgeForm({
@@ -59,10 +59,8 @@ export default function BridgeForm({
 
   const { account, chainId, library } = useActiveWeb3React()
 
-  // TOTD
-  const sendFee = useFeeSend(
-    chainId !== toChain?.id ? token?.contractAddress || token?.mainAddress : token?.mainAddress
-  )
+  const sendFee = useFeeSend(token?.contractAddress)
+  const recvFee = useRecvSend(token?.mainChainId, token?.mainAddress)
 
   const [approvalState, approvalCallback] = useERC721ApproveAllCallback(
     token?.contractAddress ?? undefined,
@@ -84,7 +82,7 @@ export default function BridgeForm({
   }, [])
 
   const handleWithdraw = useCallback(async () => {
-    if (!token || !toChain || !fromChain || !account || !library || !sendFee) return
+    if (!token || !toChain || !fromChain || !account || !library || !recvFee) return
     showModal(<TransacitonPendingModal />)
     try {
       const signRoutes = ['getNftRecvSignData']
@@ -129,7 +127,7 @@ export default function BridgeForm({
         },
         {
           gasLimit: 3500000,
-          value: sendFee
+          value: recvFee
         }
       )
 
@@ -160,7 +158,7 @@ export default function BridgeForm({
     fromChain,
     hideModal,
     library,
-    sendFee,
+    recvFee,
     showModal,
     toChain,
     token,

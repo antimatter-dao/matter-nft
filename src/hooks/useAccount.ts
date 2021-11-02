@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Axios } from '../utils/httpRequest/axios'
 import { useActiveWeb3React } from '.'
-import { AccountEventType } from 'pages/Account'
+import { AccountActivityRecvStatus, AccountEventType } from 'pages/Account'
 
-interface ActivityType {
+export interface ActivityItemProp {
   contract: string
   fromAddress: string
   fromChainId: number
-  status: number
+  status: AccountActivityRecvStatus
   timestamp: number
   toAddress: string
   toChainId: number
@@ -24,13 +24,13 @@ export function useMyActivity(
     currentPage: number
     setCurrentPage: (page: number) => void
   }
-  data: ActivityType[]
+  data: ActivityItemProp[]
 } {
   const { chainId, account } = useActiveWeb3React()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [totalPages, setTotalPages] = useState<number>(0)
-  const [list, setList] = useState<ActivityType[]>([])
+  const [list, setList] = useState<ActivityItemProp[]>([])
 
   useEffect(() => {
     setCurrentPage(1)
@@ -52,12 +52,12 @@ export function useMyActivity(
           'https://test-nftapi.antimatter.finance:8081/vault/bridgeRecord',
           req
         )
-        const recordList: ActivityType[] = _recordres.data.list.map(
+        const recordList: ActivityItemProp[] = _recordres.data.list.map(
           (item: {
             contract: any
             from_address: any
             from_chain_id: any
-            status: any
+            status: AccountActivityRecvStatus
             timestamp: any
             to_address: any
             to_chain_id: any
