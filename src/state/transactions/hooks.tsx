@@ -214,7 +214,7 @@ export function useDepositTxn(): TransactionDetails | undefined {
   const depositTxn = useMemo(() => {
     let hash: string | undefined = ''
     let chainId: number | undefined = undefined
-    Object.keys(allDepositTxn).every(key => {
+    Object.keys(allDepositTxn).map(key => {
       const txn = allDepositTxn[+key]
       if (!txn) return undefined
       if (!txn) return undefined
