@@ -18,7 +18,7 @@ export default function ActionButton({
   error?: string | undefined
   pending?: boolean
   success?: boolean
-  onAction: () => void
+  onAction: (() => void) | undefined
   actionText: string
   pendingText?: string
   successText?: string

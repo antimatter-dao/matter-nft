@@ -135,7 +135,6 @@ export default function BridgeForm({
 
       hideModal()
       setWithdrawing(true)
-      // setWithdrawHash(r.hash)
       addTransaction(r, {
         summary: `Withdraw NFT(${token?.name}) from ${toChain?.name}`,
         withdraw: {
@@ -227,11 +226,12 @@ export default function BridgeForm({
   }, [withdrawTxn])
 
   useEffect(() => {
+    if (!account) return setError('Please connect wallet')
     if (!tokenAddress) return setError('Enter token contract address')
     if (tokenAddress && !tokenId) return setError('Enter token ID')
     if (tokenAddress && tokenId && (!fromChain || !toChain)) return setError('Select Chain')
     setError('')
-  }, [fromChain, toChain, tokenAddress, tokenId])
+  }, [account, fromChain, toChain, tokenAddress, tokenId])
 
   useEffect(() => {
     token?.chainId && setFromChain(ChainListMap[token?.chainId])
@@ -250,6 +250,11 @@ export default function BridgeForm({
         fromChain={fromChain}
         toChain={toChain}
         onConfirm={handleWithdraw}
+        error={
+          depositTxn?.deposit?.log?.parsedLog.from && depositTxn?.deposit?.log?.parsedLog.from !== account
+            ? 'Account unmatched'
+            : undefined
+        }
         step1={
           <>
             <b>
@@ -289,7 +294,19 @@ export default function BridgeForm({
         </Box>
       </WithdrawConfirmationModal>
     ),
-    [account, chainId, fromChain, handleWithdraw, hideModal, library, showModal, toChain, tokenUri, withdrawModalOpen]
+    [
+      account,
+      chainId,
+      depositTxn?.deposit?.log?.parsedLog.from,
+      fromChain,
+      handleWithdraw,
+      hideModal,
+      library,
+      showModal,
+      toChain,
+      tokenUri,
+      withdrawModalOpen
+    ]
   )
   const DepositModal = useCallback(
     () => (
@@ -333,7 +350,7 @@ export default function BridgeForm({
                 chainList={ChainList}
                 onSelectTo={handleTo}
                 disabledFrom={true}
-                disabledTo={!(tokenAddress && tokenId) || deposited || withdrawed}
+                disabledTo={!(tokenAddress && tokenId) || deposited || withdrawed || depositing || withdrawing}
                 activeTo={!!fromChain && !!tokenAddress && !!tokenId && !toChain}
               />
               {account && <DestinationAddress address={account} margin="-10px 0 10px" />}

@@ -48,7 +48,7 @@ export default function ImportManual({
     if (!isAddress(contractAddress)) return setError('Invalid contract address')
     if (tokenId === '') return setError('Enter token ID')
     if (nftRes?.nft?.name === undefined) return setError(`Token doesnt exist`)
-    if (nftRes?.nft?.owner === NFT_BRIDGE_ADDRESS) return setError('')
+    // if (nftRes?.nft?.owner === NFT_BRIDGE_ADDRESS) return setError('')
     if (nftRes?.nft?.owner !== account) return setError('NFT not in your possession')
     setError('')
   }, [account, contractAddress, nftRes?.nft?.name, nftRes?.nft?.owner, tokenId])

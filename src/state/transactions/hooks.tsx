@@ -183,7 +183,6 @@ export function useTransactionFromOneChain(
   if (!chainId || !transactionHash) return undefined
   const transactions = state[chainId]
   if (!transactions || !transactionHash || !transactions[transactionHash]) return undefined
-  console.log(999, transactions[transactionHash])
   return transactions[transactionHash]
 }
 

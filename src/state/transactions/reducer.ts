@@ -93,7 +93,7 @@ export default createReducer(initialState, builder =>
     })
     .addCase(cleanUpOutdatedDeposit, (transactions, { payload: { newestHash } }) => {
       const keys = Object.keys(transactions)
-      keys.every(key => {
+      keys.map(key => {
         const tx = transactions[+key]
         if (!tx) return
         Object.keys(tx).map(hash => {
@@ -104,7 +104,7 @@ export default createReducer(initialState, builder =>
     })
     .addCase(cleanUpOutdatedWithdraw, (transactions, { payload: { newestHash } }) => {
       const keys = Object.keys(transactions)
-      keys.every(key => {
+      keys.map(key => {
         const tx = transactions[+key]
         if (!tx) return
         Object.keys(tx).map(hash => {

@@ -11,10 +11,10 @@ import useModal from './useModal'
 
 function useGetApproved(contract: Contract | undefined, spender: string) {
   const { account } = useActiveWeb3React()
-  const res = useSingleCallResult(contract, 'isApprovedForAll', [account || '', spender])
+  const res = useSingleCallResult(account ? contract : null, 'isApprovedForAll', [account || '', spender])
   return useMemo(() => {
     if (res.loading || !res.result) return undefined
-    return res.result[0]
+    return res.result?.[0]
   }, [res.loading, res.result])
 }
 
