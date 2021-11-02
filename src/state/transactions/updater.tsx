@@ -98,10 +98,10 @@ export default function Updater(): null {
                   }, 3000)
                 } else {
                   dispatch(
-                    deleteWithdrawHashToDeposit(
-                      transactions[hash].withdraw.depositHash,
-                      transactions[hash].withdraw.fromChain
-                    )
+                    deleteWithdrawHashToDeposit({
+                      depositHash: transactions[hash].withdraw.depositHash,
+                      fromChainId: transactions[hash].withdraw.fromChain
+                    })
                   )
                 }
               }

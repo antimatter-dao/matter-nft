@@ -62,4 +62,4 @@ export const addWithdrawHashToDeposit = createAction<{
 export const deleteWithdrawHashToDeposit = createAction<{
   depositHash: string
   fromChainId: ChainId
-}>('transactions/addWithdrawHashToDeposit')
+}>('transactions/deleteWithdrawHashToDeposit')
