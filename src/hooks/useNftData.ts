@@ -63,3 +63,9 @@ export function useNftDataCallback(contractAddress: string, tokenId: string) {
 
   return response
 }
+
+export function useFeeSend(address: string | undefined): undefined | string {
+  const nftContract = useNFTBridgeContract()
+  const feeSendRes = useSingleCallResult(nftContract, 'feeSend', [address])
+  return feeSendRes.result?.[0].toString()
+}

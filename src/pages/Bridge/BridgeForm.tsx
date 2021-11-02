@@ -28,6 +28,8 @@ import { useTransaction, useTransactionAdder, useDepositTxn } from 'state/transa
 import ActionButton from 'components/Button/ActionButton'
 import TransacitonPendingModal from 'components/Modal/TransactionModals/TransactionPendingModal'
 import { Axios, SignatureResponse } from 'utils/httpRequest/axios'
+import { useNFTImageByUri } from 'hooks/useNFTImage'
+import { useFeeSend } from 'hooks/useNftData'
 
 export default function BridgeForm({ token, onReturnClick }: { token: NFT | undefined; onReturnClick: () => void }) {
   const [fromChain, setFromChain] = useState<Chain | null>(null)
@@ -42,9 +44,16 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
 
   const tokenAddress = token?.contractAddress ?? ''
   const tokenId = token?.tokenId ?? ''
-  const tokenUri = token?.tokenUri ? token?.tokenUri : PlaceholderImg
+  // const tokenUri = token?.tokenUri ? token?.tokenUri : PlaceholderImg
+  const tokenUri = useNFTImageByUri(token?.tokenUri)
 
   const { account, chainId, library } = useActiveWeb3React()
+
+  // TOTD
+  const sendFee = useFeeSend(
+    chainId !== toChain?.id ? token?.contractAddress || token?.mainAddress : token?.mainAddress
+  )
+
   const [approvalState, approvalCallback] = useERC721ApproveAllCallback(
     token?.contractAddress ?? undefined,
     NFT_BRIDGE_ADDRESS
@@ -65,7 +74,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
   }, [])
 
   const handleWithdraw = useCallback(async () => {
-    if (!token || !toChain || !account || !library) return
+    if (!token || !toChain || !account || !library || !sendFee) return
     showModal(<TransacitonPendingModal />)
     try {
       const signRoutes = ['getNftRecvSignData']
@@ -110,7 +119,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
         },
         {
           gasLimit: 3500000,
-          value: '100000000000000000'
+          value: sendFee
         }
       )
 
@@ -127,14 +136,26 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
       setWithdrawing(false)
       return console.error(e)
     }
-  }, [account, addTransaction, depositTxn, hideModal, library, showModal, toChain, token, withdraw])
+  }, [
+    account,
+    addTransaction,
+    depositTxn?.deposit?.fromChain,
+    depositTxn?.deposit?.log?.parsedLog.nonce,
+    hideModal,
+    library,
+    sendFee,
+    showModal,
+    toChain,
+    token,
+    withdraw
+  ])
 
   const handleDeposit = useCallback(() => {
-    if (!token || !toChain || !fromChain) return
+    if (!token || !toChain || !fromChain || !sendFee) return
     showModal(<TransacitonPendingModal />)
     deposit(token?.contractAddress ?? '', toChain?.id ?? 1, account ?? '', token.tokenId, {
       gasLimit: 3500000,
-      value: '10000000000000000'
+      value: sendFee
     })
       .then((r: any) => {
         hideModal()
@@ -150,7 +171,7 @@ export default function BridgeForm({ token, onReturnClick }: { token: NFT | unde
         setDepositing(false)
         showModal(<MessageBox type="error">{e.message}</MessageBox>)
       })
-  }, [account, addTransaction, deposit, fromChain, hideModal, showModal, toChain, token])
+  }, [account, addTransaction, deposit, fromChain, hideModal, sendFee, showModal, toChain, token])
 
   useEffect(() => {
     if (approvalState === ApprovalState.APPROVED) {

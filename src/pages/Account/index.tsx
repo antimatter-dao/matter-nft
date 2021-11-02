@@ -24,6 +24,8 @@ import { ChainListMap } from 'constants/chain'
 import { useNftDataCallback } from 'hooks/useNftData'
 import { ReactComponent as ReceiveIcon } from 'assets/svg/receive_icon.svg'
 import { ReactComponent as SendIcon } from 'assets/svg/send_icon.svg'
+import { useNFTImageByUri } from 'hooks/useNFTImage'
+import Image from 'components/Image'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -182,18 +184,10 @@ function AccountNFTCardChild() {
 
 function ShowNFTName({ contractAddress, tokenId }: { contractAddress: string; tokenId: string | number }) {
   const { nft } = useNftDataCallback(contractAddress, tokenId.toString())
-  const nftUrl = useMemo(() => {
-    if (!nft.tokenUri) return ''
-    if (nft.tokenUri instanceof String) {
-      const str = nft.tokenUri.replace(/^data:application\/json;base64,/, '')
-      if (str.length !== nft.tokenUri.length) return JSON.parse(window.atob(str))
-      return nft.tokenUri
-    }
-    return ''
-  }, [nft.tokenUri])
+  const tokenUri = useNFTImageByUri(nft?.tokenUri)
   return (
     <Box display="flex" alignItems="center" gridColumnGap="5px">
-      <img src={nftUrl || NFTPlaceholder} alt="" style={{ width: 48, height: 48 }} />
+      <Image src={tokenUri} alt="" altSrc={NFTPlaceholder} style={{ width: 48, height: 48 }} />
       {nft?.name || '--'}
     </Box>
   )
