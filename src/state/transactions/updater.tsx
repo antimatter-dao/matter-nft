@@ -4,7 +4,13 @@ import Web3 from 'web3'
 import { useActiveWeb3React } from '../../hooks'
 import { useAddPopup, useBlockNumber } from '../application/hooks'
 import { AppDispatch, AppState } from '../index'
-import { checkedTransaction, finalizeTransaction, finalizeLog } from './actions'
+import {
+  checkedTransaction,
+  finalizeTransaction,
+  finalizeLog,
+  cleanUpOutdatedWithdraw,
+  cleanUpOutdatedDeposit
+} from './actions'
 const web3 = new Web3()
 
 export function shouldCheck(
@@ -79,6 +85,17 @@ export default function Updater(): null {
                     parsedLog: { from: parsed.from, nonce: parsed.nonce, tokenId: parsed.tokenId }
                   })
                 )
+              }
+              if (transactions[hash].withdraw) {
+                setTimeout(() => {
+                  dispatch(cleanUpOutdatedWithdraw({ newestHash: '', chainId }))
+                }, 3000)
+
+                if (receipt.status === 1) {
+                  setTimeout(() => {
+                    dispatch(cleanUpOutdatedDeposit({ newestHash: '', chainId }))
+                  }, 3000)
+                }
               }
               dispatch(
                 finalizeTransaction({

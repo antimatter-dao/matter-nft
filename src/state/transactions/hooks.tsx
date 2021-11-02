@@ -1,10 +1,11 @@
 import { TransactionResponse } from '@ethersproject/providers'
+import { ChainId } from 'constants/chain'
 import { NFT } from 'models/nft'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useActiveWeb3React } from '../../hooks'
 import { AppDispatch, AppState } from '../index'
-import { addTransaction, cleanUpOutdatedDeposit } from './actions'
+import { addTransaction, cleanUpOutdatedDeposit, addWithdrawHashToDeposit, cleanUpOutdatedWithdraw } from './actions'
 import { TransactionDetails } from './reducer'
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
@@ -16,6 +17,7 @@ export function useTransactionAdder(): (
     claim?: { recipient: string }
     ERC721Approval?: { contractAddress: string; spender: string; tokenId: string }
     deposit?: { fromChain: number; toChain: number; nft: NFT }
+    withdraw?: { fromChain: number; toChain: number; depositHash: string }
   }
 ) => void {
   const { chainId, account } = useActiveWeb3React()
@@ -29,13 +31,15 @@ export function useTransactionAdder(): (
         approval,
         claim,
         ERC721Approval,
-        deposit
+        deposit,
+        withdraw
       }: {
         summary?: string
         claim?: { recipient: string }
         approval?: { tokenAddress: string; spender: string }
         ERC721Approval?: { contractAddress: string; spender: string; tokenId: string }
         deposit?: { fromChain: number; toChain: number; nft: NFT }
+        withdraw?: { fromChain: number; toChain: number; depositHash: string }
       } = {}
     ) => {
       if (!account) return
@@ -45,10 +49,23 @@ export function useTransactionAdder(): (
       if (!hash) {
         throw Error('No transaction hash found.')
       }
+      dispatch(
+        addTransaction({ hash, from: account, chainId, approval, summary, claim, ERC721Approval, deposit, withdraw })
+      )
       if (deposit) {
         dispatch(cleanUpOutdatedDeposit({ newestHash: hash, chainId }))
+        dispatch(cleanUpOutdatedWithdraw({ newestHash: '', chainId }))
       }
-      dispatch(addTransaction({ hash, from: account, chainId, approval, summary, claim, ERC721Approval, deposit }))
+      if (withdraw) {
+        dispatch(cleanUpOutdatedWithdraw({ newestHash: hash, chainId }))
+        dispatch(
+          addWithdrawHashToDeposit({
+            withdrawHash: hash,
+            depositHash: withdraw.depositHash,
+            fromChainId: withdraw.fromChain
+          })
+        )
+      }
     },
     [dispatch, chainId, account]
   )
@@ -158,6 +175,18 @@ export function useTransaction(transactionHash?: string): TransactionDetails | u
   return transactions[transactionHash]
 }
 
+export function useTransactionFromOneChain(
+  chainId: ChainId | undefined,
+  transactionHash: string
+): TransactionDetails | undefined {
+  const state = useSelector<AppState, AppState['transactions']>(state => state.transactions)
+  if (!chainId || !transactionHash) return undefined
+  const transactions = state[chainId]
+  if (!transactions || !transactionHash || !transactions[transactionHash]) return undefined
+  console.log(999, transactions[transactionHash])
+  return transactions[transactionHash]
+}
+
 export function useAllDepositTxn(): { [chainId: number]: { [key: string]: any } } {
   const state = useSelector<AppState, AppState['transactions']>(state => state.transactions)
 
@@ -181,24 +210,26 @@ export function useAllDepositTxn(): { [chainId: number]: { [key: string]: any } 
   )
 }
 
-export function useDepositTxn(token: NFT | undefined): TransactionDetails | undefined {
+export function useDepositTxn(): TransactionDetails | undefined {
   const allDepositTxn = useAllDepositTxn()
   const depositTxn = useMemo(() => {
-    if (!token) return undefined
+    let hash: string | undefined = ''
+    let chainId: number | undefined = undefined
+    Object.keys(allDepositTxn).every(key => {
+      const txn = allDepositTxn[+key]
+      if (!txn) return undefined
+      if (!txn) return undefined
+      const hashRes: string | undefined = Object.keys(txn).find((hashStr: any) => {
+        const deposit = txn[hashStr as keyof typeof txn]
 
-    const txn = token?.chainId ? allDepositTxn[token.chainId] : undefined
-    if (!txn || !token) return undefined
-    const hash: string | undefined = Object.keys(txn).find((hashStr: any) => {
-      const deposit = txn[hashStr as keyof typeof txn].deposit
-      const nft = deposit?.nft
-      return (
-        nft &&
-        nft?.contractAddress === token?.contractAddress &&
-        nft?.tokenId === token.tokenId &&
-        deposit.fromChain === token.chainId
-      )
+        return deposit && deposit.deposit && (deposit?.receipt?.status === 1 || !deposit?.receipt)
+      })
+      hash = hashRes
+      chainId = +key
+      return
     })
-    return hash ? txn[hash] : undefined
-  }, [allDepositTxn, token])
+
+    return hash && chainId ? allDepositTxn?.[chainId]?.[hash] : undefined
+  }, [allDepositTxn])
   return depositTxn
 }

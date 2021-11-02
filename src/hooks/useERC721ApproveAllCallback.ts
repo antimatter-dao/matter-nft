@@ -7,6 +7,7 @@ import { useSingleCallResult } from '../state/multicall/hooks'
 import { ApprovalState } from './useApproveCallback'
 import { useActiveWeb3React } from '.'
 import { useNFTContract } from './useContract'
+import useModal from './useModal'
 
 function useGetApproved(contract: Contract | undefined, spender: string) {
   const { account } = useActiveWeb3React()
@@ -22,6 +23,7 @@ export function useERC721ApproveAllCallback(
   spender: string
 ): [ApprovalState, () => Promise<void>] {
   // const { account } = useActiveWeb3React()
+  const { hideModal } = useModal()
   const contract = useNFTContract(contractAddress)
   const isApproved = useGetApproved(contract ?? undefined, spender)
   const pendingApproval = useHasPendingApproval(contract?.address, spender)
@@ -63,16 +65,18 @@ export function useERC721ApproveAllCallback(
         gasLimit: calculateGasMargin(estimatedGas)
       })
       .then((response: TransactionResponse) => {
+        hideModal()
         addTransaction(response, {
           summary: 'Approve NFT',
           approval: { tokenAddress: contract.address, spender }
         })
       })
       .catch((error: Error) => {
+        hideModal()
         console.debug('Failed to approve nft', error)
         throw error
       })
-  }, [approvalState, contract, spender, addTransaction])
+  }, [approvalState, contract, spender, hideModal, addTransaction])
 
   return [approvalState, approve]
 }

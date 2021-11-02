@@ -22,6 +22,7 @@ export const addTransaction = createAction<{
   claim?: { recipient: string }
   summary?: string
   deposit?: { fromChain: number; toChain: number; nft: NFT }
+  withdraw?: { fromChain: number; toChain: number; depositHash: string }
 }>('transactions/addTransaction')
 export const clearAllTransactions = createAction<{ chainId: ChainId }>('transactions/clearAllTransactions')
 export const finalizeTransaction = createAction<{
@@ -46,3 +47,14 @@ export const cleanUpOutdatedDeposit = createAction<{
   newestHash: string
   chainId: ChainId
 }>('transactions/cleanUpOutdatedDeposit')
+
+export const cleanUpOutdatedWithdraw = createAction<{
+  newestHash: string
+  chainId: ChainId
+}>('transactions/cleanUpOutdatedWithdraw')
+
+export const addWithdrawHashToDeposit = createAction<{
+  withdrawHash: string
+  depositHash: string
+  fromChainId: ChainId
+}>('transactions/addWithdrawHashToDeposit')

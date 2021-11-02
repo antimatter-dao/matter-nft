@@ -7,7 +7,9 @@ import {
   finalizeTransaction,
   SerializableTransactionReceipt,
   finalizeLog,
-  cleanUpOutdatedDeposit
+  cleanUpOutdatedDeposit,
+  cleanUpOutdatedWithdraw,
+  addWithdrawHashToDeposit
 } from './actions'
 
 const now = () => new Date().getTime()
@@ -23,7 +25,14 @@ export interface TransactionDetails {
   addedTime: number
   confirmedTime?: number
   from: string
-  deposit?: { fromChain: number; toChain: number; nft: NFT; log?: { log: any; parsedLog: any } }
+  deposit?: {
+    fromChain: number
+    toChain: number
+    nft: NFT
+    log?: { log: any; parsedLog: any }
+    withdrawHash?: string
+  }
+  withdraw?: { fromChain: number; toChain: number; depositHash: string }
 }
 
 export interface TransactionState {
@@ -38,12 +47,15 @@ export default createReducer(initialState, builder =>
   builder
     .addCase(
       addTransaction,
-      (transactions, { payload: { chainId, from, hash, approval, summary, claim, ERC721Approval, deposit } }) => {
+      (
+        transactions,
+        { payload: { chainId, from, hash, approval, summary, claim, ERC721Approval, deposit, withdraw } }
+      ) => {
         if (transactions[chainId]?.[hash]) {
           throw Error('Attempted to add existing transaction.')
         }
         const txs = transactions[chainId] ?? {}
-        txs[hash] = { hash, approval, summary, claim, from, addedTime: now(), ERC721Approval, deposit }
+        txs[hash] = { hash, approval, summary, claim, from, addedTime: now(), ERC721Approval, deposit, withdraw }
         transactions[chainId] = txs
       }
     )
@@ -78,12 +90,34 @@ export default createReducer(initialState, builder =>
       tx.deposit.log = { log, parsedLog }
       tx.confirmedTime = now()
     })
-    .addCase(cleanUpOutdatedDeposit, (transactions, { payload: { newestHash, chainId } }) => {
-      const tx = transactions[chainId]
-      if (!tx) return
-      Object.keys(tx).map(hash => {
-        if (hash === newestHash) return
-        tx?.[hash]?.deposit && delete tx?.[hash].deposit
+    .addCase(cleanUpOutdatedDeposit, (transactions, { payload: { newestHash } }) => {
+      const keys = Object.keys(transactions)
+      keys.every(key => {
+        const tx = transactions[+key]
+        if (!tx) return
+        Object.keys(tx).map(hash => {
+          if (hash === newestHash) return
+          tx?.[hash]?.deposit && delete tx?.[hash].deposit
+        })
       })
+    })
+    .addCase(cleanUpOutdatedWithdraw, (transactions, { payload: { newestHash } }) => {
+      const keys = Object.keys(transactions)
+      keys.every(key => {
+        const tx = transactions[+key]
+        if (!tx) return
+        Object.keys(tx).map(hash => {
+          if (hash === newestHash) return
+          tx?.[hash]?.withdraw && delete tx?.[hash].withdraw
+        })
+      })
+    })
+    .addCase(addWithdrawHashToDeposit, (transactions, { payload: { withdrawHash, depositHash, fromChainId } }) => {
+      const tx = fromChainId && transactions[fromChainId]
+      if (!tx || !depositHash || !withdrawHash) return
+      if (tx[depositHash]?.deposit && tx[depositHash].deposit !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        tx[depositHash].deposit!.withdrawHash = withdrawHash
+      }
     })
 )

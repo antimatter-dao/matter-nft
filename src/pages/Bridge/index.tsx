@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Typography, Box } from '@material-ui/core'
 import AppBody from 'components/AppBody'
 import Button from 'components/Button/Button'
@@ -8,6 +8,7 @@ import ImportManual from './ImportManual'
 import { NFT } from 'models/nft'
 import { useActiveWeb3React } from 'hooks'
 import { useWalletModalToggle } from 'state/application/hooks'
+import { useDepositTxn, useTransactionFromOneChain } from 'state/transactions/hooks'
 
 export enum PAGE_STATE_TYPE {
   DEFAULT,
@@ -22,6 +23,9 @@ export default function Bridge() {
   const [showManual, setShowManual] = useState(false)
 
   const toggleWalletModal = useWalletModalToggle()
+
+  const depositTxn = useDepositTxn()
+  const withdrawTxn = useTransactionFromOneChain(depositTxn?.deposit?.toChain, depositTxn?.deposit?.withdrawHash ?? '')
 
   const handleImport = useCallback((nft: NFT) => {
     setSelectedToken(nft)
@@ -44,6 +48,13 @@ export default function Bridge() {
     setShowInventory(false)
     setShowManual(true)
   }, [])
+
+  useEffect(() => {
+    if (depositTxn && depositTxn.deposit) {
+      setSelectedToken(depositTxn.deposit.nft)
+      setPageState(PAGE_STATE_TYPE.BRIDGE)
+    }
+  }, [depositTxn])
 
   return (
     <>
@@ -82,7 +93,14 @@ export default function Bridge() {
           </Box>
         </AppBody>
       )}
-      {pageState === PAGE_STATE_TYPE.BRIDGE && <BridgeForm token={selectedToken} onReturnClick={handleDismiss} />}
+      {pageState === PAGE_STATE_TYPE.BRIDGE && (
+        <BridgeForm
+          token={selectedToken}
+          onReturnClick={handleDismiss}
+          depositTxn={depositTxn}
+          withdrawTxn={withdrawTxn}
+        />
+      )}
       {showInventory && (
         <ImportInventory
           isOpen={showInventory}
