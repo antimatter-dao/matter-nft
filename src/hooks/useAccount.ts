@@ -48,7 +48,10 @@ export function useMyActivity(
           pageSize: 10,
           type: type === AccountEventType.ALL ? '' : type === AccountEventType.SEND ? '1' : '2'
         }
-        const { data: _recordres } = await Axios.get('vault/bridgeRecord', req)
+        const { data: _recordres } = await Axios.get(
+          'https://test-nftapi.antimatter.finance:8081/vault/bridgeRecord',
+          req
+        )
         const recordList: ActivityType[] = _recordres.data.list.map(
           (item: {
             contract: any

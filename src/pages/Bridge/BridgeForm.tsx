@@ -271,9 +271,9 @@ export default function BridgeForm({
               >
                 switch
               </TextButton>
-              &nbsp;your wallet network
+              &nbsp;your wallet network&nbsp;
             </b>
-            to BSC to complete token swap.
+            to {toChain?.name || ''} to complete token swap.
           </>
         }
         step2={

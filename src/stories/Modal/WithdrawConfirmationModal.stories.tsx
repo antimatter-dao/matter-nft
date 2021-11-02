@@ -52,7 +52,7 @@ const DefaultTemplate: ComponentStory<typeof WithdrawConfirmationModal> = ({ isS
         step1={
           <>
             Please switch your wallet network
-            <br /> to BSC to complete token swap.
+            <br /> to {toChain.name} to complete token swap.
           </>
         }
         step2={
