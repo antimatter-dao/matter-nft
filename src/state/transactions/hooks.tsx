@@ -223,8 +223,10 @@ export function useDepositTxn(): TransactionDetails | undefined {
 
         return deposit && deposit.deposit && (deposit?.receipt?.status === 1 || !deposit?.receipt)
       })
-      hash = hashRes
-      chainId = +key
+      if (hashRes) {
+        hash = hashRes
+        chainId = +key
+      }
       return
     })
 
