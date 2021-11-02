@@ -9,7 +9,8 @@ import {
   finalizeLog,
   cleanUpOutdatedDeposit,
   cleanUpOutdatedWithdraw,
-  addWithdrawHashToDeposit
+  addWithdrawHashToDeposit,
+  deleteWithdrawHashToDeposit
 } from './actions'
 
 const now = () => new Date().getTime()
@@ -118,6 +119,14 @@ export default createReducer(initialState, builder =>
       if (tx[depositHash]?.deposit && tx[depositHash].deposit !== undefined) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         tx[depositHash].deposit!.withdrawHash = withdrawHash
+      }
+    })
+    .addCase(deleteWithdrawHashToDeposit, (transactions, { payload: { depositHash, fromChainId } }) => {
+      const tx = fromChainId && transactions[fromChainId]
+      if (!tx || !depositHash) return
+      if (tx[depositHash]?.deposit && tx[depositHash].deposit !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        tx[depositHash].deposit!.withdrawHash && delete tx[depositHash].deposit!.withdrawHash
       }
     })
 )

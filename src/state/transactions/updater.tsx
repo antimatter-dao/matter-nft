@@ -9,7 +9,8 @@ import {
   finalizeTransaction,
   finalizeLog,
   cleanUpOutdatedWithdraw,
-  cleanUpOutdatedDeposit
+  cleanUpOutdatedDeposit,
+  deleteWithdrawHashToDeposit
 } from './actions'
 const web3 = new Web3()
 
@@ -95,6 +96,13 @@ export default function Updater(): null {
                   setTimeout(() => {
                     dispatch(cleanUpOutdatedDeposit({ newestHash: '', chainId }))
                   }, 3000)
+                } else {
+                  dispatch(
+                    deleteWithdrawHashToDeposit(
+                      transactions[hash].withdraw.depositHash,
+                      transactions[hash].withdraw.fromChain
+                    )
+                  )
                 }
               }
               dispatch(
