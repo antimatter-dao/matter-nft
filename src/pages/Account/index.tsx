@@ -191,7 +191,6 @@ function ShowNFTName({ data }: { data: ActivityItemProp }) {
   const chain = data.type === AccountEventType.SEND ? data.fromChainId : data.toChainId
   const nft = useNftBaseData(chain, data.contract, data.tokenId.toString())
   const tokenUri = useNFTImageByUri(nft?.tokenUri)
-  console.log('🚀 ~ file: index.tsx ~ line 194 ~ ShowNFTName ~ tokenUri', tokenUri)
   return (
     <Box display="flex" alignItems="center" gridColumnGap="5px">
       <Image src={tokenUri || NFTPlaceholder} alt="" altSrc={NFTPlaceholder} style={{ width: 48, height: 48 }} />
@@ -239,11 +238,12 @@ export default function Account() {
         {ChainListMap[item.fromChainId]?.icon}
         {shortenAddress(item.fromAddress)}
       </Box>,
-      <Box display="flex" alignItems="center" key="3">
+      <Box display="flex" alignItems="center" key="4">
         {ChainListMap[item.toChainId]?.icon}
         {shortenAddress(item.toAddress)}
       </Box>,
-      new Date(item.timestamp * 1000).toLocaleString('en')
+      new Date(item.timestamp * 1000).toLocaleString('en'),
+      item.status === AccountActivityRecvStatus.NORECV ? <Button key="5">Withdraw</Button> : <></>
     ])
   }, [myActivityList])
 
@@ -309,7 +309,7 @@ export default function Account() {
               )}
             </Box>
             <TableView
-              header={['Event', 'Item', 'Quantity', 'From', 'To', 'Date']}
+              header={['Event', 'Item', 'Quantity', 'From', 'To', 'Date', 'operate']}
               rows={myActivityListRows}
               isHeaderGray
             />

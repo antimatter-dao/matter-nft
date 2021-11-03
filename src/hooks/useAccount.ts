@@ -9,6 +9,7 @@ export interface ActivityItemProp {
   fromChainId: number
   status: AccountActivityRecvStatus
   timestamp: number
+  nonce: number
   toAddress: string
   toChainId: number
   tokenId: number
@@ -60,6 +61,7 @@ export function useMyActivity(
             status: AccountActivityRecvStatus
             timestamp: any
             to_address: any
+            nonce: any
             to_chain_id: any
             token_id: any
             type: any
@@ -69,6 +71,7 @@ export function useMyActivity(
               fromAddress: item.from_address,
               fromChainId: item.from_chain_id,
               status: item.status,
+              nonce: item.nonce,
               timestamp: item.timestamp,
               toAddress: item.to_address,
               toChainId: item.to_chain_id,
