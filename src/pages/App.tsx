@@ -67,6 +67,7 @@ export default function App() {
                     <Route exact strict path={routes.bridge} component={Bridge} />
                     <Route strict path={routes.profileTab} component={Account} />
                     <Route strict path={routes.profile} component={Account} />
+                    <Route path={routes.home} component={Home} />
                   </Switch>
                 </SwapProvider>
               </Web3ReactManager>

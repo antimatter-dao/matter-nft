@@ -195,7 +195,12 @@ function ShowNFTName({ data }: { data: ActivityItemProp }) {
   const tokenUri = useNFTImageByUri(nft?.tokenUri)
   return (
     <Box display="flex" alignItems="center" gridColumnGap="5px">
-      <Image src={tokenUri || NFTPlaceholder} alt="" altSrc={NFTPlaceholder} style={{ width: 48, height: 48 }} />
+      <Image
+        src={tokenUri || NFTPlaceholder}
+        alt=""
+        altSrc={NFTPlaceholder}
+        style={{ width: 48, height: 48, objectFit: 'contain' }}
+      />
       {nft?.name || '--'}
     </Box>
   )
@@ -236,14 +241,17 @@ export default function Account() {
         {item.type}
       </>,
       <ShowNFTName key={0} data={item} />,
+      <span key={2} style={{ whiteSpace: 'nowrap' }}>
+        {item.tokenId}
+      </span>,
       1,
       <Box display="flex" alignItems="center" key="3">
         {ChainListMap[item.fromChainId]?.icon}
-        {ChainListMap[item.fromChainId]?.name}
+        {ChainListMap[item.fromChainId]?.symbol}
       </Box>,
       <Box display="flex" alignItems="center" key="4">
         {ChainListMap[item.toChainId]?.icon}
-        {ChainListMap[item.toChainId]?.name}
+        {ChainListMap[item.toChainId]?.symbol}
       </Box>,
       new Date(item.timestamp * 1000).toLocaleString('en'),
       item.status === AccountActivityRecvStatus.NORECV ? (
@@ -324,7 +332,7 @@ export default function Account() {
               )}
             </Box>
             <TableView
-              header={['Event', 'Item', 'Quantity', 'From', 'To', 'Date', 'operate']}
+              header={['Event', 'Item', 'Token ID', 'Quantity', 'From', 'To', 'Date', 'operate']}
               rows={myActivityListRows}
               isHeaderGray
             />

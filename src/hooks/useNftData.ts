@@ -115,7 +115,6 @@ export function useNftBaseData(chainId?: number, contractAddress?: string, token
     bridgeContract
       .mappingNftInfo(contractAddress, tokenId)
       .then((res: any) => {
-        console.log('success')
         const nft = {
           tokenId,
           name: res.name,
@@ -129,7 +128,6 @@ export function useNftBaseData(chainId?: number, contractAddress?: string, token
         setNftData(nft)
       })
       .catch((e: any) => {
-        console.log('fail')
         setNftData(undefined)
         console.log('load error:', e)
       })
