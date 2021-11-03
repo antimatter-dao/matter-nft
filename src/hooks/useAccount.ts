@@ -13,6 +13,8 @@ export interface ActivityItemProp {
   toAddress: string
   toChainId: number
   tokenId: number
+  name: string
+  tokenURI: string
   type: AccountEventType
   hash?: string
 }
@@ -67,6 +69,8 @@ export function useMyActivity(
             to_chain_id: any
             token_id: any
             type: any
+            token_uri: any
+            name: any
           }) => {
             return {
               contract: item.contract,
@@ -79,7 +83,9 @@ export function useMyActivity(
               toChainId: item.to_chain_id,
               tokenId: item.token_id,
               type: item.type === 1 ? AccountEventType.SEND : AccountEventType.RECEIVE,
-              hash: item.hash ? item.hash : undefined
+              hash: item.hash ? item.hash : undefined,
+              name: item.name,
+              tokenURI: item.token_uri
             }
           }
         )

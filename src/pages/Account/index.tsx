@@ -21,7 +21,6 @@ import TableView from 'components/Table'
 import { ActivityItemProp, useMyActivity } from '../../hooks/useAccount'
 import Spinner from 'components/Spinner'
 import { ChainListMap } from 'constants/chain'
-import { useNftBaseData } from 'hooks/useNftData'
 import { ReactComponent as ReceiveIcon } from 'assets/svg/receive_icon.svg'
 import { ReactComponent as SendIcon } from 'assets/svg/send_icon.svg'
 import { useNFTImageByUri } from 'hooks/useNFTImage'
@@ -190,9 +189,7 @@ function AccountNFTCardChild() {
 }
 
 function ShowNFTName({ data }: { data: ActivityItemProp }) {
-  const chain = data.type === AccountEventType.SEND ? data.fromChainId : data.toChainId
-  const nft = useNftBaseData(chain, data.contract, data.tokenId.toString())
-  const tokenUri = useNFTImageByUri(nft?.tokenUri)
+  const tokenUri = useNFTImageByUri(data.tokenURI)
   return (
     <Box display="flex" alignItems="center" gridColumnGap="5px">
       <Image
@@ -201,7 +198,7 @@ function ShowNFTName({ data }: { data: ActivityItemProp }) {
         altSrc={NFTPlaceholder}
         style={{ width: 48, height: 48, objectFit: 'contain' }}
       />
-      {nft?.name || '--'}
+      {data.name || '--'}
     </Box>
   )
 }
@@ -256,6 +253,8 @@ export default function Account() {
       new Date(item.timestamp * 1000).toLocaleString('en'),
       item.status === AccountActivityRecvStatus.NORECV ? (
         <Button
+          height="40px"
+          width="100px"
           key="5"
           onClick={() => {
             importDeposit(item)
