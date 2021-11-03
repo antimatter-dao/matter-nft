@@ -8,9 +8,9 @@ import Copy from 'components/Copy'
 import { useHistory } from 'react-router'
 import { SwitchTabWrapper, Tab } from 'components/SwitchTab'
 import { useParams } from 'react-router-dom'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import NetworkSelect from 'components/Header/NetworkSelect'
-import ImportManual from 'pages/Bridge/ImportManual'
+import ImportManual from 'pages/Home/ImportManual'
 import { NFT } from 'models/nft'
 import NFTCard from 'components/NFTCard'
 import { ZERO_ADDRESS } from '../../constants'
@@ -26,6 +26,8 @@ import { ReactComponent as ReceiveIcon } from 'assets/svg/receive_icon.svg'
 import { ReactComponent as SendIcon } from 'assets/svg/send_icon.svg'
 import { useNFTImageByUri } from 'hooks/useNFTImage'
 import Image from 'components/Image'
+import { SwapContext } from 'context/SwapContext'
+import { routes } from 'constants/routes'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -207,6 +209,7 @@ export default function Account() {
   const [currentTab, setCurrentTab] = useState(UserInfoTabs.INVENTORY)
   const [showManual, setShowManual] = useState(false)
   const [currentEventType, setCurrentEventType] = useState(AccountEventType.ALL)
+  const { setSelectedToken, importDeposit } = useContext(SwapContext)
 
   useEffect(() => {
     if (!account) history.replace('/')
@@ -243,9 +246,21 @@ export default function Account() {
         {shortenAddress(item.toAddress)}
       </Box>,
       new Date(item.timestamp * 1000).toLocaleString('en'),
-      item.status === AccountActivityRecvStatus.NORECV ? <Button key="5">Withdraw</Button> : <></>
+      item.status === AccountActivityRecvStatus.NORECV ? (
+        <Button
+          key="5"
+          onClick={() => {
+            importDeposit(item)
+            history.push(routes.bridge)
+          }}
+        >
+          Withdraw{item.tokenId}
+        </Button>
+      ) : (
+        <></>
+      )
     ])
-  }, [myActivityList])
+  }, [myActivityList, importDeposit, history])
 
   return (
     <div className={classes.root}>
@@ -265,7 +280,7 @@ export default function Account() {
           )}
         </Box>
 
-        <Button width={'170px'} height={'48px'} onClick={() => history.replace('/')}>
+        <Button width={'170px'} height={'48px'} onClick={() => history.replace(routes.home)}>
           Back to Bridge
         </Button>
       </Box>
@@ -334,8 +349,11 @@ export default function Account() {
         isOpen={showManual}
         onImport={(nft: NFT) => {
           console.log(nft)
+          setSelectedToken(nft)
         }}
-        onProceed={() => {}}
+        onProceed={() => {
+          history.push(routes.bridge)
+        }}
         onDismiss={() => {
           setShowManual(false)
         }}

@@ -60,32 +60,39 @@ export default function Updater(): null {
           .then(receipt => {
             if (receipt) {
               if (transactions[hash].deposit) {
-                const parsed = web3.eth.abi.decodeLog(
-                  [
-                    {
-                      name: 'from',
-                      type: 'address'
-                    },
-                    {
-                      name: 'nonce',
-                      type: 'uint256'
-                    },
-                    {
-                      name: 'tokenId',
-                      type: 'uint256'
-                    }
-                  ],
-                  receipt.logs[3].data,
-                  receipt.logs[3].topics
-                )
-                dispatch(
-                  finalizeLog({
-                    chainId,
-                    hash,
-                    log: receipt.logs,
-                    parsedLog: { from: parsed.from, nonce: parsed.nonce, tokenId: parsed.tokenId }
-                  })
-                )
+                if (receipt.status === 1) {
+                  const parsed = web3.eth.abi.decodeLog(
+                    [
+                      {
+                        name: 'from',
+                        type: 'address'
+                      },
+                      {
+                        name: 'nonce',
+                        type: 'uint256'
+                      },
+                      {
+                        name: 'tokenId',
+                        type: 'uint256'
+                      }
+                    ],
+                    receipt.logs[3].data,
+                    receipt.logs[3].topics
+                  )
+                  dispatch(
+                    finalizeLog({
+                      chainId,
+                      hash,
+                      nonce: parsed.nonce,
+                      from: parsed.from,
+                      tokenId: parsed.tokenId
+                    })
+                  )
+                } else {
+                  setTimeout(() => {
+                    dispatch(cleanUpOutdatedDeposit({ newestHash: '', chainId }))
+                  }, 3000)
+                }
               }
               if (transactions[hash].withdraw) {
                 setTimeout(() => {

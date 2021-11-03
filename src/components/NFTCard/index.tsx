@@ -1,4 +1,4 @@
-import { Box, Typography, makeStyles } from '@material-ui/core'
+import { Box, Typography, makeStyles, Button } from '@material-ui/core'
 import { Text } from 'rebass'
 import clsx from 'clsx'
 import { OutlinedCard } from 'components/Card'
@@ -6,7 +6,6 @@ import Image from 'components/Image'
 import { NFT } from 'models/nft'
 import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 import { shortenAddress } from 'utils'
-import TextButton from 'components/Button/TextButton'
 import Copy from 'components/Copy'
 
 const useStyles = makeStyles(theme => ({
@@ -74,10 +73,12 @@ export default function NFTCard({
   const classes = useStyles()
 
   return (
-    <TextButton
+    <Button
+      variant="text"
+      component="div"
       onClick={onClick}
       style={{ width: '100%' }}
-      classname={clsx(isBorderHover && classes.borderHover, isBgHover && classes.bgHover)}
+      className={clsx(isBorderHover && classes.borderHover, isBgHover && classes.bgHover)}
     >
       <OutlinedCard style={{ overflow: 'hidden', width: '100%', position: 'relative' }}>
         <Box display="grid">
@@ -105,6 +106,6 @@ export default function NFTCard({
           </Box>
         </Box>
       </OutlinedCard>
-    </TextButton>
+    </Button>
   )
 }

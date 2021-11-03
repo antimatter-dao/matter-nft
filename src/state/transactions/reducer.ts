@@ -10,7 +10,8 @@ import {
   cleanUpOutdatedDeposit,
   cleanUpOutdatedWithdraw,
   addWithdrawHashToDeposit,
-  deleteWithdrawHashToDeposit
+  deleteWithdrawHashToDeposit,
+  importDeposit
 } from './actions'
 
 const now = () => new Date().getTime()
@@ -30,7 +31,9 @@ export interface TransactionDetails {
     fromChain: number
     toChain: number
     nft: NFT
-    log?: { log: any; parsedLog: any }
+    nonce?: number | string
+    from?: string
+    tokenId?: string
     withdrawHash?: string
   }
   withdraw?: { fromChain: number; toChain: number; depositHash: string }
@@ -83,12 +86,12 @@ export default createReducer(initialState, builder =>
       tx.receipt = receipt
       tx.confirmedTime = now()
     })
-    .addCase(finalizeLog, (transactions, { payload: { hash, chainId, log, parsedLog } }) => {
+    .addCase(finalizeLog, (transactions, { payload: { hash, chainId, nonce, from, tokenId } }) => {
       const tx = transactions[chainId]?.[hash]
       if (!tx || !tx.deposit) {
         return
       }
-      tx.deposit.log = { log, parsedLog }
+      tx.deposit = { ...tx.deposit, nonce, from, tokenId }
       tx.confirmedTime = now()
     })
     .addCase(cleanUpOutdatedDeposit, (transactions, { payload: { newestHash } }) => {
@@ -128,5 +131,15 @@ export default createReducer(initialState, builder =>
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         tx[depositHash].deposit!.withdrawHash && delete tx[depositHash].deposit!.withdrawHash
       }
+    })
+    .addCase(importDeposit, (transactions, { payload: { txn, fromChainId } }) => {
+      if (transactions[fromChainId]?.[txn.hash]) {
+        // console.error('Attempted to add existing transaction.')
+        transactions[fromChainId][txn.hash].deposit = txn.deposit
+        return
+      }
+      const txs = transactions[fromChainId] ?? {}
+      txs[txn.hash] = txn
+      transactions[fromChainId] = txs
     })
 )

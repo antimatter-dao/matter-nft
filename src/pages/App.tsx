@@ -6,10 +6,13 @@ import Polling from '../components/essential/Polling'
 import Popups from '../components/essential/Popups'
 import Web3ReactManager from '../components/essential/Web3ReactManager'
 import WarningModal from '../components/Modal/WarningModal'
+import Home from './Home'
 import Bridge from './Bridge'
 import Account from './Account'
 import { ModalProvider } from 'context/ModalContext'
 import Footer from 'components/Footer'
+import { SwapProvider } from 'context/SwapContext'
+import { routes } from 'constants/routes'
 
 const AppWrapper = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -58,11 +61,14 @@ export default function App() {
               <Polling />
               <WarningModal />
               <Web3ReactManager>
-                <Switch>
-                  <Route exact strict path="/" component={Bridge} />
-                  <Route strict path="/profile/:tab" component={Account} />
-                  <Route strict path="/profile" component={Account} />
-                </Switch>
+                <SwapProvider>
+                  <Switch>
+                    <Route exact strict path={routes.home} component={Home} />
+                    <Route exact strict path={routes.bridge} component={Bridge} />
+                    <Route strict path={routes.profileTab} component={Account} />
+                    <Route strict path={routes.profile} component={Account} />
+                  </Switch>
+                </SwapProvider>
               </Web3ReactManager>
             </BodyWrapper>
             <Footer />

@@ -14,6 +14,7 @@ export interface ActivityItemProp {
   toChainId: number
   tokenId: number
   type: AccountEventType
+  hash?: string
 }
 
 export function useMyActivity(
@@ -55,6 +56,7 @@ export function useMyActivity(
         )
         const recordList: ActivityItemProp[] = _recordres.data.list.map(
           (item: {
+            hash: string
             contract: any
             from_address: any
             from_chain_id: any
@@ -76,7 +78,8 @@ export function useMyActivity(
               toAddress: item.to_address,
               toChainId: item.to_chain_id,
               tokenId: item.token_id,
-              type: item.type === 1 ? AccountEventType.SEND : AccountEventType.RECEIVE
+              type: item.type === 1 ? AccountEventType.SEND : AccountEventType.RECEIVE,
+              hash: item.hash ? item.hash : undefined
             }
           }
         )

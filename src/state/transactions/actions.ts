@@ -1,6 +1,7 @@
 import { createAction } from '@reduxjs/toolkit'
 import { NFT } from 'models/nft'
 import { ChainId } from '../../constants/chain'
+import { TransactionDetails } from './reducer'
 
 export interface SerializableTransactionReceipt {
   to: string
@@ -39,8 +40,9 @@ export const checkedTransaction = createAction<{
 export const finalizeLog = createAction<{
   chainId: ChainId
   hash: string
-  log: any
-  parsedLog: any
+  nonce?: number | string
+  from?: string
+  tokenId?: string
 }>('transactions/finalizeLog')
 
 export const cleanUpOutdatedDeposit = createAction<{
@@ -63,3 +65,8 @@ export const deleteWithdrawHashToDeposit = createAction<{
   depositHash: string
   fromChainId: ChainId
 }>('transactions/deleteWithdrawHashToDeposit')
+
+export const importDeposit = createAction<{
+  fromChainId: ChainId
+  txn: TransactionDetails
+}>('transactions/importDeposit')

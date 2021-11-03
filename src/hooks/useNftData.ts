@@ -104,16 +104,18 @@ export function useRecvSend(chainId: number | undefined, address: string | undef
   return feeRecvRes.result?.[0].toString()
 }
 
-export function useNftBaseData(chainId: number, contractAddress: string, tokenId: string): NFT | undefined {
+export function useNftBaseData(chainId?: number, contractAddress?: string, tokenId?: string): NFT | undefined {
   const [nftData, setNftData] = useState<NFT | undefined>()
 
   useEffect(() => {
+    if (!tokenId || !contractAddress || !chainId) return
     const library = getOtherNetworkLibrary(chainId)
     if (!library || !tokenId || !contractAddress) return
     const bridgeContract = getContract(NFT_BRIDGE_ADDRESS, NFT_BRIDGE_ABI, library)
     bridgeContract
       .mappingNftInfo(contractAddress, tokenId)
       .then((res: any) => {
+        console.log('success')
         const nft = {
           tokenId,
           name: res.name,
@@ -127,6 +129,7 @@ export function useNftBaseData(chainId: number, contractAddress: string, tokenId
         setNftData(nft)
       })
       .catch((e: any) => {
+        console.log('fail')
         setNftData(undefined)
         console.log('load error:', e)
       })

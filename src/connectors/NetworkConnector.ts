@@ -83,11 +83,10 @@ class MiniRpcProvider implements AsyncSendable {
       memo[current.request.id] = current
       return memo
     }, {})
-    if (!(json[Symbol.iterator] === 'function')) {
-      console.error('json not iterator')
-      // new RequestError('json not iterator')
-      return
-    }
+    // if (!(json[Symbol.iterator] === 'function')) {
+    //   console.error('json not iterator')
+    //   return
+    // }
     for (const result of json) {
       const {
         resolve,
