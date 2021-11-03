@@ -254,7 +254,7 @@ export default function Account() {
             history.push(routes.bridge)
           }}
         >
-          Withdraw{item.tokenId}
+          Withdraw
         </Button>
       ) : (
         <></>
