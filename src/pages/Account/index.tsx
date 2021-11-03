@@ -236,11 +236,11 @@ export default function Account() {
       1,
       <Box display="flex" alignItems="center" key="3">
         {ChainListMap[item.fromChainId]?.icon}
-        {shortenAddress(item.fromAddress)}
+        {ChainListMap[item.fromChainId]?.name}
       </Box>,
       <Box display="flex" alignItems="center" key="4">
         {ChainListMap[item.toChainId]?.icon}
-        {shortenAddress(item.toAddress)}
+        {ChainListMap[item.toChainId]?.name}
       </Box>,
       new Date(item.timestamp * 1000).toLocaleString('en'),
       item.status === AccountActivityRecvStatus.NORECV ? <Button key="5">Withdraw</Button> : <></>
