@@ -28,7 +28,7 @@ export function useMyActivity(
   }
   data: ActivityItemProp[]
 } {
-  const { chainId, account } = useActiveWeb3React()
+  const { account } = useActiveWeb3React()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [totalPages, setTotalPages] = useState<number>(0)
@@ -39,13 +39,13 @@ export function useMyActivity(
   }, [type])
   useEffect(() => {
     ;(async () => {
-      if (!account || !chainId) return
+      if (!account) return
       try {
         setIsLoading(true)
         setList([])
         const req = {
           address: account,
-          chainId: chainId,
+          // chainId: chainId,
           curPage: currentPage,
           pageSize: 10,
           type: type === AccountEventType.ALL ? '' : type === AccountEventType.SEND ? '1' : '2'
@@ -90,7 +90,7 @@ export function useMyActivity(
         console.error('fetch useMyActivity', error)
       }
     })()
-  }, [account, chainId, currentPage, type])
+  }, [account, currentPage, type])
 
   const res = useMemo(() => ({ page: { totalPages, currentPage, setCurrentPage }, loading: isLoading, data: list }), [
     currentPage,
