@@ -177,11 +177,8 @@ function AccountNFTCardChild() {
   return (
     <Box width="100%" position="absolute" className={classes.cardHover}>
       <Box width="100%" height="100%" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-        <Button width="70%" height="20%" classname={classes.cardButton} style={{ marginBottom: '5%' }}>
+        <Button width="70%" height="20%" classname={classes.cardButton} onClick={() => alert('soming soon')}>
           Bridge
-        </Button>
-        <Button width="70%" height="20%" classname={classes.cardButton} onClick={() => alert('Transfer')}>
-          Transfer
         </Button>
       </Box>
     </Box>

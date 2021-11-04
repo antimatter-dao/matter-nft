@@ -315,7 +315,7 @@ export default function BridgeForm() {
           <Typography variant="h6">Confirm Deposit</Typography>
           <Image src={tokenUri} style={{ width: 180 }} altSrc={PlaceholderImg} />
           <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
-            <Typography variant="body1">{tokenId}</Typography>
+            <Typography variant="body1">Token ID: {tokenId}</Typography>
             <Typography variant="body1">{account && shortenAddress(account)}</Typography>
           </Box>
         </Box>
