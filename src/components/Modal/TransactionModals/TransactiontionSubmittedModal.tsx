@@ -25,3 +25,24 @@ export default function TransactionSubmittedModal({ children, hash }: { hash?: s
     </MessageBox>
   )
 }
+
+export function SwapSuccessModal({ children, hash }: { hash?: string; children?: React.ReactNode }) {
+  const { chainId } = useActiveWeb3React()
+
+  return (
+    <MessageBox type={'success'} header={'Congratulations!'}>
+      <Box display="grid" gridGap="20px" justifyContent="center">
+        {children}
+        {chainId && hash && (
+          <ExternalLink
+            underline="always"
+            href={getEtherscanLink(chainId, hash, 'transaction')}
+            style={{ color: '#ffffff', fontSize: 12 }}
+          >
+            View on Etherscan
+          </ExternalLink>
+        )}
+      </Box>
+    </MessageBox>
+  )
+}

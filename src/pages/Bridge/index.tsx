@@ -14,7 +14,9 @@ import DepositConfirmationModal from 'components/Modal/TransactionModals/Deposit
 import useModal from 'hooks/useModal'
 import { useActiveWeb3React } from 'hooks'
 import { shortenAddress } from 'utils'
-import TransactionSubmittedModal from 'components/Modal/TransactionModals/TransactiontionSubmittedModal'
+import TransactionSubmittedModal, {
+  SwapSuccessModal
+} from 'components/Modal/TransactionModals/TransactiontionSubmittedModal'
 import WithdrawConfirmationModal from 'components/Modal/TransactionModals/WithdrawConfirmationModal'
 import SwitchChainModal from 'components/Modal/SwitchChainModal'
 import { ChainList, ChainListMap } from 'constants/chain'
@@ -212,12 +214,13 @@ export default function BridgeForm() {
     if (withdrawTxn?.receipt?.status === 1) {
       setWithdrawed(true)
       setWithdrawing(false)
+      showModal(<SwapSuccessModal hash={withdrawTxn.receipt.transactionHash} />)
     }
     if (withdrawTxn?.receipt?.status === 0) {
       setWithdrawed(false)
       setWithdrawing(false)
     }
-  }, [withdrawTxn])
+  }, [showModal, withdrawTxn])
 
   useEffect(() => {
     if (!token) return setError('Please import token')
