@@ -337,7 +337,7 @@ export default function BridgeForm() {
             <Box display="grid" gridGap="24px" maxWidth={isUpToSM ? 'unset' : '428px'} flexGrow="1">
               <Input
                 value={tokenAddress}
-                label="Token Contact Address"
+                label="Token Contract Address"
                 disabled={true}
                 placeholder="Enter your token contract address"
               />
