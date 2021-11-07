@@ -64,7 +64,7 @@ export default function Bridge() {
       <AppBody>
         <Box display="grid" gridGap="29px" padding="20px 40px 52px">
           <Typography variant="h5">NFT Bridge</Typography>
-          <Button
+          {/* <Button
             disabled={!account}
             onClick={() => {
               setSelectedToken(undefined)
@@ -72,7 +72,7 @@ export default function Bridge() {
             }}
           >
             Select From Inventory
-          </Button>
+          </Button> */}
           <Button
             disabled={!account}
             onClick={() => {
