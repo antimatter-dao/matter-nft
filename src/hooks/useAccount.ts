@@ -52,10 +52,7 @@ export function useMyActivity(
           pageSize: 10,
           type: type === AccountEventType.ALL ? '' : type === AccountEventType.SEND ? '1' : '2'
         }
-        const { data: _recordres } = await Axios.get(
-          'https://test-nftapi.antimatter.finance:8081/vault/bridgeRecord',
-          req
-        )
+        const { data: _recordres } = await Axios.get('https://info.chainswap.com:8443/vault/bridgeRecord', req)
         const recordList: ActivityItemProp[] = _recordres.data.list.map(
           (item: {
             hash: string
