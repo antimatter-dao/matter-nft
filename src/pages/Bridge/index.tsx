@@ -96,7 +96,7 @@ export default function BridgeForm() {
         Axios.post<any, AxiosResponse<ResponseType<SignatureResponse>>>(route, {
           chainId: toChain?.id,
           fromChainId: depositTxn?.deposit?.fromChain,
-          mainChainId: token.mainChainId ?? 0,
+          mainChainId: token.mainChainId ? token.mainChainId : 1,
           name: token.name,
           nft: token.contractAddress,
           nonce: +nonce,
@@ -106,6 +106,7 @@ export default function BridgeForm() {
           tokenURI: token.tokenUri
         })
       )
+
       const aggregated: any[] = []
       let error = 0
       const requestList: Promise<AxiosResponse<ResponseType<SignatureResponse>>[]> = new Promise((resolve, reject) => {
@@ -114,13 +115,12 @@ export default function BridgeForm() {
             .then(r => {
               aggregated.push(r)
               if (aggregated.length >= 3) {
-                resolve(aggregated.slice(0, 2))
+                resolve(aggregated.slice(0, 3))
               }
             })
             .catch(() => {
               if (error > 2) {
                 reject('signature request fail')
-                showModal(<MessageBox type="error">Signature request failed</MessageBox>)
               } else {
                 error++
               }
@@ -129,14 +129,12 @@ export default function BridgeForm() {
       })
 
       const resList: AxiosResponse<ResponseType<SignatureResponse>>[] = await requestList
-
       const signsList = resList.map(({ data: { data: response, code } }) => {
         if (code === 500) {
           return
         }
         return [response.signatory, response.signV, response.signR, response.signS]
       })
-
       if (signsList.length !== 3) {
         showModal(<MessageBox type="error">Signature request failed</MessageBox>)
         return

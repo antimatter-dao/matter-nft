@@ -37,7 +37,7 @@ export function useImportDepositCallback() {
         blockNumber: 11353167
       },
       deposit: {
-        nft,
+        nft: { ...nft, name: item.name, symbol: item.symbol, tokenUri: item.tokenURI },
         fromChain: item.fromChainId,
         toChain: item.toChainId,
         nonce: item.nonce,
