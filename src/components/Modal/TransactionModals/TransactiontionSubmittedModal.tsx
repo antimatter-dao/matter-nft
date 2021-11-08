@@ -18,7 +18,7 @@ export default function TransactionSubmittedModal({ children, hash }: { hash?: s
             href={getEtherscanLink(chainId, hash, 'transaction')}
             style={{ color: '#ffffff', fontSize: 12 }}
           >
-            View on Etherscan
+            View on explorer
           </ExternalLink>
         )}
       </Box>
@@ -39,7 +39,7 @@ export function SwapSuccessModal({ children, hash }: { hash?: string; children?:
             href={getEtherscanLink(chainId, hash, 'transaction')}
             style={{ color: '#ffffff', fontSize: 12 }}
           >
-            View on Etherscan
+            View on explorer
           </ExternalLink>
         )}
       </Box>
