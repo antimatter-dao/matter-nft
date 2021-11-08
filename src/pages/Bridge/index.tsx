@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useContext } from 'react'
-import AppBody from 'components/AppBody'
 import { Typography, Box } from '@material-ui/core'
+import Axios, { AxiosResponse } from 'axios'
+import { useHistory } from 'react-router'
+import AppBody from 'components/AppBody'
 import Input from 'components/Input'
 import Image from 'components/Image'
 import PlaceholderImg from 'assets/images/placeholder_image.png'
@@ -26,12 +28,11 @@ import MessageBox from 'components/Modal/TransactionModals/MessageBox'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import ActionButton from 'components/Button/ActionButton'
 import TransacitonPendingModal from 'components/Modal/TransactionModals/TransactionPendingModal'
-import { Axios, SignatureResponse } from 'utils/httpRequest/axios'
+import { SignatureResponse, ResponseType } from 'utils/httpRequest/axios'
 import { useNFTImageByUri } from 'hooks/useNFTImage'
 import { useFeeSend, useRecvSend } from 'hooks/useNftData'
 import { SwapContext } from 'context/SwapContext'
 import { routes } from 'constants/routes'
-import { useHistory } from 'react-router'
 
 export default function BridgeForm() {
   const { selectedToken: token, depositTxn, withdrawTxn } = useContext(SwapContext)
@@ -79,33 +80,65 @@ export default function BridgeForm() {
     if (!token || !toChain || !fromChain || !account || !library || !recvFee) return
     showModal(<TransacitonPendingModal />)
     try {
-      const signRoutes = ['getNftRecvSignData']
+      const signRoutes = [
+        'https://node1.chainswap.com/web/getNftRecvSignData',
+        'https://node2.chainswap.com/web/getNftRecvSignData',
+        'https://node3.chainswap.com/web/getNftRecvSignData',
+        'https://node4.chainswap.com/web/getNftRecvSignData',
+        'https://node5.chainswap.com/web/getNftRecvSignData'
+      ]
       const nonce = depositTxn?.deposit?.nonce
       if (nonce === undefined) throw Error('No nonce')
-      const requestList = await Promise.all(
-        signRoutes.map(route =>
-          Axios.post<SignatureResponse>(route, {
-            chainId: toChain?.id,
-            fromChainId: depositTxn?.deposit?.fromChain,
-            mainChainId: token.mainChainId ?? 0,
-            name: token.name,
-            nft: token.contractAddress,
-            nonce: +nonce,
-            symbol: token.symbol,
-            to: account,
-            tokenId: token.tokenId,
-            tokenURI: token.tokenUri
-          })
-        )
+      const httpRequestsList = signRoutes.map(route =>
+        Axios.post<any, AxiosResponse<ResponseType<SignatureResponse>>>(route, {
+          chainId: toChain?.id,
+          fromChainId: depositTxn?.deposit?.fromChain,
+          mainChainId: token.mainChainId ?? 0,
+          name: token.name,
+          nft: token.contractAddress,
+          nonce: +nonce,
+          symbol: token.symbol,
+          to: account,
+          tokenId: token.tokenId,
+          tokenURI: token.tokenUri
+        })
       )
+      const aggregated: any[] = []
+      let error = 0
+      const requestList: Promise<AxiosResponse<ResponseType<SignatureResponse>>[]> = new Promise((resolve, reject) => {
+        httpRequestsList.map(promise => {
+          promise
+            .then(r => {
+              aggregated.push(r)
+              if (aggregated.length >= 3) {
+                resolve(aggregated.slice(0, 2))
+              }
+            })
+            .catch(() => {
+              if (error > 2) {
+                reject('signature request fail')
+                showModal(<MessageBox type="error">Signature request failed</MessageBox>)
+              } else {
+                error++
+              }
+            })
+        })
+      })
 
-      const resList = await requestList
-      const signsList = resList.map(({ data: { data: response } }: { data: { data: any } }) => [
-        response.signatory,
-        response.signV,
-        response.signR,
-        response.signS
-      ])
+      const resList: AxiosResponse<ResponseType<SignatureResponse>>[] = await requestList
+
+      const signsList = resList.map(({ data: { data: response, code } }) => {
+        if (code === 500) {
+          return
+        }
+        return [response.signatory, response.signV, response.signR, response.signS]
+      })
+
+      if (signsList.length !== 3) {
+        showModal(<MessageBox type="error">Signature request failed</MessageBox>)
+        return
+      }
+
       setwithdrawModalOpen(false)
       const res = resList[0].data.data
       const r: any = await withdraw(
