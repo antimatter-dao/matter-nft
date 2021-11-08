@@ -35,6 +35,7 @@ import { useNFTImageByUri } from 'hooks/useNFTImage'
 import { useFeeSend, useRecvSend } from 'hooks/useNftData'
 import { SwapContext } from 'context/SwapContext'
 import { routes } from 'constants/routes'
+import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 
 export default function BridgeForm() {
   const { selectedToken: token, depositTxn, withdrawTxn } = useContext(SwapContext)
@@ -370,7 +371,7 @@ export default function BridgeForm() {
             <Box display="grid" gridGap="24px" maxWidth={isUpToSM ? 'unset' : '428px'} flexGrow="1">
               <Input
                 value={tokenAddress}
-                label="Token Contract Address"
+                label="Token Contract Address (ERC721)"
                 disabled={true}
                 placeholder="Enter your token contract address"
               />
@@ -388,7 +389,7 @@ export default function BridgeForm() {
             </Box>
             <Box style={{ margin: isUpToSM ? '0 auto' : 'unset' }}>
               <Image
-                src={tokenUri}
+                src={tokenUri || NFTPlaceholder}
                 altSrc={PlaceholderImg}
                 style={{
                   width: 240,
