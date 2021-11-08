@@ -17,6 +17,7 @@ export interface ActivityItemProp {
   tokenURI: string
   type: AccountEventType
   hash?: string
+  symbol: string
 }
 
 export function useMyActivity(
@@ -68,6 +69,7 @@ export function useMyActivity(
             type: any
             token_uri: any
             name: any
+            symbol: string
           }) => {
             return {
               contract: item.contract,
@@ -82,7 +84,8 @@ export function useMyActivity(
               type: item.type === 1 ? AccountEventType.SEND : AccountEventType.RECEIVE,
               hash: item.hash ? item.hash : undefined,
               name: item.name,
-              tokenURI: item.token_uri
+              tokenURI: item.token_uri,
+              symbol: item.symbol
             }
           }
         )

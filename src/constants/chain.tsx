@@ -23,7 +23,7 @@ export const ChainList = [
     hex: '0x1'
   },
   {
-    icon: <BSCInvert />,
+    icon: <BSCInvert height={20} width={20} />,
     logo: BSCUrl,
     symbol: 'BSC',
     name: 'Binance Smart Chain',
