@@ -1,40 +1,59 @@
 import { Chain } from 'models/chain'
 import { ReactComponent as ETH } from 'assets/svg/eth_logo.svg'
 import EthUrl from 'assets/svg/eth_logo.svg'
+import BSCUrl from 'assets/svg/binance.svg'
+import { ReactComponent as BSCInvert } from 'assets/svg/binance.svg'
 
 export enum ChainId {
   MAINNET = 1,
   ROPSTEN = 3,
   RINKEBY = 4,
   GÖRLI = 5,
-  KOVAN = 42
+  KOVAN = 42,
+  BSC = 56
 }
 
 export const ChainList = [
   {
     icon: <ETH />,
     logo: EthUrl,
-    symbol: 'Ropsten',
-    name: 'Ropsten Test Network',
-    id: ChainId.ROPSTEN,
-    hex: '0x3'
+    symbol: 'ETH',
+    name: 'ETH Network',
+    id: ChainId.MAINNET,
+    hex: '0x1'
   },
   {
-    icon: <ETH />,
-    logo: EthUrl,
-    symbol: 'Rinkeby',
-    name: 'Rinkeby Testnet',
-    id: ChainId.RINKEBY,
-    hex: '0x4'
-  },
-  {
-    icon: <ETH />,
-    logo: EthUrl,
-    symbol: 'Kovan',
-    name: 'Kovan Testnet',
-    id: ChainId.KOVAN,
-    hex: '0x2a'
+    icon: <BSCInvert />,
+    logo: BSCUrl,
+    symbol: 'BSC',
+    name: 'Binance Smart Chain',
+    id: ChainId.BSC,
+    hex: '0x38'
   }
+  // {
+  //   icon: <ETH />,
+  //   logo: EthUrl,
+  //   symbol: 'Ropsten',
+  //   name: 'Ropsten Test Network',
+  //   id: ChainId.ROPSTEN,
+  //   hex: '0x3'
+  // },
+  // {
+  //   icon: <ETH />,
+  //   logo: EthUrl,
+  //   symbol: 'Rinkeby',
+  //   name: 'Rinkeby Testnet',
+  //   id: ChainId.RINKEBY,
+  //   hex: '0x4'
+  // },
+  // {
+  //   icon: <ETH />,
+  //   logo: EthUrl,
+  //   symbol: 'Kovan',
+  //   name: 'Kovan Testnet',
+  //   id: ChainId.KOVAN,
+  //   hex: '0x2a'
+  // }
 ]
 
 export const ChainListMap: {
@@ -67,6 +86,17 @@ export const SUPPORTED_NETWORKS: {
     },
     rpcUrls: ['https://mainnet.infura.io/v3'],
     blockExplorerUrls: ['https://etherscan.com']
+  },
+  [ChainId.BSC]: {
+    chainId: '0x38',
+    chainName: 'Binance Smart Chain',
+    nativeCurrency: {
+      name: 'Binance Coin',
+      symbol: 'BNB',
+      decimals: 18
+    },
+    rpcUrls: ['https://bsc-dataseed.binance.org'],
+    blockExplorerUrls: ['https://bscscan.com']
   },
   [ChainId.ROPSTEN]: {
     chainId: '0x3',
