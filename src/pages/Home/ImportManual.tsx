@@ -62,8 +62,8 @@ export default function ImportManual({
           <ChainSelect selectedChain={chainId ? ChainListMap[chainId] : null} disabled chainList={ChainList} />
         </div>
         <Input
-          placeholder="Token Contact Address"
-          label="Token Contact Address"
+          placeholder="Token Contract Address"
+          label="Token Contract Address"
           value={contractAddress}
           onChange={e => setContractAddress(e.target.value)}
         />

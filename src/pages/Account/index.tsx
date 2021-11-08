@@ -9,11 +9,11 @@ import { useHistory } from 'react-router'
 import { SwitchTabWrapper, Tab } from 'components/SwitchTab'
 import { useParams } from 'react-router-dom'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import NetworkSelect from 'components/Header/NetworkSelect'
+// import NetworkSelect from 'components/Header/NetworkSelect'
 import ImportManual from 'pages/Home/ImportManual'
 import { NFT } from 'models/nft'
-import NFTCard from 'components/NFTCard'
-import { ZERO_ADDRESS } from '../../constants'
+// import NFTCard from 'components/NFTCard'
+// import { ZERO_ADDRESS } from '../../constants'
 import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 import PaginationView from 'components/Pagination'
 import OutlineButton from 'components/Button/OutlineButton'
@@ -27,6 +27,7 @@ import { useNFTImageByUri } from 'hooks/useNFTImage'
 import Image from 'components/Image'
 import { SwapContext } from 'context/SwapContext'
 import { routes } from 'constants/routes'
+import ComingSoon from 'pages/ComingSoon'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -97,48 +98,48 @@ export const UserInfoTabRoute = {
   [UserInfoTabs.ACTIVITY]: 'Activity'
 }
 
-const DummyNFTList = [
-  {
-    chainId: 1,
-    contractAddress: ZERO_ADDRESS,
-    mainAddress: ZERO_ADDRESS,
-    tokenId: '1234',
-    name: 'Berserk - Red EthRanger #04 ttttttttttt',
-    tokenUri: NFTPlaceholder
-  },
-  {
-    chainId: 1,
-    contractAddress: ZERO_ADDRESS,
-    mainAddress: ZERO_ADDRESS,
-    tokenId: '1235',
-    name: 'Berserk - Red EthRanger #04 ttttttttttt',
-    tokenUri: NFTPlaceholder
-  },
-  {
-    chainId: 1,
-    contractAddress: ZERO_ADDRESS,
-    mainAddress: ZERO_ADDRESS,
-    tokenId: '1236',
-    name: 'Berserk - Red EthRanger #04 ttttttttttt',
-    tokenUri: NFTPlaceholder
-  },
-  {
-    chainId: 1,
-    contractAddress: ZERO_ADDRESS,
-    mainAddress: ZERO_ADDRESS,
-    tokenId: '1237',
-    name: 'Berserk - Red EthRanger #04 ttttttttttt',
-    tokenUri: NFTPlaceholder
-  },
-  {
-    chainId: 1,
-    contractAddress: ZERO_ADDRESS,
-    mainAddress: ZERO_ADDRESS,
-    tokenId: '1238',
-    name: 'Berserk - Red EthRanger #04 ttttttttttt',
-    tokenUri: NFTPlaceholder
-  }
-]
+// const DummyNFTList = [
+//   {
+//     chainId: 1,
+//     contractAddress: ZERO_ADDRESS,
+//     mainAddress: ZERO_ADDRESS,
+//     tokenId: '1234',
+//     name: 'Berserk - Red EthRanger #04 ttttttttttt',
+//     tokenUri: NFTPlaceholder
+//   },
+//   {
+//     chainId: 1,
+//     contractAddress: ZERO_ADDRESS,
+//     mainAddress: ZERO_ADDRESS,
+//     tokenId: '1235',
+//     name: 'Berserk - Red EthRanger #04 ttttttttttt',
+//     tokenUri: NFTPlaceholder
+//   },
+//   {
+//     chainId: 1,
+//     contractAddress: ZERO_ADDRESS,
+//     mainAddress: ZERO_ADDRESS,
+//     tokenId: '1236',
+//     name: 'Berserk - Red EthRanger #04 ttttttttttt',
+//     tokenUri: NFTPlaceholder
+//   },
+//   {
+//     chainId: 1,
+//     contractAddress: ZERO_ADDRESS,
+//     mainAddress: ZERO_ADDRESS,
+//     tokenId: '1237',
+//     name: 'Berserk - Red EthRanger #04 ttttttttttt',
+//     tokenUri: NFTPlaceholder
+//   },
+//   {
+//     chainId: 1,
+//     contractAddress: ZERO_ADDRESS,
+//     mainAddress: ZERO_ADDRESS,
+//     tokenId: '1238',
+//     name: 'Berserk - Red EthRanger #04 ttttttttttt',
+//     tokenUri: NFTPlaceholder
+//   }
+// ]
 
 export enum AccountEventType {
   ALL = 'All',
@@ -172,21 +173,18 @@ function SwitchTab({
   )
 }
 
-function AccountNFTCardChild() {
-  const classes = useStyles()
-  return (
-    <Box width="100%" position="absolute" className={classes.cardHover}>
-      <Box width="100%" height="100%" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-        <Button width="70%" height="20%" classname={classes.cardButton} style={{ marginBottom: '5%' }}>
-          Bridge
-        </Button>
-        <Button width="70%" height="20%" classname={classes.cardButton} onClick={() => alert('Transfer')}>
-          Transfer
-        </Button>
-      </Box>
-    </Box>
-  )
-}
+// function AccountNFTCardChild() {
+//   const classes = useStyles()
+//   return (
+//     <Box width="100%" position="absolute" className={classes.cardHover}>
+//       <Box width="100%" height="100%" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+//         <Button width="70%" height="20%" classname={classes.cardButton} onClick={() => alert('soming soon')}>
+//           Bridge
+//         </Button>
+//       </Box>
+//     </Box>
+//   )
+// }
 
 function ShowNFTName({ data }: { data: ActivityItemProp }) {
   const tokenUri = useNFTImageByUri(data.tokenURI)
@@ -297,7 +295,7 @@ export default function Account() {
 
         {currentTab === UserInfoTabs.INVENTORY && (
           <>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
+            {/* <Box display="flex" justifyContent="space-between" alignItems="center">
               <NetworkSelect />
               <TextButton fontSize={16} fontWeight={500} onClick={() => setShowManual(true)}>
                 + Import Manually
@@ -311,6 +309,9 @@ export default function Account() {
 
             <Box display="flex" flexDirection="row-reverse">
               <PaginationView count={20} page={6} onChange={() => {}} setPage={() => {}} />
+            </Box> */}
+            <Box display="flex" justifyContent="center">
+              <ComingSoon />
             </Box>
           </>
         )}

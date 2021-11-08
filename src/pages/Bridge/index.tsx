@@ -16,7 +16,9 @@ import DepositConfirmationModal from 'components/Modal/TransactionModals/Deposit
 import useModal from 'hooks/useModal'
 import { useActiveWeb3React } from 'hooks'
 import { shortenAddress } from 'utils'
-import TransactionSubmittedModal from 'components/Modal/TransactionModals/TransactiontionSubmittedModal'
+import TransactionSubmittedModal, {
+  SwapSuccessModal
+} from 'components/Modal/TransactionModals/TransactiontionSubmittedModal'
 import WithdrawConfirmationModal from 'components/Modal/TransactionModals/WithdrawConfirmationModal'
 import SwitchChainModal from 'components/Modal/SwitchChainModal'
 import { ChainList, ChainListMap } from 'constants/chain'
@@ -245,12 +247,13 @@ export default function BridgeForm() {
     if (withdrawTxn?.receipt?.status === 1) {
       setWithdrawed(true)
       setWithdrawing(false)
+      showModal(<SwapSuccessModal hash={withdrawTxn.receipt.transactionHash} />)
     }
     if (withdrawTxn?.receipt?.status === 0) {
       setWithdrawed(false)
       setWithdrawing(false)
     }
-  }, [withdrawTxn])
+  }, [showModal, withdrawTxn])
 
   useEffect(() => {
     if (!token) return setError('Please import token')
@@ -348,7 +351,7 @@ export default function BridgeForm() {
           <Typography variant="h6">Confirm Deposit</Typography>
           <Image src={tokenUri} style={{ width: 180 }} altSrc={PlaceholderImg} />
           <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
-            <Typography variant="body1">{tokenId}</Typography>
+            <Typography variant="body1">Token ID: {tokenId}</Typography>
             <Typography variant="body1">{account && shortenAddress(account)}</Typography>
           </Box>
         </Box>
@@ -367,7 +370,7 @@ export default function BridgeForm() {
             <Box display="grid" gridGap="24px" maxWidth={isUpToSM ? 'unset' : '428px'} flexGrow="1">
               <Input
                 value={tokenAddress}
-                label="Token Contact Address"
+                label="Token Contract Address"
                 disabled={true}
                 placeholder="Enter your token contract address"
               />
