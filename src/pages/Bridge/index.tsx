@@ -145,18 +145,18 @@ export default function BridgeForm() {
       const r: any = await withdraw(
         {
           fromChainId: res.fromChainId,
-          toAddress: account,
-          nonce: nonce,
-          name: token.name,
-          symbol: token.symbol,
+          toAddress: res.to,
+          nonce: res.nonce,
+          name: res.name,
+          symbol: res.symbol,
           mainChainId: res.mainChainId,
-          nftAddress: token.mainAddress,
-          tokenId: token.tokenId,
-          tokenURI: token.tokenUri,
+          nftAddress: res.nft,
+          tokenId: res.tokenId,
+          tokenURI: res.tokenURI,
           signatures: signsList
         },
         {
-          gasLimit: 3500000,
+          // gasLimit: 3500000,
           value: recvFee
         }
       )
@@ -199,7 +199,7 @@ export default function BridgeForm() {
     if (!token || !toChain || !fromChain || !sendFee) return
     showModal(<TransacitonPendingModal />)
     deposit(token?.contractAddress ?? '', toChain?.id ?? 1, account ?? '', token.tokenId, {
-      gasLimit: 3500000,
+      // gasLimit: 3500000,
       value: sendFee
     })
       .then((r: any) => {
