@@ -174,7 +174,7 @@ export default function BridgeForm() {
       showModal(<TransactionSubmittedModal />)
     } catch (e) {
       hideModal()
-      showModal(<MessageBox type="error">{(e as Error).message}</MessageBox>)
+      showModal(<MessageBox type="error">{(e as any)?.error?.message || (e as Error).message}</MessageBox>)
       setWithdrawing(false)
       return console.error(e)
     }
