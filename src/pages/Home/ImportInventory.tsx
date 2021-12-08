@@ -1,4 +1,4 @@
-import { Box, Typography } from '@material-ui/core'
+import { Box, Typography } from '@mui/material'
 import Input from 'components/Input'
 import Modal from 'components/Modal'
 import NFTCard from 'components/NFTCard'
@@ -80,9 +80,9 @@ export default function SelectFromInventory({
   return (
     <Modal width="100%" maxWidth="800px" closeIcon customIsOpen={isOpen} customOnDismiss={onDismiss}>
       {DummyNFTList.length > 0 ? (
-        <Box padding="20px 40px 55px" display="grid" gridGap="24px">
+        <Box padding="20px 40px 55px" display="grid" gap="24px">
           <Typography variant="h6"> Select NFT</Typography>
-          <Box display="flex" gridGap="16px">
+          <Box display="flex" gap="16px">
             <ChainSelect selectedChain={ChainListMap[chainId ?? 1]} chainList={ChainList} width="180px" />
             <Input
               value={searchStr}
@@ -92,7 +92,7 @@ export default function SelectFromInventory({
               placeholder={'Search'}
             />
           </Box>
-          <Box display="grid" gridTemplateColumns="1fr 1fr 1fr 1fr" gridColumnGap="10px" gridRowGap="20px">
+          <Box display="grid" gridTemplateColumns="1fr 1fr 1fr 1fr" columnGap="10px" rowGap="20px">
             {DummyNFTList.map(nft => (
               <NFTCard
                 selected={selectedToken?.tokenId === nft.tokenId}
@@ -128,7 +128,7 @@ export default function SelectFromInventory({
           <Typography variant="h5" style={{ width: '100%' }}>
             Select NFT
           </Typography>
-          <Box display="grid" gridGap="24px" justifyItems="center">
+          <Box display="grid" gap="24px" justifyItems="center">
             <ErrorIcon style={{ fill: '#ffffff' }} />
             <Typography variant="h6" style={{ marginTop: -10 }}>
               Oops... No data was founded
@@ -150,7 +150,7 @@ export default function SelectFromInventory({
 function ConfirmSelectModal({ onConfirm, nft }: { onConfirm: () => void; nft: NFT }) {
   return (
     <Modal closeIcon>
-      <Box padding="40px" display="grid" gridGap="24px" width="100%" justifyItems="center">
+      <Box padding="40px" display="grid" gap="24px" width="100%" justifyItems="center">
         <Typography variant="h6">Select NFT</Typography>
         <Box maxWidth="160px">
           <NFTCard nft={nft} key={nft.tokenId} isSmall />

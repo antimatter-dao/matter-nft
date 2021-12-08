@@ -16,7 +16,7 @@ export const Axios = {
   }
 }
 
-export type AxiosResponseType<T = any, D = any> = AxiosResponse<T, D>
+export type AxiosResponseType<T = any> = AxiosResponse<T>
 
 export interface ResponseType<T = any> {
   msg: string

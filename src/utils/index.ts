@@ -79,6 +79,18 @@ const chains: ChainObject = {
   [ChainId.BSC]: {
     link: 'https://bscscan.com',
     builder: explorers.etherscan
+  },
+  [ChainId.RINKEBY]: {
+    link: 'https://rinkeby.etherscan.io/',
+    builder: explorers.etherscan
+  },
+  [ChainId.GÖRLI]: {
+    link: 'https://goerli.etherscan.io/',
+    builder: explorers.etherscan
+  },
+  [ChainId.KOVAN]: {
+    link: 'https://kovan.etherscan.io/',
+    builder: explorers.etherscan
   }
   // [ChainId.Arbitrum]: {
   //   link: 'https://arbiscan.io',

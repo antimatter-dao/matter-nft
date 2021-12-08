@@ -1,15 +1,13 @@
-import { ChangeEvent } from 'react'
-import { styled, Box, useTheme } from '@material-ui/core'
-import { Text } from 'rebass'
+import { ChangeEvent, useCallback } from 'react'
+import { styled, Box, useTheme, Typography } from '@mui/material'
 import InputNumerical from 'components/Input/InputNumerical'
 import OutlineButton from 'components/Button/OutlineButton'
 import InputLabel from 'components/Input/InputLabel'
 import SelectButton from 'components/Button/SelectButton'
 import useModal from 'hooks/useModal'
 import LogoText from 'components/LogoText'
-import { HideOnMobile, ShowOnMobile } from 'theme/muiTheme'
+import { HideOnMobile, ShowOnMobile } from 'theme/index'
 import SelectCurrencyModal from './SelectCurrencyModal'
-import { useCallback } from 'react'
 import { useActiveWeb3React } from 'hooks'
 import { useCurrencyBalance } from 'state/wallet/hooks'
 import { Currency } from 'constants/token/currency'
@@ -38,7 +36,7 @@ const InputRow = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
   '& .Mui-focused': {
     '&:before': {
-      content: "''",
+      content: '""',
       position: 'absolute',
       top: 0,
       left: 0,
@@ -62,7 +60,7 @@ const ButtonWrapper = styled('div')(({ theme }) => ({
   height: '100%',
   display: 'flex',
   alignItems: 'center',
-  [theme.breakpoints.down('sm')]: {
+  [theme.breakpoints.down('lg')]: {
     right: 20
   }
 }))
@@ -93,7 +91,7 @@ export default function CurrencyInputPanel({
   }, [disableCurrencySelect, onSelectCurrency, showModal])
 
   return (
-    <Box display="grid" gridGap="24px">
+    <Box display="grid" gap="24px">
       <ShowOnMobile breakpoint={'sm'}>
         <InputLabel>Token</InputLabel>
         <SelectButton width={'180px'} onClick={showCurrencySearch} disabled={disabled} primary={selectActive}>
@@ -108,11 +106,11 @@ export default function CurrencyInputPanel({
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <InputLabel>Amount</InputLabel>
           {currency && (
-            <Text color={theme.textColor.text3} fontWeight={500} fontSize={14}>
+            <Typography color={theme.textColor.text3} fontWeight={500} fontSize={14}>
               {!hideBalance && !!currency && selectedCurrencyBalance
                 ? (customBalanceText ?? 'Your balance: ') + selectedCurrencyBalance?.toSignificant(6)
                 : ' -'}
-            </Text>
+            </Typography>
           )}
         </Box>
         <InputRow>

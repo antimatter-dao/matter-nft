@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useContext } from 'react'
-import { Typography, Box } from '@material-ui/core'
+import { Typography, Box } from '@mui/material'
 import Axios, { AxiosResponse } from 'axios'
 import { useHistory } from 'react-router'
 import AppBody from 'components/AppBody'
@@ -346,7 +346,7 @@ export default function BridgeForm() {
         toChain={toChain}
         onConfirm={handleDeposit}
       >
-        <Box display="grid" gridGap="28px" justifyItems="center">
+        <Box display="grid" gap="28px" justifyItems="center">
           <Typography variant="h6">Confirm Deposit</Typography>
           <Image src={tokenUri} style={{ width: 180 }} altSrc={PlaceholderImg} />
           <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
@@ -363,10 +363,10 @@ export default function BridgeForm() {
     <>
       <WithdrawModal />
       <AppBody maxWidth="800px" width="100%" onReturnClick={handleReturnClick} closeIcon>
-        <Box display="grid" gridGap="29px" padding="20px 40px 52px" width="100%">
+        <Box display="grid" gap="29px" padding="20px 40px 52px" width="100%">
           <Typography variant="h5">NFT Bridge</Typography>
-          <Box display={isUpToSM ? 'grid' : 'flex'} gridGap={isUpToSM ? '24px' : '40px'} width="100%">
-            <Box display="grid" gridGap="24px" maxWidth={isUpToSM ? 'unset' : '428px'} flexGrow="1">
+          <Box display={isUpToSM ? 'grid' : 'flex'} gap={isUpToSM ? '24px' : '40px'} width="100%">
+            <Box display="grid" gap="24px" maxWidth={isUpToSM ? 'unset' : '428px'} flexGrow={1}>
               <Input
                 value={tokenAddress}
                 label="Token Contract Address (ERC721)"
@@ -415,7 +415,7 @@ export default function BridgeForm() {
               />
             ) : (
               <>
-                <Box display={isUpToSM ? 'grid' : 'flex'} gridGap="16px">
+                <Box display={isUpToSM ? 'grid' : 'flex'} gap="16px">
                   <ActionButton
                     error={error}
                     onAction={() => {

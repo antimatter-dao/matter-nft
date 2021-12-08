@@ -1,10 +1,11 @@
-import { Box, makeStyles, Typography } from '@material-ui/core'
+import { Box, Typography } from '@mui/material'
+import makeStyles from '@mui/styles/makeStyles'
 import Button from 'components/Button/Button'
 import { ReactComponent as UcenterIcon } from 'assets/svg/ucenter.svg'
 import { useActiveWeb3React } from 'hooks'
 import { shortenAddress } from 'utils'
 import TextButton from 'components/Button/TextButton'
-import Copy from 'components/Copy'
+import Copy from 'components/essential/Copy'
 import { useHistory } from 'react-router'
 import { SwitchTabWrapper, Tab } from 'components/SwitchTab'
 import { useParams } from 'react-router-dom'
@@ -28,8 +29,9 @@ import Image from 'components/Image'
 import { SwapContext } from 'context/SwapContext'
 import { routes } from 'constants/routes'
 import ComingSoon from 'pages/ComingSoon'
+import theme from 'theme'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles({
   root: {
     position: 'relative',
     width: '100%',
@@ -38,7 +40,7 @@ const useStyles = makeStyles(theme => ({
     minHeight: `calc(100vh - ${theme.height.header} - ${theme.height.footer})`,
     boxSizing: 'border-box',
     overflow: 'auto',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       maxWidth: 'unset'
     }
   },
@@ -74,7 +76,7 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: '#ddd'
     }
   }
-}))
+})
 
 // const SwitchTabWrapper = styled('div')(({ theme }) => ({
 //   borderBottom: '1px solid rgb(255,255,255, 0.1)',
@@ -189,7 +191,7 @@ function SwitchTab({
 function ShowNFTName({ data }: { data: ActivityItemProp }) {
   const tokenUri = useNFTImageByUri(data.tokenURI)
   return (
-    <Box display="flex" alignItems="center" gridColumnGap="5px">
+    <Box display="flex" alignItems="center" columnGap="5px">
       <Image
         src={tokenUri || NFTPlaceholder}
         alt=""
@@ -290,7 +292,7 @@ export default function Account() {
         </Button>
       </Box>
 
-      <Box display="grid" gridGap="30px">
+      <Box display="grid" gap="30px">
         <SwitchTab onTabClick={handleTabClick} currentTab={currentTab} />
 
         {currentTab === UserInfoTabs.INVENTORY && (
@@ -318,7 +320,7 @@ export default function Account() {
 
         {currentTab === UserInfoTabs.ACTIVITY && (
           <>
-            <Box display="flex" gridGap="20px" flexWrap="wrap">
+            <Box display="flex" gap="20px" flexWrap="wrap">
               {Object.values(AccountEventType).map(item =>
                 currentEventType === item ? (
                   <Button key={item} width="120px" height="48px">
@@ -334,7 +336,6 @@ export default function Account() {
             <TableView
               header={['Event', 'Item', 'Token ID', 'Quantity', 'From', 'To', 'Date', 'operate']}
               rows={myActivityListRows}
-              isHeaderGray
             />
             {myActivityLoading && (
               <Box display="flex" justifyContent="center">

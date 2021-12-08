@@ -1,53 +1,83 @@
 import { NavLink } from 'react-router-dom'
-import { AppBar, Box, makeStyles, styled } from '@material-ui/core'
+import { AppBar, Box, MenuItem, styled as muiStyled, styled } from '@mui/material'
+import { ExternalLink } from 'theme/components'
 import Web3Status from './Web3Status'
-import { HideOnMobile } from 'theme/muiTheme'
+import { HideOnMobile } from 'theme/index'
+import { Check, ExpandMore } from '@mui/icons-material'
+import PlainSelect from 'components/Select/PlainSelect'
 import Image from 'components/Image'
 import ChainSwap from '../../assets/svg/chain_swap.svg'
 import MobileHeader from './MobileHeader'
-import { Check, ChevronDown } from 'react-feather'
-import { ChainList, ChainListMap } from 'constants/chain'
 import { useActiveWeb3React } from 'hooks'
+import { ChainList, ChainListMap } from 'constants/chain'
 import { triggerSwitchChain } from 'utils/triggerSwitchChain'
+import { routes } from 'constants/routes'
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    position: 'relative',
-    height: theme.height.header,
-    backgroundColor: theme.palette.background.default,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    boxShadow: 'none',
-    padding: '0 60px 00 40px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    [theme.breakpoints.down('sm')]: {
-      position: 'fixed',
-      bottom: 0,
-      left: 0,
-      top: 'unset',
-      borderTop: '1px solid ' + theme.bgColor.bg4,
-      justifyContent: 'center'
-    }
+interface TabContent {
+  title: string
+  route?: string
+  link?: string
+  titleContent?: JSX.Element
+}
+
+interface Tab extends TabContent {
+  subTab?: TabContent[]
+}
+
+export const Tabs: Tab[] = [
+  { title: 'Dashboard', link: 'https://exchange.chainswap.com/#/dashboard' },
+  { title: 'Bridge Aggregator', link: 'https://exchange.chainswap.com/#/bridge' },
+  { title: 'NFT Bridge', route: routes.home },
+  { title: 'Statistics', link: 'https://exchange.chainswap.com/#/statistics' },
+  { title: 'DAO', link: 'https://exchange.chainswap.com/#/dao' }
+]
+
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  position: 'relative',
+  height: theme.height.header,
+  backgroundColor: theme.palette.background.default,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  boxShadow: 'none',
+  padding: '0 60px 00 40px',
+  [theme.breakpoints.down('md')]: {
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    top: 'unset',
+    borderTop: '1px solid ' + theme.bgColor.bg4,
+    justifyContent: 'center'
   },
-  actionButton: {
-    [theme.breakpoints.down('sm')]: {
-      maxWidth: 320,
-      width: '100%',
-      borderRadius: 49,
-      height: 40
-    }
-  },
-  mainLogo: {
-    '& img': {
-      width: 180.8,
-      height: 34.7
+  '& .link': {
+    textDecoration: 'none',
+    fontSize: 14,
+    color: '#FFFFFF',
+    opacity: 0.5,
+    marginRight: 28,
+    '&.active': {
+      opacity: 1
     },
     '&:hover': {
-      cursor: 'pointer'
+      opacity: 1
     }
   }
 }))
+
+const MainLogo = styled(NavLink)({
+  '& img': {
+    width: 180.8,
+    height: 34.7
+  },
+  '&:hover': {
+    cursor: 'pointer'
+  }
+})
+
+const LinksWrapper = muiStyled('div')({
+  marginLeft: 60.2
+})
+
 const NetworkCard = styled('div')({
   display: 'flex',
   alignItems: 'center',
@@ -125,26 +155,58 @@ const Dropdown = styled('div')({
 
 export default function Header() {
   const { account, chainId, library } = useActiveWeb3React()
-  const classes = useStyles()
+
   return (
     <>
       <MobileHeader />
-      <AppBar className={classes.root}>
-        <HideOnMobile>
+      <StyledAppBar>
+        <HideOnMobile breakpoint="md">
           <Box display="flex" alignItems="center">
-            <NavLink id={'chainswap'} to={'/'} className={classes.mainLogo}>
+            <MainLogo id={'chainswap'} to={'/'}>
               <Image src={ChainSwap} alt={'chainswap'} />
-            </NavLink>
+            </MainLogo>
           </Box>
         </HideOnMobile>
-        <Box display="flex" alignItems="center">
+
+        <LinksWrapper>
+          {Tabs.map(({ title, route, subTab, link, titleContent }, idx) =>
+            subTab ? (
+              <PlainSelect placeholder="about" key={title + idx}>
+                {subTab.map((sub, idx) =>
+                  sub.link ? (
+                    <MenuItem key={sub.link + idx}>
+                      <ExternalLink href={sub.link} className={'link'}>
+                        {sub.titleContent ?? sub.title}
+                      </ExternalLink>
+                    </MenuItem>
+                  ) : (
+                    <MenuItem key={sub.title + idx}>
+                      <NavLink to={sub.route ?? ''} className={'link'}>
+                        {sub.titleContent ?? sub.title}
+                      </NavLink>
+                    </MenuItem>
+                  )
+                )}
+              </PlainSelect>
+            ) : link ? (
+              <ExternalLink href={link} className={'link'} key={link + idx}>
+                {titleContent ?? title}
+              </ExternalLink>
+            ) : (
+              <NavLink key={title + idx} id={`${route}-nav-link`} to={route ?? ''} className={'link'}>
+                {titleContent ?? title}
+              </NavLink>
+            )
+          )}
+        </LinksWrapper>
+        <Box display="flex">
           {account && chainId && ChainListMap[chainId] && (
             <NetworkCard>
               <span>
                 {ChainListMap[chainId].icon}
                 {ChainListMap[chainId].symbol}
               </span>
-              <ChevronDown size="18" />
+              <ExpandMore sx={{ height: 18, width: 18 }} />
               <div className="dropdown_wrapper">
                 <Dropdown>
                   {ChainList.map(chain => (
@@ -156,7 +218,7 @@ export default function Header() {
                     >
                       {chain.id === chainId && (
                         <span style={{ position: 'absolute', left: '15px' }}>
-                          <Check size={18} />
+                          <Check sx={{ height: 18, width: 18 }} />
                         </span>
                       )}
                       {chain.icon ?? chain.icon}
@@ -169,7 +231,7 @@ export default function Header() {
           )}
           <Web3Status />
         </Box>
-      </AppBar>
+      </StyledAppBar>
     </>
   )
 }

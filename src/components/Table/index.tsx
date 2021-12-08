@@ -1,33 +1,21 @@
-import styled from 'styled-components'
-import {
-  TableContainer,
-  TableHead,
-  TableCell,
-  TableRow,
-  TableBody,
-  makeStyles,
-  Box,
-  Typography
-} from '@material-ui/core'
+import { TableContainer, TableHead, TableCell, TableRow, TableBody, Box, Typography, styled } from '@mui/material'
 import useBreakpoint from '../../hooks/useBreakpoint'
 
-interface StyleProps {
-  isHeaderGray?: boolean
-}
-
-const Profile = styled.div`
+const Profile = styled('div')(`
   display: flex;
   align-items: center;
-`
+`)
 
-export const TableProfileImg = styled.div<{ url?: string }>`
-  height: 24px;
-  width: 24px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 8px;
-  background: #000000 ${({ url }) => (url ? `url(${url})` : '')};
-`
+export const TableProfileImg = styled('div', {
+  shouldForwardProp: () => true
+})(({ url }: { url?: string }) => ({
+  height: '24px',
+  width: '24px',
+  borderRadius: '50%',
+  objectFit: 'cover',
+  marginRight: '8px',
+  background: `#000000 ${url ? `url(${url})` : ''}`
+}))
 
 export function OwnerCell({ url, name }: { url?: string; name: string }) {
   return (
@@ -38,77 +26,76 @@ export function OwnerCell({ url, name }: { url?: string; name: string }) {
   )
 }
 
-const useStyles = makeStyles({
-  root: {
-    display: 'table',
-    // backgroundColor: '#ffffff',
-    borderRadius: '40px',
-    '& .MuiTableCell-root': {
-      fontSize: '16px',
-      borderBottom: 'none',
-      fontWeight: 400,
-      padding: '14px 20px',
-      '& svg': {
-        marginRight: 8
-      },
-      '&:first-child': {
-        paddingLeft: 50
-      },
-      '&:last-child': {
-        paddingRight: 50
-      }
+const StyledTableContainer = styled(TableContainer)({
+  display: 'table',
+  // backgroundColor: '#ffffff',
+  borderRadius: '40px',
+  '& .MuiTableCell-root': {
+    fontSize: '16px',
+    borderBottom: 'none',
+    fontWeight: 400,
+    padding: '14px 20px',
+    '& svg': {
+      marginRight: 8
     },
-    '& table': {
-      width: '100%',
-      borderCollapse: 'separate',
-      borderSpacing: 0
+    '&:first-of-type': {
+      paddingLeft: 50
+    },
+    '&:last-child': {
+      paddingRight: 50
     }
   },
-  tableHeader: {
-    borderRadius: 8,
-    overflow: 'hidden',
-    '& .MuiTableCell-root': {
-      background: ({ isHeaderGray }: StyleProps) => (isHeaderGray ? 'rgba(255, 255, 255, 0.08)' : 'transparent'),
-      padding: '12px 20px',
-      fontSize: '12px',
-      color: 'rgba(255,255,255,0.5)',
-      borderBottom: ({ isHeaderGray }: StyleProps) => (isHeaderGray ? 'none' : '1px solid #000000'),
-      '&:first-child': {
-        paddingLeft: 50,
-        borderTopLeftRadius: 8
-      },
-      '&:last-child': {
-        paddingRight: 50,
-        borderTopRightRadius: 8
-      }
-    }
-  },
-  tableRow: {
-    height: 72,
-    '& .MuiTableCell-root': {
-      borderBottom: ({ isHeaderGray }: StyleProps) =>
-        isHeaderGray ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #999999'
+  '& table': {
+    width: '100%',
+    borderCollapse: 'separate',
+    borderSpacing: 0
+  }
+})
+
+const StyledTableHead = styled(TableHead)({
+  borderRadius: 8,
+  overflow: 'hidden',
+  '& .MuiTableCell-root': {
+    background: 'rgba(255, 255, 255, 0.08)',
+    padding: '12px 20px',
+    fontSize: '12px',
+    color: 'rgba(255,255,255,0.5)',
+    borderBottom: 'none',
+    '&:first-of-type': {
+      paddingLeft: 50,
+      borderTopLeftRadius: 8
     },
-    '&:hover': {
-      backgroundColor: ' rgba(255, 255, 255, 0.02)'
+    '&:last-child': {
+      paddingRight: 50,
+      borderTopRightRadius: 8
     }
   }
 })
 
-const Card = styled.div`
+const StyledTableRow = styled(TableRow)({
+  height: 72,
+  '& .MuiTableCell-root': {
+    borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+  },
+  '&:hover': {
+    backgroundColor: ' rgba(255, 255, 255, 0.02)'
+  }
+})
+
+const Card = styled('div')(`
   background-color: rgba(255, 255, 255, 0.08);
   border-radius: 30px;
   padding: 24px;
   > div {
     width: 100%;
   }
-`
+`)
 
-const CardRow = styled.div`
+const CardRow = styled('div')(`
   display: flex;
   justify-content: space-between;
   grid-template-columns: auto 100%;
-  > div:first-child {
+  > div:first-of-type {
     white-space: nowrap;
   }
   > div:last-child {
@@ -117,18 +104,9 @@ const CardRow = styled.div`
     justify-content: flex-end;
     align-items: center;
   }
-`
+`)
 
-export default function Table({
-  header,
-  rows,
-  isHeaderGray
-}: {
-  header: string[]
-  rows: (string | number | JSX.Element)[][]
-  isHeaderGray?: boolean
-}) {
-  const classes = useStyles({ isHeaderGray })
+export default function Table({ header, rows }: { header: string[]; rows: (string | number | JSX.Element)[][] }) {
   const matches = useBreakpoint()
   return (
     <>
@@ -136,7 +114,7 @@ export default function Table({
         <>
           {rows.map((data, index) => (
             <Card key={index}>
-              <Box display="flex" flexDirection="column" gridGap="16px">
+              <Box display="flex" flexDirection="column" gap="16px">
                 {header.map((headerString, index) => (
                   <CardRow key={index}>
                     <Typography variant="inherit">{headerString}</Typography>
@@ -148,26 +126,26 @@ export default function Table({
           ))}
         </>
       ) : (
-        <TableContainer className={classes.root}>
+        <StyledTableContainer>
           <table>
-            <TableHead className={classes.tableHeader}>
+            <StyledTableHead>
               <TableRow>
                 {header.map((string, idx) => (
                   <TableCell key={idx}>{string}</TableCell>
                 ))}
               </TableRow>
-            </TableHead>
+            </StyledTableHead>
             <TableBody>
               {rows.map((row, idx) => (
-                <TableRow key={row[0].toString() + idx} className={classes.tableRow}>
+                <StyledTableRow key={row[0].toString() + idx}>
                   {row.map((data, idx) => (
                     <TableCell key={idx}>{data}</TableCell>
                   ))}
-                </TableRow>
+                </StyledTableRow>
               ))}
             </TableBody>
           </table>
-        </TableContainer>
+        </StyledTableContainer>
       )}
     </>
   )

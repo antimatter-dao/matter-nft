@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { useTheme, Box, Typography } from '@material-ui/core'
-import { Text } from 'rebass'
-import styled from 'styled-components'
+import { useTheme, Box, Typography } from '@mui/material'
+import { styled } from '@mui/material'
 import { ApplicationModal } from '../../../state/application/actions'
 import { useModalOpen, useSettingsModalToggle } from '../../../state/application/hooks'
 import {
@@ -18,33 +17,32 @@ import Button from 'components/Button/Button'
 import TextButton from 'components/Button/TextButton'
 import SwitchToggle from 'components/SwitchToggle'
 
-const StyledMenuIcon = styled(SettingsIcon)`
-  height: 20px;
-  width: 20px;
-
-  > * {
-    stroke: ${({ theme }) => theme.text2};
+const StyledMenuIcon = styled(SettingsIcon)(({ theme }) => ({
+  height: '20px',
+  width: '20px',
+  '& > *': {
+    stroke: theme.textColor.text2
+  },
+  '&:hover': {
+    opacity: 0.7
   }
+}))
 
-  :hover {
-    opacity: 0.7;
-  }
-`
+const EmojiWrapper = styled('div')({
+  position: 'absolute',
+  bottom: '-6px',
+  right: '0px',
+  fontSize: '14px'
+})
 
-const EmojiWrapper = styled.div`
-  position: absolute;
-  bottom: -6px;
-  right: 0px;
-  font-size: 14px;
-`
-
-const CustomizedAutoRow = styled.div`
+const CustomizedAutoRow = styled('div')(`
   display: flex;
   align-items: center;
   & > div {
-    width: 50%;
+    width: 50%;  
   }
-`
+`)
+
 export const SLIPPAGE_TYPE = { generation: 'generation', redeem: 'redeem' }
 
 export default function Settings({ onlySlippage }: { onlySlippage?: boolean }) {
@@ -81,20 +79,18 @@ export default function Settings({ onlySlippage }: { onlySlippage?: boolean }) {
         maxWidth="500px"
         closeIcon
       >
-        <Box display="grid" gridGap="8px" padding="24px">
+        <Box display="grid" gap="8px" padding="24px">
           <Box display="flex" alignItems="center" justifyContent="space-between" padding="0 24px">
-            <Text fontWeight={500} fontSize={18}>
-              Are you sure?
-            </Text>
+            <Typography sx={{ fontWeight: 500, fontSize: 18 }}>Are you sure?</Typography>
           </Box>
-          <Box display="grid" gridGap="8px" style={{ padding: '0 1rem' }}>
-            <Text fontWeight={500} fontSize={14}>
+          <Box display="grid" gap="8px" style={{ padding: '0 1rem' }}>
+            <Typography fontWeight={500} fontSize={14}>
               Expert mode turns off the confirm transaction prompt and allows high slippage trades that often result in
               bad rates and lost funds.
-            </Text>
-            <Text fontWeight={600} fontSize={14}>
+            </Typography>
+            <Typography fontWeight={600} fontSize={14}>
               ONLY USE THIS MODE IF YOU KNOW WHAT YOU ARE DOING.
-            </Text>
+            </Typography>
             <Button
               style={{ marginTop: '1rem' }}
               onClick={() => {
@@ -112,7 +108,7 @@ export default function Settings({ onlySlippage }: { onlySlippage?: boolean }) {
       <Modal customIsOpen={open} customOnDismiss={toggle} closeIcon>
         <Box
           display="grid"
-          gridGap="28px"
+          gap="28px"
           padding="30px 30px 48px"
           justifyContent="center"
           style={{ background: theme.gradient.gradient1 }}
@@ -127,15 +123,15 @@ export default function Settings({ onlySlippage }: { onlySlippage?: boolean }) {
           />
           {!onlySlippage && (
             <>
-              <Text fontWeight={400} fontSize={18} style={{ marginTop: '16px' }}>
+              <Typography fontWeight={400} fontSize={18} style={{ marginTop: '16px' }}>
                 Interface Settings
-              </Text>
+              </Typography>
               <CustomizedAutoRow>
                 <Box display="grid">
                   <Box display="flex" alignItems="center" marginBottom="11px">
-                    <Text fontWeight={400} fontSize={14} color={theme.textColor.text2}>
+                    <Typography fontWeight={400} fontSize={14} color={theme.textColor.text2}>
                       Toggle Expert Mode
-                    </Text>
+                    </Typography>
                     <QuestionHelper text="Bypasses confirmation modals and allows high slippage trades. Use at your own risk." />
                   </Box>
                   <SwitchToggle
@@ -155,9 +151,9 @@ export default function Settings({ onlySlippage }: { onlySlippage?: boolean }) {
                 </Box>
                 <Box display="grid">
                   <Box display="flex" alignItems="center" marginBottom="11px">
-                    <Text fontWeight={400} fontSize={14} color={theme.textColor.text2}>
+                    <Typography fontWeight={400} fontSize={14} color={theme.textColor.text2}>
                       Disable Multihops
-                    </Text>
+                    </Typography>
                     <QuestionHelper text="Restricts swaps to direct pairs only." />
                   </Box>
                   <SwitchToggle

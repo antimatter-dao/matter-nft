@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Box, Typography } from '@material-ui/core'
+import { Box, Typography } from '@mui/material'
 import Input from 'components/Input'
 import InputLabel from 'components/Input/InputLabel'
 import Modal from 'components/Modal'
@@ -55,7 +55,7 @@ export default function ImportManual({
 
   return (
     <Modal maxWidth="520px" width="100%" customIsOpen={isOpen} customOnDismiss={onDismiss} closeIcon>
-      <Box display="grid" gridGap="24px" padding="40px">
+      <Box display="grid" gap="24px" padding="40px">
         <Typography variant="h5">Import Manually</Typography>
         <div>
           <InputLabel>Select Chain</InputLabel>

@@ -1,10 +1,9 @@
 import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
 import 'inter-ui'
 import { StrictMode } from 'react'
-import { CssBaseline, ThemeProvider as MuiThemeProvider } from '@material-ui/core'
+import { CssBaseline, ThemeProvider as MuiThemeProvider, Theme, StyledEngineProvider } from '@mui/material'
 import ReactDOM from 'react-dom'
-// import ReactGA from 'react-ga'
-import theme from 'theme/muiTheme'
+import theme from 'theme/index'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
 import Blocklist from './components/essential/Blocklist'
@@ -15,31 +14,18 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration'
 import ApplicationUpdater from './state/application/updater'
 import MulticallUpdater from './state/multicall/updater'
 import TransactionUpdater from './state/transactions/updater'
-import ThemeProvider from './theme'
 import getLibrary from './utils/getLibrary'
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
 
 const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 
 if (!!window.ethereum) {
   window.ethereum.autoRefreshOnNetworkChange = false
 }
-
-// const GOOGLE_ANALYTICS_ID: string | undefined = process.env.REACT_APP_GOOGLE_ANALYTICS_ID
-// if (typeof GOOGLE_ANALYTICS_ID === 'string') {
-//   ReactGA.initialize(GOOGLE_ANALYTICS_ID)
-//   ReactGA.set({
-//     customBrowserType: !isMobile ? 'desktop' : 'web3' in window || 'ethereum' in window ? 'mobileWeb3' : 'mobileRegular'
-//   })
-// } else {
-//   ReactGA.initialize('test', { testMode: true, debug: true })
-// }
-
-// window.addEventListener('error', error => {
-//   ReactGA.exception({
-//     description: `${error.message} @ ${error.filename}:${error.lineno}:${error.colno}`,
-//     fatal: true
-//   })
-// })
 
 function Updaters() {
   return (
@@ -58,14 +44,14 @@ ReactDOM.render(
         <Blocklist>
           <Provider store={store}>
             <Updaters />
-            <ThemeProvider>
+            <StyledEngineProvider injectFirst>
               <MuiThemeProvider theme={theme}>
                 <CssBaseline />
                 <HashRouter>
                   <App />
                 </HashRouter>
               </MuiThemeProvider>
-            </ThemeProvider>
+            </StyledEngineProvider>
           </Provider>
         </Blocklist>
       </Web3ProviderNetwork>

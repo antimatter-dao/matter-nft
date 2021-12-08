@@ -1,11 +1,8 @@
-import { useEffect } from 'react'
-import { Box, Button } from '@material-ui/core'
+import { Box, Button } from '@mui/material'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import Modal from 'components/Modal'
 import AccountDetails from 'components/Modal/WalletModal/AccountDetails'
 import useModal from 'hooks/useModal'
-import { useTransactionAdder } from 'state/transactions/hooks'
-// import JSBI from 'jsbi'
 
 export default {
   title: 'Modal/AccountDetailsModal',
@@ -14,16 +11,6 @@ export default {
 
 const DefaultTemplate: ComponentStory<typeof AccountDetails> = (args: any) => {
   const { showModal } = useModal()
-  const addTxn = useTransactionAdder()
-
-  useEffect(() => {
-    // addTxn(
-    //   { hash: 'test', from: 'address1', to: 'address2', nonce: 1, gasLimit: JSBI.BigInt(0) },
-    //   {
-    //     summary: 'Account details modal test'
-    //   }
-    // )
-  }, [addTxn])
 
   return (
     <Button
@@ -31,7 +18,7 @@ const DefaultTemplate: ComponentStory<typeof AccountDetails> = (args: any) => {
       onClick={() => {
         showModal(
           <Modal customIsOpen={true} customOnDismiss={() => {}} maxWidth="560px" closeIcon={true}>
-            <Box width={'100%'} padding="32px" display="flex" flexDirection="column" alignItems="center" gridGap={20}>
+            <Box width={'100%'} padding="32px" display="flex" flexDirection="column" alignItems="center" gap={20}>
               <AccountDetails
                 {...args}
                 toggleWalletModal={() => {}}

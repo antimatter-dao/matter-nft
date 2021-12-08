@@ -1,91 +1,80 @@
 import React from 'react'
-import { Select as MuiSelect, makeStyles, createStyles, Theme } from '@material-ui/core'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import { Select as MuiSelect, styled, InputBase } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 interface Props {
   children?: React.ReactNode
   placeholder: string
 }
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '55px',
-      cursor: 'pointer',
-      color: 'rgba(255, 255, 255, 0.5)',
-      paddingRight: '0 !important',
-      '&::before': {
-        content: ({ placeholder }: Props) => '"' + placeholder + '"',
-        position: 'absolute',
-        fontSize: 14,
-        fontWeight: 400
-      },
-      '&:hover': {
-        color: 'rgba(255, 255, 255, 1)'
-      }
-    },
-    icon: {
-      color: 'rgba(255, 255, 255, 0.5)',
-      fontSize: 16,
-      right: 0,
-      top: 8
-    },
-    iconOpen: {
-      color: '#FFFFFF'
-    },
-    paper: {
-      width: 148,
-      borderRadius: 14,
-      marginTop: 6,
-      border: '1px solid rgba(255, 255, 255, 0.2)',
-      backgroundColor: 'transparent',
-      '& ul': {
-        background: '#0F0F10',
-        padding: '10px 20px 18px 20px'
-      },
-      '& li': {
-        fontSize: 13,
-        fontWeight: 400,
-        color: 'rgba(255, 255, 255, 0.4)',
-        padding: '8px 0',
-        border: 'none',
-        outline: 'none'
-      },
-      '& li:hover': {
-        color: theme.palette.primary.main
-      }
-    },
-    base: {
-      width: 'inherit',
-      // borderRadius: theme.shape.borderRadius,
-      '&.Mui-focused': {
-        color: 'white',
-        '& .MuiSelect-root:before': {
-          color: 'rgba(255, 255, 255, 1)'
-        }
-      }
+const StyledSelect = styled(MuiSelect)(({ theme }) => ({
+  backgroundColor: 'transparent',
+  cursor: 'pointer',
+  width: '72px',
+  position: 'relative',
+  border: 'none',
+  '& .MuiSelect-icon': {
+    color: theme.palette.primary.contrastText,
+    right: '16px',
+    fontSize: '16px'
+  },
+  // '&.Mui-focused': {
+  //   backgroundColor: 'transparent'
+  // },
+  '&:hover': {
+    color: 'rgba(255, 255, 255, 1)',
+    '& .MuiOutlinedInput-notchedOutline': {
+      border: 'none'
     }
-  })
-)
+  }
+}))
 
 export default function Select(props: Props) {
-  const classes = useStyles(props)
-  const { children } = props
-
-  const blur = () => {
-    setTimeout(() => {
-      return (document.activeElement as HTMLElement).blur()
-    }, 0)
-  }
+  const { children, placeholder } = props
 
   return (
-    <MuiSelect
-      disableUnderline
-      className={classes.base}
-      classes={{ root: classes.root, icon: classes.icon, iconOpen: classes.iconOpen }}
-      onClose={blur}
+    <StyledSelect
+      sx={{
+        '&:before': {
+          position: 'absolute',
+          zIndex: -1,
+          content: '"' + placeholder ? `'${placeholder}'` : '' + '"',
+          fontSize: 14,
+          fontWeight: 400
+        }
+      }}
+      autoWidth
+      placeholder={placeholder}
       MenuProps={{
-        classes: { paper: classes.paper },
+        sx: {
+          '& .MuiPaper-root': {
+            width: 148,
+            borderRadius: '14px',
+            marginTop: 6,
+            backgroundColor: 'transparent',
+            '& ul': {
+              background: '#0F0F10',
+              padding: '10px 20px 18px 20px'
+            },
+            '& li': {
+              fontSize: 13,
+              fontWeight: 400,
+              color: 'rgba(255, 255, 255, 0.4)',
+              padding: '8px 0',
+              border: 'none',
+              outline: 'none',
+              backgroundColor: 'transparent'
+            },
+            '& li:hover': {
+              color: theme => theme.palette.primary.main,
+              backgroundColor: 'transparent'
+            },
+            '& .Mui-selected': {
+              color: theme => theme.palette.primary.main,
+              backgroundColor: 'transparent'
+            }
+          }
+        },
         anchorOrigin: {
           vertical: 'bottom',
           horizontal: 'left'
@@ -93,12 +82,13 @@ export default function Select(props: Props) {
         transformOrigin: {
           vertical: 'top',
           horizontal: 'left'
-        },
-        getContentAnchorEl: null
+        }
       }}
       IconComponent={ExpandMoreIcon}
+      input={<InputBase />}
+      renderValue={() => ''}
     >
       {children}
-    </MuiSelect>
+    </StyledSelect>
   )
 }

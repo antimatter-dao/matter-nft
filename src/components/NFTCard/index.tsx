@@ -1,12 +1,12 @@
-import { Box, Typography, makeStyles, Button } from '@material-ui/core'
-import { Text } from 'rebass'
+import { Box, Typography, Button } from '@mui/material'
+import makeStyles from '@mui/styles/makeStyles'
 import clsx from 'clsx'
 import { OutlinedCard } from 'components/Card'
 import Image from 'components/Image'
 import { NFT } from 'models/nft'
 import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 import { shortenAddress } from 'utils'
-import Copy from 'components/Copy'
+import Copy from 'components/essential/Copy'
 
 const useStyles = makeStyles(theme => ({
   imgWrapper: {
@@ -87,15 +87,15 @@ export default function NFTCard({
             <Image src={nft.tokenUri || NFTPlaceholder} className={classes.img} />
           </div>
 
-          <Box display="grid" padding="16px" gridGap="8px">
-            <Text
+          <Box display="grid" padding="16px" gap="8px">
+            <Typography
               fontWeight={isSmall ? 400 : 500}
               fontSize={isSmall ? 14 : 16}
               textAlign="left"
               style={{ width: '100%', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
             >
               {nft.name}
-            </Text>
+            </Typography>
 
             <Box display="flex" justifyContent="space-between">
               <Typography variant="body2" component="div" style={{ display: 'flex' }}>

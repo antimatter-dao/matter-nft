@@ -1,6 +1,20 @@
 import React from 'react'
-import { IconButton, makeStyles } from '@material-ui/core'
-import CloseIcon from '@material-ui/icons/Close'
+import { styled } from '@mui/material/styles'
+import { CloseIcon } from 'theme/components'
+
+const Root = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: 20,
+  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%), #000000',
+  justifyContent: 'center',
+  border: '1px solid rgba(255, 255, 255, 0.2)',
+  boxSizing: 'border-box',
+  overflow: 'auto',
+  [theme.breakpoints.down('lg')]: {
+    width: '100%!important',
+    maxWidth: 'unset'
+  }
+}))
 
 interface Props {
   children: React.ReactNode
@@ -11,47 +25,18 @@ interface Props {
   closeIcon?: boolean
 }
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    position: 'relative',
-    width: (props: Partial<Props>) => props.width || 560,
-    maxWidth: (props: Partial<Props>) => props.maxWidth || 560,
-    borderRadius: 20,
-    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%), #000000',
-    justifyContent: 'center',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    boxSizing: 'border-box',
-    overflow: 'auto',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%!important',
-      maxWidth: 'unset'
-    }
-  },
-  closeIconContainer: {
-    padding: 0,
-    position: 'absolute',
-    top: 24,
-    right: 24,
-    '&:hover $closeIcon': {
-      color: theme.palette.text.primary
-    }
-  },
-  closeIcon: {
-    color: theme.palette.grey[500]
-  }
-}))
-
-export default function AppBody({ children, closeIcon, onReturnClick, ...props }: Props) {
-  const classes = useStyles(props)
+export default function AppBody(props: Props) {
+  const { children, closeIcon, onReturnClick, width, maxWidth } = props
 
   return (
-    <div className={classes.root}>
-      {closeIcon && (
-        <IconButton className={classes.closeIconContainer} onClick={onReturnClick}>
-          <CloseIcon className={classes.closeIcon} />
-        </IconButton>
-      )}
+    <Root
+      sx={{
+        width: width || 560,
+        maxWidth: maxWidth || 560
+      }}
+    >
+      {closeIcon && <CloseIcon onClick={onReturnClick} />}
       {children}
-    </div>
+    </Root>
   )
 }

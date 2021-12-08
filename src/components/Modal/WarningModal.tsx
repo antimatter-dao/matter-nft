@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
-import { X } from 'react-feather'
+import { Close } from '@mui/icons-material'
 import Button from 'components/Button/Button'
 import Modal from './index'
-import { Typography, Box } from '@material-ui/core'
+import { Typography, Box } from '@mui/material'
 import useModal from 'hooks/useModal'
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -21,13 +21,13 @@ export default function WarningModal() {
 export function WarningModalContent({ onDismiss }: { onDismiss: () => void }) {
   return (
     <Modal maxWidth="608px" width="100%">
-      <Box display="grid" gridGap="24px" width="100%" padding="32px">
+      <Box display="grid" gap="24px" width="100%" padding="32px">
         <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
           <div />
           <Typography variant="h6" style={{ textAlign: 'center' }}>
             Warning!
           </Typography>
-          <X onClick={onDismiss} style={{ cursor: 'pointer' }} />
+          <Close onClick={onDismiss} sx={{ cursor: 'pointer' }} />
         </Box>
 
         <Typography variant="inherit">

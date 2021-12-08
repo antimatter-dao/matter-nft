@@ -1,7 +1,7 @@
-import { Box } from '@material-ui/core'
+import { Box } from '@mui/material'
 import { useActiveWeb3React } from 'hooks'
 import React from 'react'
-import { ExternalLink } from 'theme'
+import { ExternalLink } from 'theme/components'
 import { getEtherscanLink } from 'utils'
 import MessageBox from './MessageBox'
 
@@ -10,7 +10,7 @@ export default function TransactionSubmittedModal({ children, hash }: { hash?: s
 
   return (
     <MessageBox type={'success'} header={'Transaction Submitted'}>
-      <Box display="grid" gridGap="20px" justifyContent="center">
+      <Box display="grid" gap="20px" justifyContent="center">
         {children}
         {chainId && hash && (
           <ExternalLink
@@ -31,7 +31,7 @@ export function SwapSuccessModal({ children, hash }: { hash?: string; children?:
 
   return (
     <MessageBox type={'success'} header={'Congratulations!'}>
-      <Box display="grid" gridGap="20px" justifyContent="center">
+      <Box display="grid" gap="20px" justifyContent="center">
         {children}
         {chainId && hash && (
           <ExternalLink
@@ -44,5 +44,5 @@ export function SwapSuccessModal({ children, hash }: { hash?: string; children?:
         )}
       </Box>
     </MessageBox>
-  )
+  );
 }

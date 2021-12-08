@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useContext } from 'react'
-import { Typography, Box } from '@material-ui/core'
+import { Typography, Box } from '@mui/material'
 import AppBody from 'components/AppBody'
 import Button from 'components/Button/Button'
 import ImportInventory from './ImportInventory'
@@ -62,17 +62,17 @@ export default function Bridge() {
   return (
     <>
       <AppBody>
-        <Box display="grid" gridGap="29px" padding="20px 40px 52px">
+        <Box display="grid" gap="29px" padding="20px 40px 52px">
           <Typography variant="h5">NFT Bridge</Typography>
           {/* <Button
-            disabled={!account}
-            onClick={() => {
-              setSelectedToken(undefined)
-              setShowInventory(true)
-            }}
-          >
-            Select From Inventory
-          </Button> */}
+          disabled={!account}
+          onClick={() => {
+            setSelectedToken(undefined)
+            setShowInventory(true)
+          }}
+        >
+          Select From Inventory
+        </Button> */}
           <Button
             disabled={!account}
             onClick={() => {

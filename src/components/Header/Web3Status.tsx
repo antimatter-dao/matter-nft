@@ -1,9 +1,8 @@
 import { useCallback, useMemo } from 'react'
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
-import { useTheme, Box, makeStyles, styled } from '@material-ui/core'
-// import { CountUp } from 'use-count-up'
-import { Activity } from 'react-feather'
-import Copy from 'components/Copy'
+import { useTheme, Box, styled } from '@mui/material'
+import { Warning } from '@mui/icons-material'
+import Copy from 'components/essential/Copy'
 import { NetworkContextName } from '../../constants'
 import useENSName from '../../hooks/useENSName'
 import { useHasSocks } from '../../hooks/useSocksBalance'
@@ -24,27 +23,12 @@ import { ReactComponent as UcenterIcon } from 'assets/svg/ucenter.svg'
 import { useHistory } from 'react-router'
 import { UserInfoTabRoute, UserInfoTabs } from 'pages/Account'
 
-const useStyles = makeStyles(theme => ({
-  actionButton: {
-    [theme.breakpoints.down('sm')]: {
-      maxWidth: 320,
-      width: '100%',
-      borderRadius: 49,
-      height: 40
-    }
-  },
-  dot: {
-    width: 12,
-    height: 12,
-    background: `linear-gradient(135deg, #ffffff 4.17%, rgba(255, 255, 255, 0) 75%)`,
-    border: '0.6px solid #ffffff',
-    boxSizing: 'border-box',
-    borderRadius: '50%'
-  },
-  ucenterButton: {
-    width: 36,
-    height: 36,
-    borderRadius: '50%'
+const ActionButton = styled(Button)(({ theme }) => ({
+  [theme.breakpoints.down('lg')]: {
+    maxWidth: 320,
+    width: '100%',
+    borderRadius: 49,
+    height: 40
   }
 }))
 
@@ -80,7 +64,7 @@ const UserMenuWrapper = styled('div')({
   display: 'flex',
   border: '1px solid #ededed',
   flexDirection: 'column',
-  '& > div:first-child': {
+  '& > div:first-of-type': {
     padding: '16px 24px',
     display: 'flex',
     alignItems: 'center',
@@ -120,7 +104,6 @@ const SOCK = (
 function Web3StatusInner() {
   const { account, error } = useWeb3React()
   const isDownMD = useBreakpoint('md')
-  const classes = useStyles()
   // const aggregateBalance: TokenAmount | undefined = useAggregateUniBalance()
 
   // const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
@@ -153,13 +136,13 @@ function Web3StatusInner() {
         height={'36px'}
         display={'flex'}
         paddingLeft={'10px'}
-        borderRadius={'32px'}
+        sx={{ borderRadius: 32 }}
         style={{ fontSize: 14, lineHeight: '16px', background: 'rgba(255,255,255,0.1)' }}
         alignItems={'center'}
       >
         {/* {!!account && aggregateBalance && (
           <>
-            <Box padding={isDownMD ? '0 8px' : '0 10px 0 12px'} gridGap={10}>
+            <Box padding={isDownMD ? '0 8px' : '0 10px 0 12px'} gap={10}>
               <CountUp
                 key={countUpValue}
                 isCounting
@@ -174,17 +157,17 @@ function Web3StatusInner() {
             <Divider orientation={'vertical'} />
           </>
         )} */}
-        <Box display="flex" alignItems="center" padding={isDownMD ? '0 0 0 8px' : '0 0 0 10px'} gridGap={10}>
+        <Box display="flex" alignItems="center" padding={isDownMD ? '0 0 0 8px' : '0 0 0 10px'} gap={10}>
           {hasPendingTransactions ? (
-            <Box margin="0 auto" gridGap={10} display="flex" alignItems="center" justifyContent="center">
+            <Box margin="0 auto" gap={10} display="flex" alignItems="center" justifyContent="center">
               <Spinner color={theme.textColor.text1} size="16px" />
               <span style={{ marginRight: isDownMD ? '8px' : '10px' }}>{pending?.length} Pending</span>
             </Box>
           ) : (
             <>
               {hasSocks ? SOCK : null}
-              {/* {!hasPendingTransactions && connector && <span className={classes.dot} />} */}
-              <TextButton onClick={toggleWalletModal} fontSize={14} opacity={0.5}>
+              {/* {!hasPendingTransactions && connector && <Dot />} */}
+              <TextButton onClick={toggleWalletModal} fontSize={14} opacity={0.6}>
                 {ENSName || shortenAddress(account)}
               </TextButton>
               {account && <Copy toCopy={account}></Copy>}
@@ -194,7 +177,10 @@ function Web3StatusInner() {
             {/* <UserButton id="userButton" onClick={toShowUserPanel} isOpen={!!match}>
                   <AntimatterIcon />
                 </UserButton> */}
-            <UcenterIcon onClick={toShowUserPanel} style={{ width: 36, position: 'absolute', cursor: 'pointer' }} />
+            <UcenterIcon
+              onClick={toShowUserPanel}
+              style={{ width: 36, height: 36, position: 'absolute', cursor: 'pointer' }}
+            />
             <UserMenu account={account} />
           </UserButtonWrap>
         </Box>
@@ -202,29 +188,22 @@ function Web3StatusInner() {
     )
   } else if (error) {
     return (
-      <Button
+      <ActionButton
         backgroundColor={theme.palette.error.main}
-        classname={classes.actionButton}
         fontSize={'14px'}
         width={'140px'}
         height={'36px'}
         onClick={toggleWalletModal}
       >
-        <Activity size={16} style={{ marginRight: 10 }} />
+        <Warning sx={{ fontSize: 16, mr: 10 }} />
         {error instanceof UnsupportedChainIdError ? 'Wrong Network' : 'Error'}
-      </Button>
+      </ActionButton>
     )
   } else {
     return (
-      <Button
-        // classname={classes.actionButton}
-        fontSize={'14px'}
-        width={'140px'}
-        height={'36px'}
-        onClick={toggleWalletModal}
-      >
+      <ActionButton fontSize={'14px'} width={'140px'} height={'32px'} onClick={toggleWalletModal}>
         Connect Wallet
-      </Button>
+      </ActionButton>
     )
   }
 }

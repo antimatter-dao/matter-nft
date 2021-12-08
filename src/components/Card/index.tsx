@@ -1,17 +1,15 @@
-import { Paper, useTheme } from '@material-ui/core'
+import { Paper, useTheme } from '@mui/material'
 import React from 'react'
 
 export function OutlinedCard({
   children,
   color,
-  classname,
   padding,
   width,
   style
 }: {
   children: JSX.Element
   color?: string
-  classname?: string
   padding?: string | number
   width?: string | number
   style?: React.CSSProperties
@@ -21,14 +19,13 @@ export function OutlinedCard({
   return (
     <Paper
       variant="outlined"
-      style={{
+      sx={{
         backgroundColor: 'transparent',
         border: `1px solid ${color ?? theme.palette.grey.A400}`,
         padding,
         width,
         ...style
       }}
-      classes={{ root: classname }}
     >
       {children}
     </Paper>
