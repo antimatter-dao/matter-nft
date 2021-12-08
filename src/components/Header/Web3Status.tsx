@@ -122,6 +122,7 @@ function Web3StatusInner() {
   } else if (error) {
     return (
       <ActionButton
+        style={{ borderRadius: '60px' }}
         backgroundColor={theme.palette.error.main}
         fontSize={'14px'}
         width={'140px'}

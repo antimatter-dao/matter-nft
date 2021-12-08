@@ -42,6 +42,7 @@ export const Tabs: Tab[] = [
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   position: 'relative',
   height: theme.height.header,
+  borderBottom: '1px solid #00000020',
   backgroundColor: theme.palette.background.default,
   flexDirection: 'row',
   alignItems: 'center',
@@ -59,7 +60,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   '& .link': {
     textDecoration: 'none',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: theme.palette.text.primary,
     opacity: 0.5,
     marginRight: 28,
     '&.active': {
@@ -98,7 +99,7 @@ export default function Header() {
             <LinksWrapper>
               {Tabs.map(({ title, route, subTab, link, titleContent }, idx) =>
                 subTab ? (
-                  <PlainSelect placeholder="about" key={title + idx}>
+                  <PlainSelect placeholder={title} key={title + idx}>
                     {subTab.map((sub, idx) =>
                       sub.link ? (
                         <MenuItem key={sub.link + idx}>

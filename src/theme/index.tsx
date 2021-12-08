@@ -16,7 +16,6 @@ interface TextColor {
   text3: string
   text4: string
   text5: string
-  primary: string
 }
 
 interface BgColor {
@@ -66,19 +65,19 @@ declare module '@mui/material/styles/createTheme' {
 export const theme = {
   palette: {
     primary: {
-      light: '#2E2247',
-      main: '#9867FF',
-      dark: '#7433FF',
+      light: '#16161650',
+      main: '#161616',
+      dark: '#000000',
       contrastText: '#FFFFFF'
     },
     secondary: {
-      light: '#1D152D',
-      main: '#211735',
-      dark: '#3E276B',
-      contrastText: '#9867FF'
+      light: '#DEDEDF70',
+      main: ' #DEDEDF',
+      dark: '#16161650',
+      contrastText: '#00000080'
     },
     error: {
-      main: '#F53030'
+      main: '#EB1312'
     },
     warning: {
       main: '#9867FF'
@@ -87,15 +86,15 @@ export const theme = {
       main: '#9867FF'
     },
     success: {
-      main: '#2DAB50'
+      main: '#3AC261'
     },
     background: {
-      default: '#1C1C1F',
-      paper: '#191919'
+      default: '#FFFFFF',
+      paper: '#F3F3F3'
     },
     text: {
-      primary: '#FFFFFF',
-      secondary: '#333333',
+      primary: '#161616',
+      secondary: '#16161640',
       disabled: '#999999'
     },
     action: {
@@ -113,8 +112,7 @@ export const theme = {
     text2: '#CCCCCC',
     text3: '#999999',
     text4: '#727272',
-    text5: '#333333',
-    primary: '#9867FF'
+    text5: '#333333'
   },
   bgColor: {
     bg1: '#000000',
@@ -136,16 +134,12 @@ export const theme = {
     borderRadius: 10
   },
   spacing: (factor: number) => `${1 * factor}px`
-  // gray: {
-  //   main: '#333333',
-  //   dark: '#262626',
-  // },
 }
 
 export const override: any = {
   MuiCssBaseline: {
     styleOverrides: {
-      body: { backgroundColor: '#1C1C1F', fontSize: 16 },
+      body: { backgroundColor: theme.palette.background.default, fontSize: 16 },
       'html, input, textarea, button': {
         fontFamily: 'Roboto, sans-serif',
         fontDisplay: 'fallback'

@@ -10,10 +10,10 @@ import Web3ReactManager from 'components/essential/Web3ReactManager'
 
 export const parameters = {
   backgrounds: {
-    default: 'dark',
+    default: 'default',
     values: [
       {
-        name: 'dark',
+        name: 'default',
         value: themeColor.palette.background.default
       }
     ]

@@ -29,6 +29,7 @@ export function ExternalLink({
   rel = 'noopener noreferrer',
   style,
   sx,
+  className,
   children,
   underline
 }: Omit<HTMLProps<HTMLAnchorElement>, 'as' | 'ref' | 'onClick'> & {
@@ -36,6 +37,7 @@ export function ExternalLink({
   style?: React.CSSProperties
   sx?: SxProps<Theme>
   underline?: 'always' | 'hover' | 'none'
+  className?: string
 }) {
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -49,6 +51,7 @@ export function ExternalLink({
   )
   return (
     <Link
+      className={className}
       target={target}
       rel={rel}
       href={href}

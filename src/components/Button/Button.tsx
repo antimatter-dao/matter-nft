@@ -23,7 +23,6 @@ export default function Button(props: Props) {
       onClick={onClick}
       disabled={disabled}
       sx={{
-        ...style,
         width: width || '100%',
         height: height || 60,
         fontSize: fontSize || 16,
@@ -38,7 +37,8 @@ export default function Button(props: Props) {
         '&:disabled': {
           opacity: 0.24,
           backgroundColor: theme.palette.primary.dark
-        }
+        },
+        ...style
       }}
     >
       {children}

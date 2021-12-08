@@ -51,7 +51,6 @@ export default function Modal(props: Props) {
             ...{
               width: { xs: 'calc(100vw - 32px)!important', md: width || 480 },
               maxWidth: maxWidth || 480,
-              background: theme => theme.gradient.gradient1,
               border: hasBorder ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid transparent',
               padding: padding || 0,
               boxSizing: 'border-box',

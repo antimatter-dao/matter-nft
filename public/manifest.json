@@ -1,11 +1,11 @@
 {
   "background_color": "#fff",
   "display": "standalone",
-  "homepage_url": "https://app.uniswap.org",
+  "homepage_url": "https://chainswap.com/",
   "icons": [
     {
-      "src": "./images/192x192_App_Icon.png",
-      "sizes": "192x192",
+      "src": "./images/196x196_App_Icon.png",
+      "sizes": "196x196",
       "type": "image/png",
       "purpose": "any maskable"
     },
@@ -17,8 +17,8 @@
     }
   ],
   "orientation": "portrait",
-  "name": "Uniswap",
-  "short_name": "Uniswap",
+  "name": "Chainswap",
+  "short_name": "Chainswap",
   "start_url": ".",
-  "theme_color": "#ff007a"
+  "theme_color": "#7869CC"
 }
