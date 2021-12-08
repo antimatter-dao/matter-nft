@@ -4,12 +4,12 @@ import ERC721_ABI from 'constants/abis/erc721.json'
 import { useActiveWeb3React } from 'hooks'
 import JSBI from 'jsbi'
 import { useSingleCallResult } from 'state/multicall/hooks'
-import { getContract, isAddress } from 'utils'
+import { isAddress } from 'utils'
 import { useBlockNumber } from 'state/application/hooks'
-import { getOtherNetworkLibrary } from 'connectors/MultiNetworkConnector'
-import NFT_BRIDGE_ABI from 'constants/abis/nft_bridge.json'
+// import { getOtherNetworkLibrary } from 'connectors/MultiNetworkConnector'
+// import NFT_BRIDGE_ABI from 'constants/abis/nft_bridge.json'
 import { NFT } from 'models/nft'
-import { NFT_BRIDGE_ADDRESS } from '../constants'
+// import { NFT_BRIDGE_ADDRESS } from '../constants'
 
 export function useNftDataCallback(
   contractAddress: string,
@@ -44,6 +44,7 @@ export function useNftDataCallback(
         setOwnerResLoading(false)
         setOwnerError(false)
       } catch (e) {
+        console.log('load error:', e)
         setOwnerRes(undefined)
         setOwnerResLoading(false)
         setOwnerError(true)
@@ -106,12 +107,14 @@ export function useRecvSend(chainId: number | undefined, address: string | undef
 
 export function useNftBaseData(chainId?: number, contractAddress?: string, tokenId?: string): NFT | undefined {
   const [nftData, setNftData] = useState<NFT | undefined>()
+  const bridgeContract = useNFTBridgeContract()
 
   useEffect(() => {
-    if (!tokenId || !contractAddress || !chainId) return
-    const library = getOtherNetworkLibrary(chainId)
-    if (!library || !tokenId || !contractAddress) return
-    const bridgeContract = getContract(NFT_BRIDGE_ADDRESS, NFT_BRIDGE_ABI, library)
+    // if (!tokenId || !contractAddress || !chainId) return
+    // const library = getOtherNetworkLibrary(chainId)
+    // if (!library || !tokenId || !contractAddress) return
+    // const bridgeContract = getContract(NFT_BRIDGE_ADDRESS, NFT_BRIDGE_ABI, library)
+    if (!bridgeContract || !tokenId || !contractAddress) return
     bridgeContract
       .mappingNftInfo(contractAddress, tokenId)
       .then((res: any) => {
@@ -131,6 +134,6 @@ export function useNftBaseData(chainId?: number, contractAddress?: string, token
         setNftData(undefined)
         console.log('load error:', e)
       })
-  }, [chainId, contractAddress, tokenId])
+  }, [bridgeContract, chainId, contractAddress, tokenId])
   return nftData
 }

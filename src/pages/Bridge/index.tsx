@@ -35,6 +35,7 @@ import { useNFTImageByUri } from 'hooks/useNFTImage'
 import { useFeeSend, useRecvSend } from 'hooks/useNftData'
 import { SwapContext } from 'context/SwapContext'
 import { routes } from 'constants/routes'
+import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 
 export default function BridgeForm() {
   const { selectedToken: token, depositTxn, withdrawTxn } = useContext(SwapContext)
@@ -95,7 +96,7 @@ export default function BridgeForm() {
         Axios.post<any, AxiosResponse<ResponseType<SignatureResponse>>>(route, {
           chainId: toChain?.id,
           fromChainId: depositTxn?.deposit?.fromChain,
-          mainChainId: token.mainChainId ?? 0,
+          mainChainId: token.mainChainId ? token.mainChainId : 1,
           name: token.name,
           nft: token.contractAddress,
           nonce: +nonce,
@@ -105,6 +106,7 @@ export default function BridgeForm() {
           tokenURI: token.tokenUri
         })
       )
+
       const aggregated: any[] = []
       let error = 0
       const requestList: Promise<AxiosResponse<ResponseType<SignatureResponse>>[]> = new Promise((resolve, reject) => {
@@ -113,13 +115,12 @@ export default function BridgeForm() {
             .then(r => {
               aggregated.push(r)
               if (aggregated.length >= 3) {
-                resolve(aggregated.slice(0, 2))
+                resolve(aggregated.slice(0, 3))
               }
             })
             .catch(() => {
               if (error > 2) {
                 reject('signature request fail')
-                showModal(<MessageBox type="error">Signature request failed</MessageBox>)
               } else {
                 error++
               }
@@ -128,14 +129,12 @@ export default function BridgeForm() {
       })
 
       const resList: AxiosResponse<ResponseType<SignatureResponse>>[] = await requestList
-
       const signsList = resList.map(({ data: { data: response, code } }) => {
         if (code === 500) {
           return
         }
         return [response.signatory, response.signV, response.signR, response.signS]
       })
-
       if (signsList.length !== 3) {
         showModal(<MessageBox type="error">Signature request failed</MessageBox>)
         return
@@ -146,18 +145,18 @@ export default function BridgeForm() {
       const r: any = await withdraw(
         {
           fromChainId: res.fromChainId,
-          toAddress: account,
-          nonce: nonce,
-          name: token.name,
-          symbol: token.symbol,
+          toAddress: res.to,
+          nonce: res.nonce,
+          name: res.name,
+          symbol: res.symbol,
           mainChainId: res.mainChainId,
-          nftAddress: token.mainAddress,
-          tokenId: token.tokenId,
-          tokenURI: token.tokenUri,
+          nftAddress: res.nft,
+          tokenId: res.tokenId,
+          tokenURI: res.tokenURI,
           signatures: signsList
         },
         {
-          gasLimit: 3500000,
+          // gasLimit: 3500000,
           value: recvFee
         }
       )
@@ -175,7 +174,7 @@ export default function BridgeForm() {
       showModal(<TransactionSubmittedModal />)
     } catch (e) {
       hideModal()
-      showModal(<MessageBox type="error">{(e as Error).message}</MessageBox>)
+      showModal(<MessageBox type="error">{(e as any)?.error?.message || (e as Error).message}</MessageBox>)
       setWithdrawing(false)
       return console.error(e)
     }
@@ -200,7 +199,7 @@ export default function BridgeForm() {
     if (!token || !toChain || !fromChain || !sendFee) return
     showModal(<TransacitonPendingModal />)
     deposit(token?.contractAddress ?? '', toChain?.id ?? 1, account ?? '', token.tokenId, {
-      gasLimit: 3500000,
+      // gasLimit: 3500000,
       value: sendFee
     })
       .then((r: any) => {
@@ -370,7 +369,7 @@ export default function BridgeForm() {
             <Box display="grid" gridGap="24px" maxWidth={isUpToSM ? 'unset' : '428px'} flexGrow="1">
               <Input
                 value={tokenAddress}
-                label="Token Contract Address"
+                label="Token Contract Address (ERC721)"
                 disabled={true}
                 placeholder="Enter your token contract address"
               />
@@ -388,7 +387,7 @@ export default function BridgeForm() {
             </Box>
             <Box style={{ margin: isUpToSM ? '0 auto' : 'unset' }}>
               <Image
-                src={tokenUri}
+                src={tokenUri || NFTPlaceholder}
                 altSrc={PlaceholderImg}
                 style={{
                   width: 240,

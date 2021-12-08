@@ -35,8 +35,8 @@ export function useNFTImageByUri(tokenUri: string | undefined): string {
     if (isUrl(tokenUri)) {
       fetch(tokenUri)
         .then(res => res.json())
-        .then(res => setUri((res.image as string) || tokenUri))
-        .catch(() => setUri(tokenUri))
+        .then(res => setUri((res.image as string) || ''))
+        .catch(() => setUri(''))
     } else {
       setUri('')
     }

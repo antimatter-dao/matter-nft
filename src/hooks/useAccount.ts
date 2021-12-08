@@ -17,6 +17,7 @@ export interface ActivityItemProp {
   tokenURI: string
   type: AccountEventType
   hash?: string
+  symbol: string
 }
 
 export function useMyActivity(
@@ -52,10 +53,7 @@ export function useMyActivity(
           pageSize: 10,
           type: type === AccountEventType.ALL ? '' : type === AccountEventType.SEND ? '1' : '2'
         }
-        const { data: _recordres } = await Axios.get(
-          'https://test-nftapi.antimatter.finance:8081/vault/bridgeRecord',
-          req
-        )
+        const { data: _recordres } = await Axios.get('https://info.chainswap.com:8443/vault/bridgeRecord', req)
         const recordList: ActivityItemProp[] = _recordres.data.list.map(
           (item: {
             hash: string
@@ -71,6 +69,7 @@ export function useMyActivity(
             type: any
             token_uri: any
             name: any
+            symbol: string
           }) => {
             return {
               contract: item.contract,
@@ -85,7 +84,8 @@ export function useMyActivity(
               type: item.type === 1 ? AccountEventType.SEND : AccountEventType.RECEIVE,
               hash: item.hash ? item.hash : undefined,
               name: item.name,
-              tokenURI: item.token_uri
+              tokenURI: item.token_uri,
+              symbol: item.symbol
             }
           }
         )

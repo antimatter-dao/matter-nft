@@ -194,7 +194,7 @@ function ShowNFTName({ data }: { data: ActivityItemProp }) {
         src={tokenUri || NFTPlaceholder}
         alt=""
         altSrc={NFTPlaceholder}
-        style={{ width: 48, height: 48, objectFit: 'contain' }}
+        style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }}
       />
       {data.name || '--'}
     </Box>
@@ -356,7 +356,6 @@ export default function Account() {
       <ImportManual
         isOpen={showManual}
         onImport={(nft: NFT) => {
-          console.log(nft)
           setSelectedToken(nft)
         }}
         onProceed={() => {

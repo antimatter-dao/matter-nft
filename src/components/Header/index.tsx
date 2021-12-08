@@ -62,6 +62,10 @@ const NetworkCard = styled('div')({
   '& .dropdown_wrapper': {
     display: 'none'
   },
+  '& img, & svg': {
+    width: 20,
+    height: 20
+  },
   '&>span': {
     marginRight: 6,
     display: 'flex',
