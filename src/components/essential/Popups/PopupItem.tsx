@@ -11,11 +11,10 @@ export const Popup = styled('div')(({ theme }) => ({
   width: '100%',
   background: '#ffffff linear-gradient(0deg, #F7F7F8, #F7F7F8);',
   position: 'relative',
-  borderRadius: '4px',
+  borderRadius: '8px',
   padding: '20px',
   paddingRight: '35px',
   overflow: 'hidden',
-  borderRadius: '8px',
   [theme.breakpoints.down('sm')]: {
     minWidth: '290px',
     '&:not(:last-of-type)': {
@@ -24,14 +23,14 @@ export const Popup = styled('div')(({ theme }) => ({
   }
 }))
 
-const Fader = styled('div')(({ theme }) => ({
+const Fader = styled('div')({
   position: 'absolute',
   bottom: '0px',
   left: '0px',
   width: '100%',
   height: '2px',
   backgroundColor: '#3AC261'
-}))
+})
 
 const AnimatedFader = animated(Fader)
 
