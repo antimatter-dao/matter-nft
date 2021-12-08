@@ -7,8 +7,9 @@ import { NFT } from 'models/nft'
 import NFTPlaceholder from 'assets/images/nft_placeholder.png'
 import { shortenAddress } from 'utils'
 import Copy from 'components/essential/Copy'
+import { theme as themeProp } from 'theme/index'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   imgWrapper: {
     position: 'relative',
     width: '100%',
@@ -43,8 +44,8 @@ const useStyles = makeStyles(theme => ({
         content: '""',
         width: 'calc(100% + 2px)',
         height: 'calc(100% + 2px)',
-        border: '2px solid ' + theme.palette.primary.main,
-        borderRadius: theme.shape.borderRadius
+        border: '2px solid rgba(22, 22, 22, 0.2)',
+        borderRadius: themeProp.shape.borderRadius
       }
     }
   },
@@ -77,7 +78,7 @@ export default function NFTCard({
       variant="text"
       component="div"
       onClick={onClick}
-      style={{ width: '100%' }}
+      style={{ width: '100%', background: '#ffffff', padding: 0 }}
       className={clsx(isBorderHover && classes.borderHover, isBgHover && classes.bgHover)}
     >
       <OutlinedCard style={{ overflow: 'hidden', width: '100%', position: 'relative' }}>
@@ -99,7 +100,8 @@ export default function NFTCard({
 
             <Box display="flex" justifyContent="space-between">
               <Typography variant="body2" component="div" style={{ display: 'flex' }}>
-                {shortenAddress(nft.contractAddress)} {!isSmall && <Copy toCopy={nft.contractAddress} />}
+                {nft.contractAddress && shortenAddress(nft.contractAddress)}{' '}
+                {!isSmall && <Copy toCopy={nft.contractAddress} />}
               </Typography>
               <Typography variant="body2">{nft.tokenId}</Typography>
             </Box>

@@ -1,5 +1,5 @@
-import ReportGmailerrorredOutlinedIcon from '@mui/icons-material/ReportGmailerrorredOutlined'
-import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
+import { ReactComponent as SuccessIcon } from 'assets/componentsIcon/statusIcon/success_icon.svg'
+import { ReactComponent as ErrorIcon } from 'assets/componentsIcon/statusIcon/error_icon.svg'
 import { Typography, Box } from '@mui/material'
 import { useActiveWeb3React } from 'hooks/'
 import { ExternalLink } from 'theme/components'
@@ -21,9 +21,9 @@ export default function TransactionPopup({
       <Box display="flex" alignItems="flex-start" flexWrap="nowrap">
         <div style={{ paddingRight: 16 }}>
           {success ? (
-            <CheckCircleOutlineOutlinedIcon color="success" height={20} width={20} />
+            <SuccessIcon style={{ height: 20, width: 20 }} />
           ) : (
-            <ReportGmailerrorredOutlinedIcon color="error" height={20} width={20} />
+            <ErrorIcon style={{ height: 20, width: 20 }} />
           )}
         </div>
         <Typography variant="inherit">{summary ?? 'Hash: ' + hash.slice(0, 8) + '...' + hash.slice(58, 65)}</Typography>{' '}

@@ -52,7 +52,7 @@ const Input = styled('input', {
   width: 'auto',
   outline: 'none',
   '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
-    '-webkit-appearance': 'none'
+    WebkitAppearance: 'none'
   },
   textAlign: 'left'
 }))

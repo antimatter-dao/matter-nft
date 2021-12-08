@@ -60,9 +60,10 @@ export default function Select(props: Props) {
       {label && <StyledInputLabel>{label}</StyledInputLabel>}
       <StyledSelect
         sx={{
-          backgroundColor: primary ? theme.palette.primary.main : theme.palette.grey.A400,
+          backgroundColor: primary ? theme.palette.primary.main : theme.palette.background.default,
           width: width || '100%',
-          height: height || '48px',
+          height: height || '60px',
+          border: '1px solid transparent',
           '&:before': {
             content: value || defaultValue ? "''" : `"${placeholder}"`,
             position: 'absolute',
@@ -73,7 +74,8 @@ export default function Select(props: Props) {
             fontWeight: 400
           },
           '&:hover': {
-            backgroundColor: disabled ? theme.palette.grey.A400 : theme.palette.primary.main
+            backgroundColor: theme.palette.background.default,
+            borderColor: disabled ? 'transparent' : theme.palette.text.primary
           },
           '& .MuiSelect-icon': {
             display: disabled ? 'none' : 'block'

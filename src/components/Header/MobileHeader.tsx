@@ -37,17 +37,17 @@ const navLinkSx = {
   cursor: 'pointer',
   textDecoration: 'none',
   fontSize: 24,
-  color: (theme: Theme) => theme.textColor.text1,
+  color: (theme: Theme) => theme.palette.text.secondary,
   padding: '13px 24px',
   width: '100%',
   textAlign: 'left',
   display: 'flex',
   justifyContent: 'flex-start',
   '&.active': {
-    color: (theme: Theme) => theme.palette.primary.main
+    color: (theme: Theme) => theme.palette.text.primary
   },
   '&:hover': {
-    color: (theme: Theme) => theme.palette.primary.main
+    color: (theme: Theme) => theme.palette.text.primary
   }
 } as const
 
@@ -64,7 +64,7 @@ export default function MobileHeader() {
 
   const MobileMenu = useCallback(
     ({ isOpen, onDismiss }: { isOpen: boolean; onDismiss: () => void }) => (
-      <Modal isCardOnMobile customOnDismiss={onDismiss} customIsOpen={isOpen} maxWidth="900px">
+      <Modal customOnDismiss={onDismiss} customIsOpen={isOpen} maxWidth="900px">
         <Box display="grid" gap="15px">
           {Tabs.map(({ title, route, link, titleContent, subTab }) => {
             const content = titleContent ?? title

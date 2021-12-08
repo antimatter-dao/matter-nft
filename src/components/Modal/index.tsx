@@ -14,6 +14,9 @@ interface Props {
   customOnDismiss?: () => void
   padding?: string
   hasBorder?: boolean
+  bgColor?: string
+  boxShadow?: string
+  showHeader?: boolean
 }
 
 export default function Modal(props: Props) {
@@ -26,7 +29,10 @@ export default function Modal(props: Props) {
     hasBorder = true,
     width,
     maxWidth,
-    padding
+    padding,
+    bgColor,
+    boxShadow,
+    showHeader
   } = props
   const { isOpen, hideModal } = useModal()
   const node = useRef<any>()
@@ -62,20 +68,22 @@ export default function Modal(props: Props) {
               maxHeight: theme => ({
                 xs: `calc(100vh - ${theme.height.header} - ${theme.height.mobileHeader})`,
                 md: `calc(100vh - ${theme.height.header})`
-              })
+              }),
+              boxShadow: boxShadow
             },
             ...(!isCardOnMobile
               ? {
                   [theme.breakpoints.down('lg')]: {
                     border: 'none',
-                    borderTop: '1px solid ' + theme.palette.grey.A200,
-                    borderBottom: '1px solid ' + theme.palette.grey.A200,
+                    borderTop: '1px solid transparent',
+                    borderBottom: '1px solid #00000020',
                     width: '100%!important',
                     maxWidth: 'unset!important',
                     maxHeight: 'unset',
                     height: `calc(100vh - ${theme.height.mobileHeader} - ${theme.height.header})`,
                     margin: theme.height.header,
-                    borderRadius: '20px 20px 0 0'
+                    borderRadius: '20px 20px 0 0',
+                    boxShadow: 'none'
                   }
                 }
               : {})
@@ -84,8 +92,11 @@ export default function Modal(props: Props) {
         BackdropProps={{
           sx: {
             ...{
-              backgroundColor: 'rgba(0,0,0,0.7)',
-              opacity: 0.4
+              backgroundColor: bgColor ?? 'rgba(0,0,0,0.28)',
+              top: showHeader ? theme.height.header : undefined,
+              [theme.breakpoints.down('md')]: {
+                height: showHeader ? `calc(100vh - ${theme.height.header} - ${theme.height.mobileHeader})` : undefined
+              }
             },
             ...(!isCardOnMobile
               ? {

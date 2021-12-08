@@ -13,6 +13,7 @@ import { isAddress } from 'utils'
 import MessageBox from 'components/Modal/TransactionModals/MessageBox'
 import ActionButton from 'components/Button/ActionButton'
 import { NFT_BRIDGE_ADDRESS } from 'constants/index'
+import theme from 'theme'
 
 export default function ImportManual({
   onImport,
@@ -54,7 +55,17 @@ export default function ImportManual({
   }, [account, contractAddress, nftRes?.nft?.name, nftRes?.nft?.owner, tokenId])
 
   return (
-    <Modal maxWidth="520px" width="100%" customIsOpen={isOpen} customOnDismiss={onDismiss} closeIcon>
+    <Modal
+      maxWidth="788px"
+      width="100%"
+      customIsOpen={isOpen}
+      customOnDismiss={onDismiss}
+      closeIcon
+      bgColor={theme.palette.background.default}
+      boxShadow="0 0 0 transparent"
+      // isCardOnMobile
+      showHeader
+    >
       <Box display="grid" gap="24px" padding="40px">
         <Typography variant="h5">Import Manually</Typography>
         <div>

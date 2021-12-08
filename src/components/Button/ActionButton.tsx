@@ -1,7 +1,7 @@
 import Button from './Button'
-import OutlineButton from './OutlineButton'
 import Spinner from 'components/Spinner'
 import { Typography } from '@mui/material'
+import SecondaryButton from './SecondaryButton'
 
 export default function ActionButton({
   error,
@@ -29,16 +29,18 @@ export default function ActionButton({
   return (
     <>
       {error || pending ? (
-        <OutlineButton primary disabled height={height} width={width}>
-          {pending ? (
-            <>
-              <Spinner marginRight={16} />
-              {pendingText || 'Waiting Confirmation'}
-            </>
-          ) : (
-            error
-          )}
-        </OutlineButton>
+        <>
+          <SecondaryButton primary disabled height={height} width={width}>
+            {pending ? (
+              <>
+                <Spinner marginRight={16} />
+                {pendingText || 'Waiting Confirmation'}
+              </>
+            ) : (
+              error
+            )}
+          </SecondaryButton>
+        </>
       ) : success ? (
         <Button disabled height={height} width={width}>
           <Typography variant="inherit">{successText ?? actionText}</Typography>

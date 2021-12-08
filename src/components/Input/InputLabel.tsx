@@ -6,7 +6,7 @@ export default function InputLabel({ children, infoIcon }: { children?: React.Re
   return (
     <MuiInputLabel
       sx={{
-        color: '#FFFFFF',
+        color: theme => theme.palette.text.secondary,
         marginBottom: '12px',
         display: 'flex',
         alignItems: 'center'

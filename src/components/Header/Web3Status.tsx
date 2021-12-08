@@ -35,8 +35,8 @@ const ActionButton = styled(Button)(({ theme }) => ({
 const UserButtonWrap = styled('div')({
   marginLeft: '5px',
   position: 'relative',
-  width: 36,
-  height: 36,
+  width: 44,
+  height: 44,
   '& > div': {
     opacity: 0,
     visibility: 'hidden'
@@ -133,11 +133,11 @@ function Web3StatusInner() {
   if (account) {
     return (
       <Box
-        height={'36px'}
+        height={'44px'}
         display={'flex'}
         paddingLeft={'10px'}
         sx={{ borderRadius: 32 }}
-        style={{ fontSize: 14, lineHeight: '16px', background: 'rgba(255,255,255,0.1)' }}
+        style={{ fontSize: 14, lineHeight: '16px', background: '#F7F7F8' }}
         alignItems={'center'}
       >
         {/* {!!account && aggregateBalance && (
@@ -157,17 +157,30 @@ function Web3StatusInner() {
             <Divider orientation={'vertical'} />
           </>
         )} */}
-        <Box display="flex" alignItems="center" padding={isDownMD ? '0 0 0 8px' : '0 0 0 10px'} gap={10}>
+        <Box
+          display="flex"
+          alignItems="center"
+          padding={isDownMD ? '0 0 0 8px' : '0 0 0 10px'}
+          gap={10}
+          height={'44px'}
+        >
           {hasPendingTransactions ? (
-            <Box margin="0 auto" gap={10} display="flex" alignItems="center" justifyContent="center">
-              <Spinner color={theme.textColor.text1} size="16px" />
+            <Box
+              margin="0 auto"
+              gap={10}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              sx={{ color: theme => theme.palette.text.primary }}
+            >
+              <Spinner color={theme.palette.text.primary} size="16px" />
               <span style={{ marginRight: isDownMD ? '8px' : '10px' }}>{pending?.length} Pending</span>
             </Box>
           ) : (
             <>
               {hasSocks ? SOCK : null}
               {/* {!hasPendingTransactions && connector && <Dot />} */}
-              <TextButton onClick={toggleWalletModal} fontSize={14} opacity={0.6}>
+              <TextButton onClick={toggleWalletModal} fontSize={14} opacity={0.6} color="#000000">
                 {ENSName || shortenAddress(account)}
               </TextButton>
               {account && <Copy toCopy={account}></Copy>}
@@ -179,7 +192,7 @@ function Web3StatusInner() {
                 </UserButton> */}
             <UcenterIcon
               onClick={toShowUserPanel}
-              style={{ width: 36, height: 36, position: 'absolute', cursor: 'pointer' }}
+              style={{ width: 44, height: 44, position: 'absolute', cursor: 'pointer' }}
             />
             <UserMenu account={account} />
           </UserButtonWrap>

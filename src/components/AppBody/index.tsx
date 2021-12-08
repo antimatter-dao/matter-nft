@@ -16,23 +16,28 @@ const Root = styled('div')(({ theme }) => ({
   }
 }))
 
-interface Props {
+export default function AppBody({
+  children,
+  closeIcon,
+  onReturnClick,
+  width,
+  maxWidth,
+  height
+}: {
   children: React.ReactNode
   width?: number | string
   onReturnClick?: () => void
   title?: string
   maxWidth?: string
   closeIcon?: boolean
-}
-
-export default function AppBody(props: Props) {
-  const { children, closeIcon, onReturnClick, width, maxWidth } = props
-
+  height?: string | number
+}) {
   return (
     <Root
       sx={{
         width: width || 560,
-        maxWidth: maxWidth || 560
+        maxWidth: maxWidth || 560,
+        height: height
       }}
     >
       {closeIcon && <CloseIcon onClick={onReturnClick} />}

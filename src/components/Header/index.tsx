@@ -52,7 +52,8 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   },
   '& .link': {
     textDecoration: 'none',
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: 500,
     color: theme.palette.text.primary,
     opacity: 0.5,
     marginRight: 28,
@@ -61,33 +62,47 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
     },
     '&:hover': {
       opacity: 1
+    },
+    [theme.breakpoints.down('md')]: {
+      fontSize: 14
     }
   }
 }))
 
-const MainLogo = styled(NavLink)({
+const MainLogo = styled(NavLink)(({ theme }) => ({
   '& img': {
     width: 180.8,
     height: 34.7
   },
   '&:hover': {
     cursor: 'pointer'
+  },
+  [theme.breakpoints.between('md', 'lg')]: {
+    '& img': {
+      width: 100,
+      height: 'auto'
+    }
   }
-})
+}))
 
-const LinksWrapper = muiStyled('div')({
-  marginLeft: 60.2
-})
+const LinksWrapper = muiStyled('div')(({ theme }) => ({
+  marginLeft: 60.2,
+  [theme.breakpoints.between('md', 'lg')]: {
+    marginLeft: 20
+  }
+}))
 
-const NetworkCard = styled('div')({
+const NetworkCard = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   fontWeight: 500,
   fontSize: 14,
   marginRight: 20,
   position: 'relative',
-  color: 'rgba(255,255,255,0.5)',
-  height: 36,
+  color: theme.palette.text.primary,
+  border: '1px solid #000000',
+  height: 44,
+  borderRadius: 60,
   padding: '5px 15px',
   cursor: 'pointer',
   '& .dropdown_wrapper': {
@@ -121,27 +136,27 @@ const NetworkCard = styled('div')({
       }
     }
   }
-})
+}))
 
-const Dropdown = styled('div')({
+const Dropdown = styled('div')(({ theme }) => ({
   zIndex: 10,
   height: 0,
   position: 'absolute',
   borderRadius: 10,
   overflow: 'hidden',
   display: 'flex',
-  border: '1px solid rgba(255, 255, 255, 0.2)',
-  background: '#1C1C1C',
+  border: '1px solid #ededed',
+  background: '#FFFFFF',
   flexDirection: 'column',
   width: 172,
   '&>div': {
-    color: '#ffffff',
+    color: theme.palette.text.primary,
     textDecoration: 'none',
     padding: '14px 17px 14px 40px',
     transition: '0.5s',
     display: 'flex',
     alignItems: 'center',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+    borderBottom: '1px solid #ededed',
     '&>*': {
       marginRight: 5
     },
@@ -149,10 +164,10 @@ const Dropdown = styled('div')({
       border: 'none'
     },
     '&:hover': {
-      backgroundColor: 'rgba(255, 255, 255, 0.1)'
+      backgroundColor: '#ededed'
     }
   }
-})
+}))
 
 export default function Header() {
   const { account, chainId, library } = useActiveWeb3React()
@@ -168,38 +183,39 @@ export default function Header() {
             </MainLogo>
           </Box>
         </HideOnMobile>
-
-        <LinksWrapper>
-          {Tabs.map(({ title, route, subTab, link, titleContent }, idx) =>
-            subTab ? (
-              <PlainSelect placeholder="about" key={title + idx}>
-                {subTab.map((sub, idx) =>
-                  sub.link ? (
-                    <MenuItem key={sub.link + idx}>
-                      <ExternalLink href={sub.link} className={'link'}>
-                        {sub.titleContent ?? sub.title}
-                      </ExternalLink>
-                    </MenuItem>
-                  ) : (
-                    <MenuItem key={sub.title + idx}>
-                      <NavLink to={sub.route ?? ''} className={'link'}>
-                        {sub.titleContent ?? sub.title}
-                      </NavLink>
-                    </MenuItem>
-                  )
-                )}
-              </PlainSelect>
-            ) : link ? (
-              <ExternalLink href={link} className={'link'} key={link + idx}>
-                {titleContent ?? title}
-              </ExternalLink>
-            ) : (
-              <NavLink key={title + idx} id={`${route}-nav-link`} to={route ?? ''} className={'link'}>
-                {titleContent ?? title}
-              </NavLink>
-            )
-          )}
-        </LinksWrapper>
+        <HideOnMobile breakpoint="md">
+          <LinksWrapper>
+            {Tabs.map(({ title, route, subTab, link, titleContent }, idx) =>
+              subTab ? (
+                <PlainSelect placeholder="about" key={title + idx}>
+                  {subTab.map((sub, idx) =>
+                    sub.link ? (
+                      <MenuItem key={sub.link + idx}>
+                        <ExternalLink href={sub.link} className={'link'}>
+                          {sub.titleContent ?? sub.title}
+                        </ExternalLink>
+                      </MenuItem>
+                    ) : (
+                      <MenuItem key={sub.title + idx}>
+                        <NavLink to={sub.route ?? ''} className={'link'}>
+                          {sub.titleContent ?? sub.title}
+                        </NavLink>
+                      </MenuItem>
+                    )
+                  )}
+                </PlainSelect>
+              ) : link ? (
+                <ExternalLink href={link} className={'link'} key={link + idx}>
+                  {titleContent ?? title}
+                </ExternalLink>
+              ) : (
+                <NavLink key={title + idx} id={`${route}-nav-link`} to={route ?? ''} className={'link'}>
+                  {titleContent ?? title}
+                </NavLink>
+              )
+            )}
+          </LinksWrapper>
+        </HideOnMobile>
         <Box display="flex">
           {account && chainId && ChainListMap[chainId] && (
             <NetworkCard>

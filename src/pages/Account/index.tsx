@@ -30,6 +30,7 @@ import { SwapContext } from 'context/SwapContext'
 import { routes } from 'constants/routes'
 import ComingSoon from 'pages/ComingSoon'
 import theme from 'theme'
+import SecondaryButton from 'components/Button/SecondaryButton'
 
 const useStyles = makeStyles({
   root: {
@@ -45,8 +46,8 @@ const useStyles = makeStyles({
     }
   },
   name: {
-    background: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 10,
+    background: ' #F7F7F8',
+    borderRadius: 50,
     width: 160,
     height: 40,
     display: 'grid',
@@ -280,7 +281,9 @@ export default function Account() {
                 Connect with Metamask
               </Typography>
               <Box display="flex" className={classes.name}>
-                <TextButton fontSize={14}>{shortenAddress(account)}</TextButton>
+                <TextButton fontSize={14} fontWeight={400}>
+                  {shortenAddress(account)}
+                </TextButton>
                 {account && <Copy toCopy={account}></Copy>}
               </Box>
             </Box>
@@ -323,11 +326,17 @@ export default function Account() {
             <Box display="flex" gap="20px" flexWrap="wrap">
               {Object.values(AccountEventType).map(item =>
                 currentEventType === item ? (
-                  <Button key={item} width="120px" height="48px">
+                  <SecondaryButton key={item} width="120px" height="48px" style={{ borderRadius: 60 }}>
                     {item}
-                  </Button>
+                  </SecondaryButton>
                 ) : (
-                  <OutlineButton key={item} width="120px" height="48px" onClick={() => setCurrentEventType(item)}>
+                  <OutlineButton
+                    key={item}
+                    width="120px"
+                    height="48px"
+                    onClick={() => setCurrentEventType(item)}
+                    style={{ borderRadius: 60 }}
+                  >
                     {item}
                   </OutlineButton>
                 )

@@ -1,17 +1,16 @@
 import { useState, useCallback, useEffect, useContext } from 'react'
-import { Typography, Box } from '@mui/material'
+import { Typography, Box, Grid } from '@mui/material'
 import Axios, { AxiosResponse } from 'axios'
 import { useHistory } from 'react-router'
 import AppBody from 'components/AppBody'
 import Input from 'components/Input'
 import Image from 'components/Image'
-import PlaceholderImg from 'assets/images/placeholder_image.png'
 import { Chain } from 'models/chain'
 import ChainSwap from 'components/Select/ChainSwap'
 import TextButton from 'components/Button/TextButton'
 import Stepper from 'components/Stepper'
 import useBreakpoint from 'hooks/useBreakpoint'
-import DestinationAddress from 'components/Modal/TransactionModals/DestinationAddress'
+import { StatusIcon } from 'components/Modal/TransactionModals/DestinationAddress'
 import DepositConfirmationModal from 'components/Modal/TransactionModals/DepositConfirmationModal'
 import useModal from 'hooks/useModal'
 import { useActiveWeb3React } from 'hooks'
@@ -36,6 +35,18 @@ import { useFeeSend, useRecvSend } from 'hooks/useNftData'
 import { SwapContext } from 'context/SwapContext'
 import { routes } from 'constants/routes'
 import NFTPlaceholder from 'assets/images/nft_placeholder.png'
+import NFTCard from 'components/NFTCard'
+import { HideOnMobile, ShowOnMobile } from 'theme'
+import InputLabel from 'components/Input/InputLabel'
+import { OutlinedCard } from 'components/Card'
+
+const emptyNft = {
+  tokenUri: NFTPlaceholder,
+  name: '-',
+  mainAddress: '-',
+  contractAddress: '',
+  tokenId: '-'
+}
 
 export default function BridgeForm() {
   const { selectedToken: token, depositTxn, withdrawTxn } = useContext(SwapContext)
@@ -174,7 +185,11 @@ export default function BridgeForm() {
       showModal(<TransactionSubmittedModal />)
     } catch (e) {
       hideModal()
-      showModal(<MessageBox type="error">{(e as any)?.error?.message || (e as Error).message}</MessageBox>)
+      showModal(
+        <MessageBox type="error" header="Withdraw Failed">
+          {(e as any)?.error?.message || (e as Error).message}
+        </MessageBox>
+      )
       setWithdrawing(false)
       return console.error(e)
     }
@@ -308,7 +323,7 @@ export default function BridgeForm() {
               </TextButton>
               &nbsp;your wallet network&nbsp;
             </b>
-            to {toChain?.name || ''} to complete token swap.
+            to {toChain?.name || 'BSC'} to complete token swap.
           </>
         }
         step2={
@@ -319,9 +334,26 @@ export default function BridgeForm() {
         }
         isStep3Active={!!(toChain && chainId === toChain.id)}
       >
-        <Box display="grid" width="100%" justifyContent="center">
-          <Image src={tokenUri} style={{ width: 100, borderRadius: 10 }} altSrc={PlaceholderImg} />
-        </Box>
+        <OutlinedCard color="rgba(22, 22, 22, 0.1)" style={{ overflow: 'hidden' }}>
+          <Box display="flex" width="100%" justifyContent="flex-start" height="100px" gap="20px" alignItems="center">
+            <Image
+              src={tokenUri ? tokenUri : NFTPlaceholder}
+              style={{ width: 100, borderRadius: 10 }}
+              altSrc={NFTPlaceholder}
+            />
+            <Box display="grid" gap="14px">
+              <Typography sx={{ color: '#16161660' }} fontWeight={500}>
+                {token?.name ?? '-'}
+              </Typography>
+              <Box display="flex" gap="20">
+                <Typography sx={{ color: '#16161660' }}>{token?.contractAddress ?? '-'}</Typography>
+                <Typography ml={20} sx={{ color: '#16161660' }}>
+                  {token?.tokenId ? '#' + token.tokenId : '-'}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        </OutlinedCard>
       </WithdrawConfirmationModal>
     ),
     [
@@ -334,6 +366,9 @@ export default function BridgeForm() {
       library,
       showModal,
       toChain,
+      token?.contractAddress,
+      token?.name,
+      token?.tokenId,
       tokenUri,
       withdrawModalOpen
     ]
@@ -348,119 +383,153 @@ export default function BridgeForm() {
       >
         <Box display="grid" gap="28px" justifyItems="center">
           <Typography variant="h6">Confirm Deposit</Typography>
-          <Image src={tokenUri} style={{ width: 180 }} altSrc={PlaceholderImg} />
-          <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
-            <Typography variant="body1">Token ID: {tokenId}</Typography>
-            <Typography variant="body1">{account && shortenAddress(account)}</Typography>
+          <Box width="218px">
+            <NFTCard nft={token ?? emptyNft} />
           </Box>
         </Box>
       </DepositConfirmationModal>
     ),
-    [account, fromChain, handleDeposit, toChain, tokenId, tokenUri]
+    [account, fromChain, handleDeposit, toChain, token]
   )
 
   return (
     <>
       <WithdrawModal />
-      <AppBody maxWidth="800px" width="100%" onReturnClick={handleReturnClick} closeIcon>
-        <Box display="grid" gap="29px" padding="20px 40px 52px" width="100%">
-          <Typography variant="h5">NFT Bridge</Typography>
-          <Box display={isUpToSM ? 'grid' : 'flex'} gap={isUpToSM ? '24px' : '40px'} width="100%">
-            <Box display="grid" gap="24px" maxWidth={isUpToSM ? 'unset' : '428px'} flexGrow={1}>
-              <Input
-                value={tokenAddress}
-                label="Token Contract Address (ERC721)"
-                disabled={true}
-                placeholder="Enter your token contract address"
-              />
-              <Input value={tokenId} label="Token ID" disabled={true} placeholder="Enter your token ID" />
-              <ChainSwap
-                fromChain={fromChain}
-                toChain={toChain}
-                chainList={ChainList}
-                onSelectTo={handleTo}
-                disabledFrom={true}
-                disabledTo={!(tokenAddress && tokenId) || deposited || withdrawed || depositing || withdrawing}
-                activeTo={!!fromChain && !!tokenAddress && !!tokenId && !toChain}
-              />
-              {account && <DestinationAddress address={account} margin="-10px 0 10px" />}
-            </Box>
-            <Box style={{ margin: isUpToSM ? '0 auto' : 'unset' }}>
-              <Image
-                src={tokenUri || NFTPlaceholder}
-                altSrc={PlaceholderImg}
-                style={{
-                  width: 240,
-                  borderRadius: 12,
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  maxHeight: 252,
-                  objectFit: 'cover'
-                }}
-              />
-            </Box>
-          </Box>
-          <>
-            {!approved && !deposited ? (
-              <ActionButton
-                error={error}
-                pending={approving}
-                onAction={() => {
-                  approvalCallback()
-                  showModal(<TransacitonPendingModal />)
-                }}
-                success={approved}
-                successText="Approved"
-                pendingText="approving"
-                actionText="Approve"
-              />
-            ) : (
-              <>
-                <Box display={isUpToSM ? 'grid' : 'flex'} gap="16px">
-                  <ActionButton
-                    error={error}
-                    onAction={() => {
-                      showModal(<DepositModal />)
-                    }}
-                    actionText={`Deposite in ${fromChain?.symbol} Chain`}
-                    disableAction={!!depositTxn}
-                    pending={depositing}
-                    pendingText="Depositing"
-                    success={deposited}
-                    successText={`Deposited Successfully`}
-                  />
-                  {!error && (
-                    <ActionButton
-                      error={deposited ? '' : `Withdraw in ${toChain?.symbol} Chain`}
-                      onAction={
-                        chainId === toChain?.id
-                          ? () => {
-                              setwithdrawModalOpen(true)
-                            }
-                          : () => {
-                              library?.send('wallet_switchEthereumChain', [{ chainId: toChain?.hex }, account])
-                            }
-                      }
-                      actionText={
-                        chainId === toChain?.id ? `Withdraw in ${toChain?.symbol} Chain` : `Switch to ${toChain?.name}`
-                      }
-                      disableAction={!!withdrawTxn}
-                      pending={withdrawing}
-                      pendingText="Withdrawing"
-                      success={withdrawed}
-                      successText={`Withdrawed Successfully`}
-                    />
-                  )}
-                </Box>
-                {!error && (
-                  <Box width="70%" style={{ margin: '0 auto' }}>
-                    <Stepper steps={[1, 2]} activeStep={withdrawed ? 2 : deposited ? 1 : 0} />
+      <Grid container display="flex" maxWidth="1192px" width="100%" spacing={'24'} justifyContent="center">
+        <Grid item xs={12} md={8}>
+          <AppBody maxWidth="unset" width="100%" onReturnClick={handleReturnClick} closeIcon>
+            <Box display="grid" gap="29px" padding="20px 40px 52px" width="100%">
+              <Typography variant="h5">NFT Bridge</Typography>
+
+              <Box display="grid" gap="24px" maxWidth={'unset'} flexGrow={1}>
+                <Input
+                  value={tokenAddress}
+                  label="Token Contract Address (ERC721)"
+                  disabled={true}
+                  placeholder="Enter your token contract address"
+                />
+                <Input value={tokenId} label="Token ID" disabled={true} placeholder="Enter your token ID" />
+                <ChainSwap
+                  fromChain={fromChain}
+                  toChain={toChain}
+                  chainList={ChainList}
+                  onSelectTo={handleTo}
+                  disabledFrom={true}
+                  disabledTo={!(tokenAddress && tokenId) || deposited || withdrawed || depositing || withdrawing}
+                  activeTo={!!fromChain && !!tokenAddress && !!tokenId && !toChain}
+                />
+                {account && (
+                  <Box marginBottom="10px">
+                    <InputLabel>Destination</InputLabel>
+                    <Box
+                      sx={{
+                        background: '#ffffff',
+                        borderRadius: '14px',
+                        height: 60,
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: 24,
+                        gap: 12
+                      }}
+                    >
+                      <StatusIcon />
+                      <Typography>{isUpToSM ? account && shortenAddress(account) : account}</Typography>
+                    </Box>
                   </Box>
                 )}
+              </Box>
+
+              <>
+                {!approved && !deposited ? (
+                  <ActionButton
+                    error={error}
+                    pending={approving}
+                    onAction={() => {
+                      approvalCallback()
+                      showModal(<TransacitonPendingModal />)
+                    }}
+                    success={approved}
+                    successText="Approved"
+                    pendingText="approving"
+                    actionText="Approve"
+                  />
+                ) : (
+                  <>
+                    <Box display={isUpToSM ? 'grid' : 'flex'} gap="16px">
+                      <ActionButton
+                        error={error}
+                        onAction={() => {
+                          showModal(<DepositModal />)
+                        }}
+                        actionText={`Deposite in ${fromChain?.symbol} Chain`}
+                        disableAction={!!depositTxn}
+                        pending={depositing}
+                        pendingText="Depositing"
+                        success={deposited}
+                        successText={`Deposited Successfully`}
+                      />
+                      {!error && (
+                        <ActionButton
+                          error={deposited ? '' : `Withdraw in ${toChain?.symbol} Chain`}
+                          onAction={
+                            chainId === toChain?.id
+                              ? () => {
+                                  setwithdrawModalOpen(true)
+                                }
+                              : () => {
+                                  library?.send('wallet_switchEthereumChain', [{ chainId: toChain?.hex }, account])
+                                }
+                          }
+                          actionText={
+                            chainId === toChain?.id
+                              ? `Withdraw in ${toChain?.symbol} Chain`
+                              : `Switch to ${toChain?.name}`
+                          }
+                          disableAction={!!withdrawTxn}
+                          pending={withdrawing}
+                          pendingText="Withdrawing"
+                          success={withdrawed}
+                          successText={`Withdrawed Successfully`}
+                        />
+                      )}
+                    </Box>
+                    {!error && (
+                      <Box width="70%" style={{ margin: '0 auto' }}>
+                        <Stepper steps={[1, 2]} activeStep={withdrawed ? 2 : deposited ? 1 : 0} />
+                      </Box>
+                    )}
+                  </>
+                )}
               </>
-            )}
-          </>
-        </Box>
-      </AppBody>
+            </Box>
+          </AppBody>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <AppBody width="100%" height="100%">
+            <Box display="grid" gap="29px" padding="20px 40px 52px" width="100%">
+              <Typography variant="h5">NFT Information</Typography>
+              <HideOnMobile>
+                <Box maxWidth="280px" margin="0 auto">
+                  <NFTCard nft={token ?? emptyNft} />
+                </Box>
+              </HideOnMobile>
+              <ShowOnMobile>
+                <Image
+                  src={tokenUri ? tokenUri : NFTPlaceholder}
+                  altSrc={NFTPlaceholder}
+                  style={{
+                    width: 240,
+                    borderRadius: 12,
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    maxHeight: 252,
+                    objectFit: 'cover'
+                  }}
+                />
+              </ShowOnMobile>
+            </Box>
+          </AppBody>
+        </Grid>
+      </Grid>
     </>
   )
 }

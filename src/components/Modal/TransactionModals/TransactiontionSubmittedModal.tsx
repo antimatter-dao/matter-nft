@@ -44,5 +44,5 @@ export function SwapSuccessModal({ children, hash }: { hash?: string; children?:
         )}
       </Box>
     </MessageBox>
-  );
+  )
 }

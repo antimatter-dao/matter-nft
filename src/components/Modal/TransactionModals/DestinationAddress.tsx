@@ -1,5 +1,4 @@
 import { Box, useTheme, styled, Typography } from '@mui/material'
-import { AbstractConnector } from '@web3-react/abstract-connector'
 import Image from 'components/Image'
 import CoinbaseWalletIcon from 'assets/walletIcon/coinbaseWalletIcon.svg'
 import FortmaticIcon from 'assets/walletIcon/fortmaticIcon.png'
@@ -18,7 +17,8 @@ const Dot = styled('span')({
   borderRadius: '50%'
 })
 
-function StatusIcon(connector: AbstractConnector | undefined) {
+export function StatusIcon() {
+  const { connector } = useActiveWeb3React()
   const style = { height: 16, width: 16, objectFit: 'contain' as const }
   if (connector === injected) {
     const { ethereum } = window
@@ -37,7 +37,6 @@ function StatusIcon(connector: AbstractConnector | undefined) {
 }
 
 export default function DestinationAddress({ address, margin }: { address: string; margin?: string }) {
-  const { connector } = useActiveWeb3React()
   const theme = useTheme()
 
   return (
@@ -48,7 +47,7 @@ export default function DestinationAddress({ address, margin }: { address: strin
             Destination:
           </Typography>
           <Box display="flex" alignItems={'center'}>
-            {StatusIcon(connector)}
+            {<StatusIcon />}
             <Typography marginLeft="8px" color={theme.textColor.text3}>
               {shortenAddress(address, 10)}
             </Typography>

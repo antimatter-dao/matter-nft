@@ -28,7 +28,6 @@ export function OwnerCell({ url, name }: { url?: string; name: string }) {
 
 const StyledTableContainer = styled(TableContainer)({
   display: 'table',
-  // backgroundColor: '#ffffff',
   borderRadius: '40px',
   '& .MuiTableCell-root': {
     fontSize: '16px',
@@ -48,18 +47,18 @@ const StyledTableContainer = styled(TableContainer)({
   '& table': {
     width: '100%',
     borderCollapse: 'separate',
-    borderSpacing: 0
+    borderSpacing: '0 8px'
   }
 })
 
-const StyledTableHead = styled(TableHead)({
+const StyledTableHead = styled(TableHead)(({ theme }) => ({
   borderRadius: 8,
   overflow: 'hidden',
   '& .MuiTableCell-root': {
-    background: 'rgba(255, 255, 255, 0.08)',
     padding: '12px 20px',
     fontSize: '12px',
-    color: 'rgba(255,255,255,0.5)',
+    fontWeight: 500,
+    color: theme.palette.text.secondary,
     borderBottom: 'none',
     '&:first-of-type': {
       paddingLeft: 50,
@@ -70,20 +69,34 @@ const StyledTableHead = styled(TableHead)({
       borderTopRightRadius: 8
     }
   }
-})
+}))
 
 const StyledTableRow = styled(TableRow)({
   height: 72,
+
   '& .MuiTableCell-root': {
-    borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+    borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+    borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+    '&:first-child': {
+      borderLeft: '1px solid rgba(0, 0, 0, 0.08)',
+      padding: '14px 20px',
+      borderTopLeftRadius: 16,
+      borderBottomLeftRadius: 16
+    },
+    '&:last-child': {
+      borderRight: '1px solid rgba(0, 0, 0, 0.08)',
+      padding: '14px 20px',
+      borderTopRightRadius: 16,
+      borderBottomRightRadius: 16
+    }
   },
   '&:hover': {
-    backgroundColor: ' rgba(255, 255, 255, 0.02)'
+    backgroundColor: ' rgba(0, 0, 0, 0.02)'
   }
 })
 
 const Card = styled('div')(`
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(0, 0, 0, 0.08);
   border-radius: 30px;
   padding: 24px;
   > div {

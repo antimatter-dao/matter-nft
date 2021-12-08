@@ -33,7 +33,7 @@ export default function TransacitonPendingModal({
   error?: string
 }) {
   return (
-    <Modal closeIcon customIsOpen={isOpen} customOnDismiss={onDismiss}>
+    <Modal closeIcon customIsOpen={isOpen} customOnDismiss={onDismiss} maxWidth="480px">
       <Box display="grid" padding="40px" gap="24px" justifyItems="center" width="100%">
         <Box
           style={{
@@ -43,19 +43,22 @@ export default function TransacitonPendingModal({
           gap="12px"
           width="100%"
         >
-          <Typography component="div" align="center" variant="inherit">
-            1.&nbsp;{step1}
-          </Typography>
-          <Typography component="div" align="center" variant="inherit">
-            2.&nbsp;{step2}
-          </Typography>
-          <Box justifySelf="start" width="100%" marginTop="10px">
-            {fromChain && toChain && <SwapChain to={toChain} from={fromChain} />}
-            <DestinationAddress address={destinationAddress ?? ''} />
-          </Box>
+          <ol style={{ padding: '0 24px' }}>
+            <li>
+              <Typography component="div" variant="inherit">
+                {step1}
+              </Typography>
+            </li>
+            <li style={{ marginTop: 12 }}>
+              <Typography component="div" variant="inherit">
+                {step2}
+              </Typography>
+            </li>
+          </ol>
         </Box>
         <Divider extension={40} />
         <Box
+          marginTop={12}
           style={{
             opacity: isStep3Active ? 1 : 0.5
           }}
@@ -63,10 +66,14 @@ export default function TransacitonPendingModal({
           gap="24px"
           width="100%"
         >
-          <Typography component="div" align="center" variant="inherit">
+          <Typography component="div" variant="inherit">
             3. Confirm Withdraw
           </Typography>
           {children}
+          <Box justifySelf="start" width="100%" marginTop="10px">
+            {fromChain && toChain && <SwapChain to={toChain} from={fromChain} />}
+            <DestinationAddress address={destinationAddress ?? ''} />
+          </Box>
           <ActionButton error={error} onAction={onConfirm} disableAction={!isStep3Active} actionText="Confirm" />
         </Box>
       </Box>

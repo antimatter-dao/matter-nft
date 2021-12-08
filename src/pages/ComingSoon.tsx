@@ -4,21 +4,21 @@ import { Dots } from 'theme/components'
 const Frame = styled('div')(`
 width: 500px;
 height: 280px;
-border: 1px solid rgba(255, 255, 255, 0.2);
+border: 1px solid #161616;
 box-sizing: border-box;
 border-radius: 32px;
 display: flex;
 flex-direction: column;
 align-items: center;
 justify-content: center;
-color: rgba(255, 255, 255, 0.6);
+color: #161616;
 `)
 
 const Title = styled('p')(`
   font-weight: 500;
   font-size: 24px;
   line-height: 88.69%;
-  color: #ffffff;
+  color: #161616;
 `)
 
 export default function ComingSoon() {

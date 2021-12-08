@@ -3,17 +3,12 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { Chain } from 'models/chain'
 import LogoText from 'components/LogoText'
 
-interface Props {
-  from: Chain
-  to: Chain
-}
-
-export default function SwapChain(props: Props) {
+export default function SwapChain(props: { from: Chain; to: Chain }) {
   const { from, to } = props
 
   return (
     <Box
-      bgcolor="rgba(255, 255, 255, 0.08)"
+      bgcolor="rgba(22, 22, 22, 0.1)"
       borderRadius="10px"
       height="48px"
       display="flex"
@@ -28,7 +23,7 @@ export default function SwapChain(props: Props) {
         </Box>
         <LogoText logo={from.logo} text={from.symbol} />
       </Box>
-      <Box color={'#FFFFFF'} style={{ marginBottom: -5 }}>
+      <Box color={'#161616'} style={{ marginBottom: -5 }}>
         <ArrowForwardIcon />
       </Box>
       <Box display="flex">

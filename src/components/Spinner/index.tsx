@@ -27,7 +27,7 @@ export default function Spinner({
         variant="determinate"
         sx={{
           '& svg circle': {
-            stroke: theme => theme.bgColor.bg5
+            stroke: theme => theme.palette.text.secondary
           }
         }}
         thickness={thickness - 1}
@@ -38,7 +38,7 @@ export default function Spinner({
         variant="indeterminate"
         disableShrink
         sx={{
-          color: theme => color ?? theme.palette.primary.main,
+          color: theme => color ?? theme.palette.text.primary,
           animationDuration: '850ms',
           position: 'absolute',
           left: 0,

@@ -1,36 +1,26 @@
-import { styled, Pagination as MuiPagination, Pagination } from '@mui/material'
-import { ThemeProvider as MaterialThemeProvider } from '@mui/material/styles'
-import { createTheme } from '@mui/material/styles'
-import { theme } from 'theme/index'
-
-const materialTheme = createTheme({
-  palette: {
-    mode: 'dark'
-  },
-  textColor: theme.textColor,
-  bgColor: theme.bgColor,
-  gradient: theme.gradient,
-  height: theme.height
-})
+import { styled, Pagination, Typography } from '@mui/material'
 
 export const StyledPagination = styled(Pagination)(({ theme }) => ({
-  margin: 'auto',
-  color: theme.textColor.text1,
-  '.MuiPaginationItem-page.Mui-selected': {
-    backgroundColor: theme.palette.primary.light,
-    color: theme.textColor.text4,
-    '&:hover': {
-      backgroundColor: theme.palette.primary.dark
-    }
+  // margin: '0 0 0 auto',
+
+  color: theme.palette.text.secondary,
+  '& .MuiPaginationItem-root': { opacity: 0.5, backgroundColor: '#F3F3F3' },
+  '& .MuiPaginationItem-page.Mui-selected': {
+    opacity: 1,
+    color: theme.palette.text.primary
+  },
+  '& .MuiPaginationItem-previousNext': {
+    backgroundColor: '#FFFFFF'
   }
 }))
 
 const StyledPaginationLayout = styled('div')({
   display: 'flex',
-  justifyContent: 'center',
-  '& > *': {
-    marginBottom: '20px'
-  }
+  justifyContent: 'flex-end',
+  alignItems: 'center'
+  // '& > *': {
+  //   marginBottom: '20px'
+  // }
 })
 
 interface PaginationProps {
@@ -41,6 +31,7 @@ interface PaginationProps {
   setPage: (page: number) => void
   // eslint-disable-next-line @typescript-eslint/ban-types
   onChange?: (event: object, page: number) => void
+  perPage?: number
 }
 export default function PaginationView({
   count,
@@ -48,13 +39,19 @@ export default function PaginationView({
   onChange,
   setPage,
   siblingCount,
-  boundaryCount
+  boundaryCount,
+  perPage
 }: PaginationProps) {
   return (
-    <MaterialThemeProvider theme={materialTheme}>
+    <>
       {count > 0 && (
         <StyledPaginationLayout>
-          <MuiPagination
+          {perPage && (
+            <Typography sx={{ opacity: 0.4 }} mr={26}>
+              {(page - 1) * perPage + 1} - {page * perPage} items of {count}
+            </Typography>
+          )}
+          <StyledPagination
             count={count}
             page={page}
             siblingCount={siblingCount || 1}
@@ -68,6 +65,6 @@ export default function PaginationView({
           />
         </StyledPaginationLayout>
       )}
-    </MaterialThemeProvider>
+    </>
   )
 }

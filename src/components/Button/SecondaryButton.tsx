@@ -21,7 +21,6 @@ export default function SecondaryButton(props: Props) {
       onClick={onClick}
       disabled={disabled}
       sx={{
-        ...style,
         width: width || '100%',
         fontSize: fontSize || 16,
         height: height || 60,
@@ -37,7 +36,8 @@ export default function SecondaryButton(props: Props) {
           opacity: theme.palette.action.disabledOpacity,
           backgroundColor: theme.palette.secondary.light,
           borderColor: theme.palette.secondary.light
-        }
+        },
+        ...style
       }}
     >
       {children}
