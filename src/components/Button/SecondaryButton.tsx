@@ -25,13 +25,13 @@ export default function SecondaryButton(props: Props) {
         width: width || '100%',
         fontSize: fontSize || 16,
         height: height || 60,
-        color: theme.palette.primary.main,
+        color: theme.palette.secondary.contrastText,
         border: `1px solid ${theme.palette.secondary.main}`,
         backgroundColor: theme.palette.secondary.main,
         borderRadius: 1,
         '&:hover': {
           backgroundColor: theme.palette.secondary.dark,
-          borderColor: theme.palette.secondary.dark
+          borderColor: 'transparent'
         },
         '&:disabled': {
           opacity: theme.palette.action.disabledOpacity,

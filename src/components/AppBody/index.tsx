@@ -5,7 +5,7 @@ import { CloseIcon } from 'theme/components'
 const Root = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: 20,
-  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%), #000000',
+  background: theme.palette.background.paper,
   justifyContent: 'center',
   border: '1px solid rgba(255, 255, 255, 0.2)',
   boxSizing: 'border-box',
