@@ -49,7 +49,15 @@ export default function Modal(props: Props) {
             '& .MuiDialog-scrollPaper': {
               alignItems: !isCardOnMobile ? { mdDown: 'flex-end' } : {}
             }
-          }
+          },
+          top: theme => (showHeader ? { xs: theme.height.mobileHeader, md: theme.height.header } : undefined),
+          maxHeight: theme =>
+            showHeader
+              ? {
+                  xs: `calc(100vh - ${theme.height.header} - ${theme.height.mobileHeader})`,
+                  md: `calc(100vh - ${theme.height.header})`
+                }
+              : undefined
         }}
         PaperProps={{
           ref: node,

@@ -14,7 +14,7 @@ export default function InputLabel({ children, infoIcon }: { children?: React.Re
     >
       <div
         style={{
-          opacity: 0.6,
+          opacity: 1,
           fontSize: 14,
           fontWeight: 500,
           lineHeight: '148.69%'

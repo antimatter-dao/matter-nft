@@ -42,6 +42,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   justifyContent: 'space-between',
   boxShadow: 'none',
   padding: '0 60px 00 40px',
+  zIndex: 2000,
   [theme.breakpoints.down('md')]: {
     position: 'fixed',
     bottom: 0,
