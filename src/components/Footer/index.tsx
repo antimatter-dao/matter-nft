@@ -5,6 +5,7 @@ import { ReactComponent as Twitter } from 'assets/socialLinksIcon/twitter.svg'
 import { ReactComponent as Telegram } from 'assets/socialLinksIcon/telegram.svg'
 import { ExternalLink } from 'theme/components'
 import TextButton from 'components/Button/TextButton'
+import Divider from 'components/Divider'
 
 export default function Footer() {
   const theme = useTheme()
@@ -19,24 +20,30 @@ export default function Footer() {
         <Box
           display="flex"
           alignItems="center"
-          justifyContent="flex-end"
           width="100%"
           padding="9px 60px 28px"
-          gap="40px"
+          gap="35.56px"
+          sx={{ opacity: 0.5 }}
         >
+          <ExternalLink href="https://docs.chainswap.com/" underline="always">
+            Chainswap Docs
+          </ExternalLink>
+          <Box height={16}>
+            <Divider orientation="vertical" style={{ backgroundColor: 'rgba(22, 22, 22, 0.2)', width: 1 }} />
+          </Box>
           <TextButton>
-            <ExternalLink href="">
-              <Medium />
+            <ExternalLink href="https://chain-swap.medium.com/">
+              <Medium fill="black" />
             </ExternalLink>
           </TextButton>
           <TextButton>
-            <ExternalLink href="">
-              <Twitter />
+            <ExternalLink href="https://twitter.com/chain_swap">
+              <Twitter fill="black" />
             </ExternalLink>
           </TextButton>
           <TextButton>
-            <ExternalLink href="">
-              <Telegram />
+            <ExternalLink href="https://t.me/chainswap">
+              <Telegram fill="black" />
             </ExternalLink>
           </TextButton>
         </Box>

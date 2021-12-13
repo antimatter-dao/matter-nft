@@ -19,7 +19,7 @@ const rotate360 = keyframes`
 const StyledPolling = styled('div')(({ theme }) => ({
   position: 'fixed',
   display: 'flex',
-  right: 0,
+  left: 0,
   bottom: 0,
   padding: '0.5rem',
   paddingRight: '25px',

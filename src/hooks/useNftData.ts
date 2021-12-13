@@ -44,7 +44,7 @@ export function useNftDataCallback(
         setOwnerResLoading(false)
         setOwnerError(false)
       } catch (e) {
-        console.log('load error:', e)
+        console.log('load error: _ownerRes', e)
         setOwnerRes(undefined)
         setOwnerResLoading(false)
         setOwnerError(true)
