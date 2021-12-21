@@ -12,6 +12,7 @@ import { useActiveWeb3React } from 'hooks'
 import { ChainList, ChainListMap } from 'constants/chain'
 import { triggerSwitchChain } from 'utils/triggerSwitchChain'
 import { routes } from 'constants/routes'
+import useBreakpoint from 'hooks/useBreakpoint'
 
 interface TabContent {
   title: string
@@ -172,6 +173,7 @@ const Dropdown = styled('div')(({ theme }) => ({
 
 export default function Header() {
   const { account, chainId, library } = useActiveWeb3React()
+  const isDownMd = useBreakpoint('md')
 
   return (
     <>
@@ -219,7 +221,7 @@ export default function Header() {
         </HideOnMobile>
         <Box display="flex">
           {account && chainId && ChainListMap[chainId] && (
-            <NetworkCard>
+            <NetworkCard style={{ display: isDownMd ? 'none' : 'block' }}>
               <span>
                 {ChainListMap[chainId].icon}
                 {ChainListMap[chainId].symbol}

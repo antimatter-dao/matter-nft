@@ -131,7 +131,7 @@ export default function Table({ header, rows }: { header: string[]; rows: (strin
                 {header.map((headerString, index) => (
                   <CardRow key={index}>
                     <Typography variant="inherit">{headerString}</Typography>
-                    <Typography style={{ color: '#fff' }}> {data[index] ?? null}</Typography>
+                    <Typography style={{ color: '#000' }}> {data[index] ?? null}</Typography>
                   </CardRow>
                 ))}
               </Box>

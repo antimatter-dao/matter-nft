@@ -31,6 +31,7 @@ import { routes } from 'constants/routes'
 import ComingSoon from 'pages/ComingSoon'
 import theme from 'theme'
 import SecondaryButton from 'components/Button/SecondaryButton'
+import useBreakpoint from 'hooks/useBreakpoint'
 
 const useStyles = makeStyles({
   root: {
@@ -208,6 +209,7 @@ export default function Account() {
   const { account } = useActiveWeb3React()
   const classes = useStyles()
   const history = useHistory()
+  const isDownMd = useBreakpoint('md')
   const { tab } = useParams<{ tab: string }>()
   const [currentTab, setCurrentTab] = useState(UserInfoTabs.INVENTORY)
   const [showManual, setShowManual] = useState(false)
@@ -235,7 +237,11 @@ export default function Account() {
   const myActivityListRows = useMemo(() => {
     return myActivityList.map(item => [
       <>
-        {item.type === AccountEventType.RECEIVE ? <ReceiveIcon /> : <SendIcon />}
+        {item.type === AccountEventType.RECEIVE ? (
+          <ReceiveIcon stroke={isDownMd ? '#000' : '#fff'} />
+        ) : (
+          <SendIcon stroke={isDownMd ? '#000' : '#fff'} />
+        )}
         {item.type}
       </>,
       <ShowNFTName key={0} data={item} />,
@@ -268,7 +274,7 @@ export default function Account() {
         <></>
       )
     ])
-  }, [myActivityList, importDeposit, history])
+  }, [myActivityList, isDownMd, importDeposit, history])
 
   return (
     <div className={classes.root}>
@@ -351,7 +357,7 @@ export default function Account() {
                 <Spinner size="40px" />
               </Box>
             )}
-            <Box display="flex" flexDirection="row-reverse">
+            <Box display="flex" flexDirection="row-reverse" mb="20px">
               <PaginationView
                 count={myActivityPage.totalPages}
                 page={myActivityPage.currentPage}

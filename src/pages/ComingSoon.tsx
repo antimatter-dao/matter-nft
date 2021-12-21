@@ -1,4 +1,5 @@
 import { styled } from '@mui/material'
+import useBreakpoint from 'hooks/useBreakpoint'
 import { Dots } from 'theme/components'
 
 const Frame = styled('div')(`
@@ -22,8 +23,9 @@ const Title = styled('p')(`
 `)
 
 export default function ComingSoon() {
+  const isDownMd = useBreakpoint('md')
   return (
-    <Frame>
+    <Frame style={{ width: isDownMd ? '100%' : '500px' }}>
       <Title>
         Coming Soon <Dots />
       </Title>
